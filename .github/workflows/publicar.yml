@@ -1,0 +1,59 @@
+name: Atualizar noticias e publicar
+
+on:
+  schedule:
+    - cron: "0 9 * * *"      # todo dia 09:00 UTC = 06:00 em Brasilia
+  push:
+    branches: [main]         # tambem publica quando voce muda o index.html
+  workflow_dispatch:         # botao "Run workflow" para rodar na hora
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Baixar noticias
+        run: python3 atualizar_noticias.py --og
+
+      - name: Conferir se deu certo
+        run: |
+          python3 - <<'PY'
+          import json, sys
+          d = json.loads(open("noticias.js", encoding="utf-8").read().split("=", 1)[1].rstrip("; \n"))
+          n = sum(1 for s in d["sources"].values() if s["items"])
+          print(n, "fontes com noticias")
+          sys.exit(0 if n >= 10 else 1)
+          PY
+
+      - name: Manter o Supabase ativo (evita pausa por inatividade)
+        continue-on-error: true
+        run: python3 manter_ativo.py
+
+      - name: Montar pasta publica
+        run: |
+          mkdir _site
+          cp index.html noticias.js config.js _site/
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@v4
