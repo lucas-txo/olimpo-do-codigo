@@ -48,9 +48,9 @@ jobs:
 
       - name: Montar pasta publica
         run: |
-          mkdir _site
-          cp index.html noticias.js config.js _site/
-
+         mkdir _site
+          cp index.html noticias.js config.js manifest.webmanifest sw.js _site/
+            cp -r icons _site/
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
