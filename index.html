@@ -383,6 +383,25 @@ details.src summary{cursor:pointer}.sm1{display:block;color:var(--mut);font-weig
 .mt-rbar{display:flex;justify-content:space-between;font:800 14px 'Nunito',sans-serif;color:var(--mut);margin-top:10px}
 .mt-rq{text-align:center;font:800 40px 'Cinzel',Georgia,serif;color:var(--gold2);margin:14px 0 6px}
 .mt-rin{display:block;margin:0 auto;width:120px;text-align:center;font-size:28px;font-weight:800}
+
+.mt-vis{margin:10px 0 4px;text-align:center}
+.mt-arr{display:grid;gap:4px;justify-content:center;margin:6px auto}
+.mt-dotc{width:20px;height:20px;border-radius:50%;display:block;box-shadow:inset 0 -3px 0 rgba(0,0,0,.25)}
+.mt-g100{display:grid;grid-template-columns:repeat(10,20px);gap:2px;justify-content:center;margin:6px auto}
+.mt-g100 i{display:block;width:20px;height:20px;border:1px solid rgba(255,255,255,.3);border-radius:3px}
+.mt-nl{display:flex;justify-content:center;margin:10px auto;overflow-x:auto;padding-bottom:4px}
+.mt-tk{display:flex;flex-direction:column;align-items:center;min-width:26px;font:800 11px 'Nunito',sans-serif;color:var(--mut)}
+.mt-tk i{display:block;width:2px;height:12px;background:var(--line)}
+.mt-tk.on i{background:var(--gold);height:18px;width:4px}.mt-tk.on span{color:var(--gold2)}
+.mt-bal{display:flex;gap:10px;align-items:center;justify-content:center;margin:10px 0}
+.mt-pan{border:2px solid var(--line);border-radius:10px;padding:10px 16px;font:800 20px 'Cinzel',Georgia,serif;color:var(--gold2);min-width:90px;text-align:center}
+.mt-ab{display:flex;gap:10px;justify-content:center;margin:10px 0}
+.mt-rod{display:flex;flex-direction:column;align-items:center;width:46px}
+.mt-beads{width:46px;min-height:150px;border:2px solid var(--line);border-radius:8px;display:flex;flex-direction:column-reverse;align-items:center;justify-content:flex-start;gap:3px;padding:4px 0;box-sizing:border-box}
+.mt-beads i{display:block;width:34px;height:12px;border-radius:6px;background:var(--gold);box-shadow:inset 0 -3px 0 rgba(0,0,0,.25)}
+.mt-rodl{font:800 12px 'Nunito',sans-serif;color:var(--mut);margin-top:4px}
+.mt-tbl{border-collapse:collapse;margin:8px auto}.mt-tbl th,.mt-tbl td{border:1px solid rgba(255,255,255,.2);padding:6px 10px;font:700 14px 'Nunito',sans-serif;text-align:center}.mt-tbl th{color:var(--gold2)}
+.mt-fr{height:26px}
 </style>
 </head>
 <body>
@@ -2002,11 +2021,11 @@ function mathPts(){const m=MT();let p=0;
  return p}
 
 /* ---- card diário em Hoje ---- */
-function mtCard(){const m=MT(),d=getDay(cur);let body;
+function mtCard(){const m=MT(),d=getDay(cur),nx=mtNext();let body;
  if(!m.start){body='<p class="sub">Estudo obrigatório: 1 hora por dia, durante 6 meses, do zero absoluto até a base completa. O plano começa quando você tocar no botão.</p><div class="row"><button class="btn" data-a="m_start">Começar o plano hoje</button><button class="btn ghost" data-a="m_go" data-v="plano">Ver o plano</button></div>'}
  else{const wk=mtWeek(cur),e=mtEtapa(wk);
   const foco=wk<1?'O plano ainda não tinha começado neste dia.':e?'Semana '+wk+' de 26 · Etapa '+e.n+': '+e.t:wk<=26?'Semana '+wk+' de 26 · Revisão e consolidação':'Plano de 6 meses concluído. Mantenha uma revisão por semana.';
-  body='<p class="sub">'+foco+(e?'<br>Método: '+e.met:'')+'</p>'+MTB.map((b,i)=>'<button class="qrow '+(d.mb[i]?'on':'')+'" data-a="m_blk" data-v="'+i+'"><span>'+(d.mb[i]?'✅':'⬜')+'</span><b>'+b[1]+' · '+b[2]+'<span class="sm1">'+b[3]+'</span></b><i>+3 pts</i></button>').join('')+'<div class="row" style="margin-top:10px"><button class="btn alt sm" data-a="m_go" data-v="'+(e&&e.n===1?'aula':'etapas')+'">'+(e&&e.n===1?'Abrir a Aula 1':'Abrir o curso')+'</button><button class="btn ghost sm" data-a="m_go" data-v="plano">Ver o plano</button></div>'}
+  body='<p class="sub">'+foco+(e?'<br>Método: '+e.met:'')+'</p>'+MTB.map((b,i)=>'<button class="qrow '+(d.mb[i]?'on':'')+'" data-a="m_blk" data-v="'+i+'"><span>'+(d.mb[i]?'✅':'⬜')+'</span><b>'+b[1]+' · '+b[2]+'<span class="sm1">'+b[3]+'</span></b><i>+3 pts</i></button>').join('')+'<div class="row" style="margin-top:10px">'+(nx?'<button class="btn alt sm" data-a="m_ls" data-v="'+nx+'">Abrir a próxima aula</button>':'<button class="btn alt sm" data-a="m_go" data-v="aula">Ver as aulas</button>')+'<button class="btn ghost sm" data-a="m_go" data-v="plano">Ver o plano</button></div>'}
  return card('c-math','<img class="pit-i" src="'+MT_PIT+'" alt="">','Matemática (Pitágoras)','Math','math',body)}
 
 /* ---- Mente → Matemática ---- */
@@ -2061,11 +2080,7 @@ const MTX={};const MTLV={};const MTG={A:[],P:[],X:[],B:[],E:[],M:[],G:[]};
 ].concat(MTEXTRA).forEach(g=>{(MTLV[g[0]]=MTLV[g[0]]||[]).push([MTG[g[0]].length,g[1]]);g[2].forEach(x=>{MTX[x[0]]={g:g[0],q:x[1],a:x[2],h:x[3],e:x[4]};MTG[g[0]].push(x[0])})});
 
 function mtExHtml(id){const x=MTX[id],ok=MT().ex[id];
- return '<div class="mt-ex" id="mxw-'+id+'"><div class="mt-q">'+esc(x.q)+'</div><div class="mt-ans"><input class="mt-in" id="mx-'+id+'" inputmode="decimal" autocomplete="off" placeholder="?" aria-label="Resposta" '+(ok?'value="'+x.a+'" readonly':'')+'><button class="btn sm" data-a="m_chk" data-v="'+id+'">Verificar</button></div><div class="mt-fb '+(ok?'ok':'')+'" id="mxf-'+id+'">'+(ok?'✔ Correto. '+esc(x.e):'')+'</div></div>'}
-function mtFin(g){const m=MT(),ids=MTG[g],ok=ids.filter(i=>m.ex[i]).length,need=g==='A'?10:8,key=g==='A'?'a1':'p1',done=m.les[key];
- if(done)return '<div class="empty">🏛️ Concluída em '+parse(done).toLocaleDateString('pt-BR')+'. Você acertou '+ok+' de '+ids.length+'.</div>';
- return '<p class="sub">Acertos: <b>'+ok+'</b> de '+ids.length+'. Acerte pelo menos '+need+' para concluir.</p><div class="bar"><i style="width:'+Math.round(ok/ids.length*100)+'%"></i></div><button class="btn" style="width:100%;margin-top:10px" data-a="m_les" data-v="'+key+'" '+(ok>=need?'':'disabled')+'>'+(g==='A'?'Concluir a Aula 1':'Concluir a prática')+' (+30 pts)</button>'}
-
+ return '<div class="mt-ex" id="mxw-'+id+'"><div class="mt-q">'+esc(x.q)+'</div><div class="mt-ans"><input class="mt-in" id="mx-'+id+'" inputmode="'+((x.a<0||String(x.r||'').indexOf('/')>=0)?'text':'decimal')+'" autocomplete="off" placeholder="?" aria-label="Resposta" '+(ok?'value="'+esc(String(x.r!==undefined?x.r:x.a))+'" readonly':'')+'><button class="btn sm" data-a="m_chk" data-v="'+id+'">Verificar</button></div><div class="mt-fb '+(ok?'ok':'')+'" id="mxf-'+id+'">'+(ok?'✔ Correto. '+esc(x.e):'')+'</div></div>'}
 /* ---- widgets interativos (atualizam só o próprio bloco) ---- */
 let MTF={a:8,b:7,mv:0};
 function mtTFhtml(){const f=MTF,filled=f.a+f.mv,loose=f.b-f.mv,need=10-f.a;let cells='',lo='',say,eq;
@@ -2091,9 +2106,8 @@ function mtPVhtml(){const n=MTV,c=Math.floor(n/100),d=Math.floor(n%100/10),u=n%1
  return '<div class="chips" style="justify-content:center">'+ns.map(x=>'<button class="chip '+(x===n?'on':'')+'" data-a="m_pv" data-v="'+x+'">'+x+'</button>').join('')+'</div><div class="mt-pv">'+blocks+'</div><div class="mt-eq">'+n+' = '+parts.join(' + ')+'</div>'}
 
 /* ---- Aulas ---- */
-function mtAulas(){const m=MT(),t=todayS(),a=m.les.a1;let h='';
- h+='<section class="card"><h3><span class="ic">🎓</span><span class="tt">Etapa 1 · Números</span></h3><p class="sub">Método: Number Bonds e ábaco. Cada aula leva 1 hora: teoria, exemplos, exercícios e revisão. No dia seguinte você faz uma atividade de prática para fixar.</p>';
- h+=[['Aula 1','Números e composição numérica (CPA)',a?'✅ concluída':'disponível agora'],['Prática da Aula 1','Atividade para o dia seguinte',m.les.p1?'✅ concluída':a?(t>a?'disponível agora':'libera amanhã'):'depois da Aula 1'],['Aula 2','Valor posicional e ábaco','em preparação'],['Aula 3','Comparar, ordenar e reta numérica','em preparação'],['Aula 4','Números inteiros: positivos e negativos','em preparação']].map(x=>'<div class="li"><div><b>'+x[0]+' · '+x[1]+'</b><small>'+x[2]+'</small></div></div>').join('')+'</section>';
+function mtAula1(){const m=MT(),t=todayS(),a=m.les.a1;let h='';
+ h+='';
  h+='<section class="card"><h3><span class="ic">🎯</span><span class="tt">Aula 1 · Números e composição numérica</span></h3><p class="sub">Objetivo: entender que todo número pode ser montado e desmontado em partes, e usar isso para calcular com segurança.</p><div class="li" style="display:block"><b>Ao final você será capaz de:</b><small>1. Montar e desmontar números em duas partes (number bonds).<br>2. Completar o 10 para somar de forma esperta.<br>3. Decompor números em centenas, dezenas e unidades.<br>4. Desenhar um problema em barras e escolher a conta certa.</small></div></section>';
  h+='<section class="card"><h3><span class="ic">🔎</span><span class="tt">É hora de observar e discutir</span></h3><p class="sub">Método do Ênio: antes de aprender a regra, olhe uma situação e converse sobre ela. Numa estante há 8 livros numa prateleira e 7 na outra. Sem contar um a um, como você descobre o total? Pense em duas maneiras diferentes e anote no caderno antes de seguir.</p><div class="li" style="display:block"><b>Um pouco de história</b><small>Pitágoras (580 a.C.–500 a.C.) fundou em Crotona uma escola que era centro de estudos de Matemática, Filosofia e Ciências Naturais. É por isso que o emblema deste curso é ele (Ênio, p. 181).</small></div><div class="li" style="display:block"><b>Matemática é uma escada</b><small>Laércio: para subir, é preciso avançar um degrau de cada vez. Quem não domina esta aula terá dificuldade com frações, e quem não domina frações não entende o resto.</small></div></section>';
  h+='<section class="card"><h3><span class="ic">🧱</span><span class="tt">1 · Concreto: junte e conte</span></h3><p class="sub">Você tem duas quantidades e quer saber quantas há ao todo. O jeito esperto é completar um grupo de 10, porque o 10 é um número muito fácil de usar. Toque em Passar 1 ficha e acompanhe.</p><div id="mt-tf">'+mtTFhtml()+'</div></section>';
@@ -2122,13 +2136,15 @@ function mathAct(a,v,el){
  case 'm_pv':{MTV=+v;const e=document.getElementById('mt-pv');if(e)e.innerHTML=mtPVhtml();sfx('tick');return true}
  case 'm_chk':{const x=MTX[v];if(!x)return true;const inp=document.getElementById('mx-'+v),fb=document.getElementById('mxf-'+v);if(!inp||!fb)return true;
   if(m.ex[v])return true;
-  const raw=String(inp.value||'').trim().replace(',','.');if(raw===''){toast('Digite uma resposta.');return true}
-  const val=Number(raw);if(isNaN(val)){toast('Use só números.');return true}
+  const raw=String(inp.value||'').trim().replace('−','-').replace(/\s+/g,'').replace(',','.');if(raw===''){toast('Digite uma resposta.');return true}
+  let val;if(raw.indexOf('/')>0){const q=raw.split('/');val=Number(q[0])/Number(q[1])}else val=Number(raw);if(isNaN(val)||!isFinite(val)){toast('Use números, ou frações como 3/4.');return true}
   m.tries[v]=(m.tries[v]||0)+1;
-  if(Math.abs(val-x.a)<1e-9){m.ex[v]=1;save();inp.readOnly=true;fb.className='mt-fb ok';fb.textContent='✔ Correto. '+x.e;sfx('coin');vib(30);soft();mtCounts(x.g)}
+  if(Math.abs(val-x.a)<1e-6){m.ex[v]=1;save();inp.readOnly=true;fb.className='mt-fb ok';fb.textContent='✔ Correto. '+x.e;sfx('coin');vib(30);soft();mtCounts(x.g)}
   else{save();fb.className='mt-fb no';fb.textContent=m.tries[v]>=2?'Ainda não. Veja como se resolve: '+x.e+' Tente de novo com essa ideia.':'Quase. Dica: '+x.h;sfx('tick');vib([20,40,20])}
   return true}
- case 'm_les':{const g=v==='a1'?'A':'P',ids=MTG[g],ok=ids.filter(i=>m.ex[i]).length,need=g==='A'?10:8;if(ok<need){toast('Acerte pelo menos '+need+' exercícios.');return true}if(m.les[v])return true;m.les[v]=t;save();sfx('win');confetti(140);epic('Aula concluída');toast(g==='A'?'🎓 Aula 1 concluída! +30 pts. A prática libera amanhã.':'🌅 Prática concluída! +30 pts.');render();return true}
+ case 'm_les':{const g=MTK[v],ids=MTG[g],ok=ids.filter(i=>m.ex[i]).length,need=mtNeed(g);if(ok<need){toast('Acerte pelo menos '+need+' exercícios.');return true}if(m.les[v])return true;m.les[v]=t;save();sfx('win');confetti(140);epic('Aula concluída');toast((v==='p1'||/p$/.test(v))?'🌅 Prática concluída! +30 pts.':'🎓 Aula concluída! +30 pts. A prática libera amanhã.');render();return true}
+ case 'm_ls':SUB.mente='mat';SUB.mat='aula';SUB.les=v;tab='mente';window.scrollTo(0,0);render();return true;
+ case 'm_lb':SUB.les='';window.scrollTo(0,0);render();return true;
  case 'm_pt':{const p=v.split(',').map(Number);MTP=p;const e=document.getElementById('mt-pit');if(e)e.innerHTML=mtPitHtml();sfx('tick');return true}
  case 'm_rs':{if(MTR&&MTR.iv)clearInterval(MTR.iv);MTR={tp:v,items:mtRGen(v),i:0,ans:[],t0:performance.now(),fim:false};MTR.iv=setInterval(()=>{const e=document.getElementById('mt-rt');if(!e||!MTR||MTR.fim){clearInterval(MTR&&MTR.iv);return}e.textContent=((performance.now()-MTR.t0)/1000).toFixed(1).replace('.',',')+' s'},100);const e=document.getElementById('mt-rapido');if(e){e.innerHTML=mtRapidoHtml();const i=document.getElementById('mr-in');if(i)i.focus()}return true}
  case 'm_rx':{if(MTR&&MTR.iv)clearInterval(MTR.iv);MTR=null;const e=document.getElementById('mt-rapido');if(e)e.innerHTML=mtRapidoHtml();return true}
@@ -2158,7 +2174,7 @@ function mtEtapas(){const m=MT(),wk=mtWeek(),ce=mtEtapa(wk);let h='<p class="sub
  MTE.forEach(e=>{const d=mtEP(e),isCur=ce&&ce.n===e.n;
   h+='<details class="card phase '+(isCur?'cur':'')+'" '+(isCur||(!m.start&&e.n===1)?'open':'')+'><summary>'+(isCur?'📍 ':d===e.tp.length?'✅ ':'')+e.i+' Etapa '+e.n+' · '+e.t+' · '+d+'/'+e.tp.length+'</summary><p class="small" style="margin:8px 0 0">Semana'+(e.w[0]===e.w[1]?' '+e.w[0]:'s '+e.w[0]+' e '+e.w[1])+' · Método: '+e.met+'<br>Objetivo: '+e.obj+'</p>'
   +'<div class="mt-src"><b>📚 Estude nestes livros</b>'+(MTSE[e.n]||[]).map(x=>'<span>'+esc(x)+'</span>').join('')+'</div>'
-  +'<div class="bar"><i style="width:'+Math.round(d/e.tp.length*100)+'%"></i></div><div style="margin-top:8px">'+e.tp.map((o,j)=>'<label class="chk li"><input type="checkbox" data-t="tri" data-id="mt_'+e.n+'_'+j+'" '+(st.tri['mt_'+e.n+'_'+j]?'checked':'')+'><span>'+esc(o)+'</span></label>').join('')+'</div>'+(e.n===1?'<div class="row" style="margin-top:8px"><button class="btn alt sm" data-a="m_go" data-v="aula">Ir para a Aula 1</button></div>':'')+'</details>'});
+  +'<div class="bar"><i style="width:'+Math.round(d/e.tp.length*100)+'%"></i></div><div style="margin-top:8px">'+e.tp.map((o,j)=>'<label class="chk li"><input type="checkbox" data-t="tri" data-id="mt_'+e.n+'_'+j+'" '+(st.tri['mt_'+e.n+'_'+j]?'checked':'')+'><span>'+esc(o)+'</span></label>').join('')+'</div>'+'<div class="row" style="margin-top:8px;flex-wrap:wrap">'+MTLS.filter(l=>l.e===e.n).map(l=>'<button class="btn '+(m.les[l.id]?'ghost':'alt')+' sm" data-a="m_ls" data-v="'+l.id+'">'+(m.les[l.id]?'✅ ':'')+esc(l.t.length>30?l.t.slice(0,28)+'…':l.t)+'</button>').join('')+'</div>'+'</details>'});
  const rd=MTREV.filter((_,k)=>st.tri['mt_r_'+k]).length,rc=wk>20;
  h+='<details class="card phase '+(rc?'cur':'')+'" '+(rc?'open':'')+'><summary>'+(rc?'📍 ':'')+'🏛️ Fase final · Revisão e consolidação · '+rd+'/'+MTREV.length+'</summary><p class="small" style="margin:8px 0 0">Semanas 21 a 26 · Resolver problemas misturados, sem olhar o material. Cada semana vale 15 pts.</p><div style="margin-top:8px">'+MTREV.map((o,k)=>'<label class="chk li"><input type="checkbox" data-t="tri" data-id="mt_r_'+k+'" '+(st.tri['mt_r_'+k]?'checked':'')+'><span>'+esc(o)+'</span></label>').join('')+'</div></details>';
  return h}
@@ -2247,6 +2263,521 @@ function mtLab(){const o=(g,n)=>'<span class="mt-gp" id="mt-gp-'+g+'">'+mtGP(g)+
  h+=mtDet('mif','⚖️ Equações, tabelas e desafios · Math in Focus '+o('M'),'<p class="sub" style="margin-top:8px">Dois jeitos de resolver uma equação: por substituição (teste valores) e por balanceamento (a mesma operação nos dois lados). Em histórias, a variável independente é a que você escolhe e a dependente é a que muda por causa dela. Mostre sempre o trabalho.</p>'+mtGroupHtml('M'),false);
  h+=mtDet('sg','🧸 Fichas, grupos e metades · Singapore 1B '+o('G'),'<p class="sub" style="margin-top:8px">O caderno 1B ensina com figuras. Desenhe fichas e círculos antes de responder.</p>'+mtGroupHtml('G'),false);
  return h}
+
+/* ===== Matemática · sistema de aulas (CPA) ===== */
+const MTLS=[{id:'a1',e:1,t:'Números e composição numérica (CPA)'}];const MTLD={};const MTLG={};const MTK={a1:'A',p1:'P'};
+SUB.les=SUB.les||'';
+
+/* ---- visuais geradores ---- */
+const VC=['var(--gold)','var(--sea)','var(--red)','var(--laurel)'];
+function vFrac(n,d,col,lab){let s='';for(let i=0;i<d;i++)s+='<div style="flex:1;background:'+(i<n?(col||VC[0]):'transparent')+'"></div>';return '<div class="mt-brow"><span class="mt-bl2">'+(lab||n+'/'+d)+'</span><div class="mt-bb mt-fr">'+s+'</div></div>'}
+function vArr(r,c,col){let s='';for(let i=0;i<r*c;i++)s+='<i class="mt-dotc" style="background:'+(col||VC[1])+'"></i>';return '<div class="mt-arr" style="grid-template-columns:repeat('+c+',20px)">'+s+'</div>'}
+function vG100(n){let s='';for(let i=0;i<100;i++)s+='<i style="background:'+(i<n?VC[0]:'transparent')+'"></i>';return '<div class="mt-g100">'+s+'</div>'}
+function vSq(n){let s='';for(let i=0;i<n*n;i++)s+='<i style="background:'+VC[1]+'"></i>';return '<div class="mt-g100" style="grid-template-columns:repeat('+n+',22px)">'+s+'</div>'}
+function vNL(a,b,hi,step){step=step||1;let s='';for(let x=a;x<=b;x+=step){s+='<div class="mt-tk'+((hi||[]).indexOf(x)>=0?' on':'')+'"><i></i><span>'+String(x).replace('-','−')+'</span></div>'}return '<div class="mt-nl">'+s+'</div>'}
+function vBal(l,r){return '<div class="mt-bal"><div class="mt-pan">'+l+'</div><b>=</b><div class="mt-pan">'+r+'</div></div>'}
+function vAng(deg){const r=(deg*Math.PI)/180,c=Math.cos(r),sn=Math.sin(r),big=deg>180?1:0;return '<svg viewBox="0 0 220 130" class="mt-svg" role="img" aria-label="Ângulo de '+deg+' graus"><line x1="110" y1="115" x2="205" y2="115" style="stroke:var(--ink);stroke-width:3"/><line x1="110" y1="115" x2="'+(110+95*c).toFixed(1)+'" y2="'+(115-95*sn).toFixed(1)+'" style="stroke:var(--gold);stroke-width:3"/><path d="M145 115 A35 35 0 '+big+' 0 '+(110+35*c).toFixed(1)+' '+(115-35*sn).toFixed(1)+'" style="fill:none;stroke:var(--red);stroke-width:3"/><text x="'+(110+55*Math.cos(r/2)).toFixed(1)+'" y="'+(118-55*Math.sin(r/2)).toFixed(1)+'" style="fill:var(--ink);font:800 14px Nunito,sans-serif">'+deg+'°</text></svg>'}
+function vAbaco(n){const s=String(n).padStart(4,'0'),nm=['M','C','D','U'];let h='<div class="mt-ab">';for(let i=0;i<4;i++){const k=+s[i];h+='<div class="mt-rod"><div class="mt-beads">'+'<i></i>'.repeat(k)+'</div><span class="mt-rodl">'+nm[i]+'</span></div>'}return h+'</div>'}
+function vTbl(head,rows){return '<div style="overflow-x:auto"><table class="mt-tbl"><tr>'+head.map(x=>'<th>'+x+'</th>').join('')+'</tr>'+rows.map(r=>'<tr>'+r.map(x=>'<td>'+x+'</td>').join('')+'</tr>').join('')+'</table></div>'}
+function vWrap(h){return '<div class="mt-vis">'+h+'</div>'}
+
+/* ---- registro de exercícios gerais ---- */
+function mtReg(g,id,x){const a=typeof x[1]==='string'?Function('return ('+x[1]+')')():x[1];MTX[id]={g:g,q:x[0],a:a,r:String(x[1]),h:x[2]||'Releia o enunciado e desenhe a situação.',e:x[3]||''};MTG[g].push(id)}
+function LS(id,e,t,o){MTLS.push({id:id,e:e,t:t});MTLD[id]=o;const g='L'+id,gp='L'+id+'P';MTG[g]=[];MTG[gp]=[];MTLV[g]=[];MTLV[gp]=[[0,'Prática do dia seguinte']];
+ o.ex.forEach(x=>{if(typeof x==='string')MTLV[g].push([MTG[g].length,x]);else mtReg(g,id+'_'+(MTG[g].length+1),x)});
+ o.pr.forEach(x=>mtReg(gp,id+'p_'+(MTG[gp].length+1),x));
+ MTLG[g]={need:Math.ceil(MTG[g].length*0.7),key:id,label:'a aula'};MTLG[gp]={need:Math.ceil(MTG[gp].length*0.75),key:id+'p',label:'a prática'};MTK[id]=g;MTK[id+'p']=gp}
+function mtNeed(g){return g==='A'?10:g==='P'?8:MTLG[g].need}
+function mtFin(g){const m=MT(),ids=MTG[g];let need,key,lab;if(g==='A'){need=10;key='a1';lab='a Aula 1'}else if(g==='P'){need=8;key='p1';lab='a prática'}else{const L=MTLG[g];need=L.need;key=L.key;lab=L.label}
+ const ok=ids.filter(i=>m.ex[i]).length,done=m.les[key];
+ if(done)return '<div class="empty">🏛️ Concluída em '+parse(done).toLocaleDateString('pt-BR')+'. Você acertou '+ok+' de '+ids.length+'.</div>';
+ return '<p class="sub">Acertos: <b>'+ok+'</b> de '+ids.length+'. Acerte pelo menos '+need+' para concluir.</p><div class="bar"><i style="width:'+Math.round(ok/ids.length*100)+'%"></i></div><button class="btn" style="width:100%;margin-top:10px" data-a="m_les" data-v="'+key+'" '+(ok>=need?'':'disabled')+'>Concluir '+lab+' (+30 pts)</button>'}
+
+/* ---- navegação ---- */
+function mtNext(){const m=MT();const x=MTLS.filter(l=>!m.les[l.id])[0];return x?x.id:null}
+function mtEtLabel(e){return e>12?'🏁 Fase final':(MTE[e-1].i+' Etapa '+e+' · '+MTE[e-1].t)}
+function mtLessonIndex(){const m=MT(),nx=mtNext();let done=MTLS.filter(l=>m.les[l.id]).length;
+ let h='<section class="card"><h3><span class="ic">🎓</span><span class="tt">Todas as aulas do curso</span></h3><p class="sub">'+MTLS.length+' aulas, uma por dia de estudo, seguindo a ordem das etapas. Cada aula tem observar e discutir, concreto, pictórico, abstrato, exercícios e revisão. No dia seguinte, uma atividade de prática.</p><div class="stat"><div><b>'+done+'/'+MTLS.length+'</b>aulas</div><div><b>'+MTLS.filter(l=>m.les[l.id+'p']||l.id==='a1'&&m.les.p1).length+'</b>práticas</div><div><b>'+Math.round(done/MTLS.length*100)+'%</b>do curso</div></div><div class="bar"><i style="width:'+Math.round(done/MTLS.length*100)+'%"></i></div>'+(nx?'<div class="row" style="margin-top:10px"><button class="btn" data-a="m_ls" data-v="'+nx+'">Abrir a próxima aula</button></div>':'<p class="sub" style="margin-top:10px">Todas as aulas concluídas. Parabéns!</p>')+'</section>';
+ for(let e=1;e<=13;e++){const ls=MTLS.filter(l=>l.e===e);if(!ls.length)continue;const d=ls.filter(l=>m.les[l.id]).length;
+  h+=mtDet('et'+e,mtEtLabel(e)+' · '+d+'/'+ls.length,'<div style="margin-top:8px">'+ls.map(l=>{const dn=m.les[l.id],pk=l.id==='a1'?'p1':l.id+'p';return '<button class="qrow '+(dn?'on':'')+'" data-a="m_ls" data-v="'+l.id+'"><span>'+(dn?'✅':l.id===nx?'📍':'⬜')+'</span><b>'+esc(l.t)+'<span class="sm1">'+(dn?'aula concluída'+(m.les[pk]?' · prática concluída':' · prática pendente'):l.id===nx?'próxima aula':'disponível')+'</span></b></button>'}).join('')+'</div>',nx&&MTLS.find(l=>l.id===nx).e===e)}
+ return h}
+function mtAulas(){const id=SUB.les;if(id==='a1')return '<div class="row" style="margin:12px 0 0"><button class="btn ghost sm" data-a="m_lb">← Todas as aulas</button></div>'+mtAula1();if(id&&MTLD[id])return mtLessonView(id);return mtLessonIndex()}
+
+function mtLessonView(id){const o=MTLD[id],meta=MTLS.find(x=>x.id===id),m=MT(),t=todayS(),a=m.les[id],g='L'+id,gp='L'+id+'P',e=meta.e<=12?MTE[meta.e-1]:null;
+ const card=(ic,tt,body)=>'<section class="card"><h3><span class="ic">'+ic+'</span><span class="tt">'+tt+'</span></h3>'+body+'</section>';
+ let h='<div class="row" style="margin:12px 0 0"><button class="btn ghost sm" data-a="m_lb">← Todas as aulas</button></div>';
+ h+=card('🎯','Aula · '+esc(meta.t),'<p class="small" style="margin:0 0 6px">'+mtEtLabel(meta.e)+(e?' · método: '+e.met:'')+'</p><p class="sub">Objetivo: '+o.obj+'</p>'+(o.hist?'<div class="li" style="display:block"><b>Um pouco de história</b><small>'+o.hist+'</small></div>':''));
+ h+=card('🔎','É hora de observar e discutir','<p class="sub">'+o.obs+'</p>');
+ h+=card('🧱','1 · Concreto','<p class="sub">'+o.c+'</p>'+(o.cv?vWrap(o.cv()):''));
+ h+=card('✏️','2 · Pictórico','<p class="sub">'+o.p+'</p>'+(o.pv?vWrap(o.pv()):''));
+ h+=card('🔣','3 · Abstrato','<p class="sub">'+o.a+'</p>');
+ h+=card('🧮','Exercícios <span class="mt-gp" id="mt-gp-'+g+'">'+mtGP(g)+'</span>','<p class="sub">Resolva sozinho, escrevendo o trabalho no caderno. Frações podem ser digitadas como 3/4 e decimais com vírgula. Cada acerto vale 2 pts.</p>'+mtGroupHtml(g)+'<div id="mt-fin-'+g+'" style="margin-top:14px">'+mtFin(g)+'</div>');
+ h+=card('🔁','Revisão (5 minutos)','<div class="li" style="display:block"><small>Sem olhar nada:<br>'+o.rev.map((x,i)=>(i+1)+'. '+x).join('<br>')+'<br>'+(o.rev.length+1)+'. Faça a prova real de uma conta e anote uma dúvida (metacognição).</small></div>');
+ let lock=null;if(!a)lock='Conclua a aula para liberar esta atividade no dia seguinte.';else if(t<=a)lock='Libera amanhã, '+parse(addDays(a,1)).toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'})+'. Dormir entre as aulas ajuda a fixar.';
+ h+=card('🌅','Prática de amanhã',lock?'<div class="empty">🔒 '+lock+'</div>':'<p class="sub">Questões novas sobre a mesma ideia. Resolva de cabeça primeiro e use o papel para conferir.</p>'+mtGroupHtml(gp)+'<div id="mt-fin-'+gp+'" style="margin-top:14px">'+mtFin(gp)+'</div>');
+ const i=MTLS.findIndex(x=>x.id===id),nx=MTLS[i+1];
+ if(a&&nx)h+='<div class="row" style="margin-top:12px"><button class="btn alt" data-a="m_ls" data-v="'+nx.id+'">Próxima: '+esc(nx.t)+'</button></div>';
+ return h}
+
+/* ===== Aulas 2 a 10 (Etapas 1 a 3) ===== */
+LS('l2',1,'Valor posicional e ábaco',{
+ obj:'Entender que cada algarismo vale pela sua posição e usar o ábaco para montar e ler números até 9 999.',
+ obs:'No ábaco há 3 argolas na haste das dezenas e 5 na haste das unidades. Que número é esse? E se trocarmos as argolas de haste, o número continua o mesmo? Converse e anote sua hipótese.',
+ c:'Separe tampinhas ou palitos em grupos de 10 e amarre cada grupo: é uma dezena. Dez dezenas formam uma centena. Se não tiver ábaco, desenhe 4 hastes (U, D, C, M) e use as tampinhas como argolas. Cada haste aceita no máximo 9 argolas: ao chegar à décima, você limpa a haste e coloca 1 argola na haste da esquerda.',
+ cv:()=>vAbaco(2405),
+ p:'Desenhe o ábaco e os blocos: unidade é um ponto, dezena é uma barra, centena é um quadrado e milhar é um cubo. O ábaco acima mostra 2 405: 2 argolas no milhar, 4 nas centenas, nenhuma nas dezenas (haste vazia) e 5 nas unidades.',
+ pv:()=>vAbaco(1358),
+ a:'1 358 = 1 000 + 300 + 50 + 8. O zero mantém a posição: 4 070 = 4 000 + 70. O mesmo algarismo muda de valor conforme a posição: o 7 de 4 070 vale 70 e o 7 de 7 040 vale 7 000. Por isso 4 070 e 7 040 são números diferentes.',
+ ex:['Nível 1 · Concreto: ábaco e grupos',['No ábaco há 3 argolas nas dezenas e 5 nas unidades. Que número é?','35','Cada argola das dezenas vale 10.','3 dezenas = 30 e 5 unidades = 5, então 35.'],['Quantas dezenas há em 90?','9','Quantos grupos de 10 cabem em 90?','90 ÷ 10 = 9.'],'Nível 2 · Pictórico: decomponha',['4 205 = 4 000 + 200 + ?','5','Veja as unidades.','4 205 = 4 000 + 200 + 5.'],['Qual é o valor do algarismo 7 em 3 724? (responda com o número)','700','O 7 está na posição das centenas.','7 centenas = 700.'],['Escreva o número: 6 milhares e 8 unidades.','6008','Não há centenas nem dezenas: use zeros.','6 000 + 8 = 6 008.'],'Nível 3 · Abstrato e problemas',['Qual é o maior número de 4 algarismos diferentes?','9876','Coloque os maiores algarismos nas posições mais altas.','9 876.'],['Quantas unidades há em 3 centenas e 4 dezenas?','340','300 + 40.','340 unidades.']],
+ pr:[['Que número tem 2 milhares, 0 centenas, 5 dezenas e 3 unidades?','2053','Zero nas centenas.','2 000 + 50 + 3 = 2 053.'],['No número 5 913, qual é o valor do algarismo 9?','900','Centenas.','9 centenas = 900.'],['Quantas centenas há em 1 700?','17','1 700 ÷ 100.','17 centenas.'],['7 300 + 40 + 6 = ?','7346','Some cada posição.','7 346.'],['Ábaco: 6 argolas nas centenas, nenhuma nas dezenas e 9 nas unidades. Que número é?','609','Haste vazia = zero.','609.']],
+ rev:['Explique por que 4 070 e 7 040 são números diferentes.','Qual a vantagem de agrupar de 10 em 10?']});
+
+LS('l3',1,'Comparar, ordenar e reta numérica',{
+ obj:'Comparar números com maior, menor e igual, ordenar, achar antecessor e sucessor e localizar números na reta numérica.',
+ obs:'Duas fileiras de fichas: uma com 23 e outra com 32. Como saber qual tem mais sem contar tudo de novo?',
+ c:'Alinhe as fichas uma sobre a outra, de um em um. A fileira que sobra é a maior e a quantidade que sobra é a diferença (caderno 1B, cap. 1: quantos a mais, quantos a menos).',
+ cv:()=>mtBr('23',[[23,'23',VC[1]]])+mtBr('32',[[23,'23',VC[1]],[9,'9 a mais',VC[0]]]),
+ p:'Na reta numérica, quanto mais à direita, maior o número. Marque o 23 e o 32 e veja a distância entre eles.',
+ pv:()=>vNL(0,10,[3,7]),
+ a:'Compare primeiro a posição de maior valor: 32 > 23 porque 3 dezenas > 2 dezenas. Símbolos: > (maior), < (menor), = (igual), com a boca aberta para o maior. Sucessor é +1 e antecessor é −1: o antecessor de 100 é 99 e o sucessor de 99 é 100. Ordem crescente vai do menor ao maior.',
+ ex:['Nível 1',['Qual é o sucessor de 199?','200','Some 1.','199 + 1 = 200.'],['Qual é o antecessor de 1 000?','999','Tire 1.','999.'],['Quantos a mais tem 32 que 23?','9','Diferença entre os dois.','32 − 23 = 9.'],'Nível 2',['Em ordem crescente: 45, 54, 405 e 450. Qual é o 3º número da lista?','405','Do menor ao maior.','45, 54, 405, 450: o 3º é 405.'],['Qual número está no meio de 20 e 30 na reta?','25','Metade da distância.','25.'],['Quantos números existem entre 12 e 20 (sem contar 12 e 20)?','7','13 até 19.','13, 14, 15, 16, 17, 18, 19: sete números.'],'Nível 3',['Um número é 5 unidades maior que 48. Qual é?','53','Some 5.','53.'],['Qual é o antecessor do maior número de 3 algarismos?','998','O maior de 3 algarismos é 999.','998.']],
+ pr:[['Sucessor de 4 599?','4600','Some 1 e cuide da virada.','4 600.'],['Antecessor de 7 000?','6999','Tire 1.','6 999.'],['Quantos números naturais existem de 50 a 60, incluindo os dois?','11','Conte 50, 51… até 60.','11 números.'],['Quantos números existem entre 8 e 17 (sem contar 8 e 17)?','8','9 até 16.','8 números.']],
+ rev:['Como você sabe qual de dois números é maior?','Qual a diferença entre antecessor e sucessor?']});
+
+LS('l4',1,'Números inteiros: positivos e negativos',{
+ obj:'Entender números negativos como falta ou "abaixo de zero", localizá-los na reta e comparar e somar inteiros simples.',
+ obs:'O termômetro marca 3 graus abaixo de zero. Se esquentar 5 graus, o que acontece? Como escrever "3 abaixo de zero"?',
+ c:'Use fichas de duas cores: azul vale +1 e vermelha vale −1. Uma azul e uma vermelha se anulam e formam zero. Com 3 azuis e 5 vermelhas, anulando pares sobram 2 vermelhas: −2. Também funciona como dinheiro: ter 20 reais e dever 35 deixa um saldo de −15.',
+ cv:()=>mtBr('+3',[[3,'+ + +',VC[1]]])+mtBr('−5',[[5,'− − − − −',VC[2]]]),
+ p:'Na reta numérica, os negativos ficam à esquerda do zero. Somar é andar para a direita e subtrair é andar para a esquerda.',
+ pv:()=>vNL(-5,5,[-3,2]),
+ a:'(−3) + 5 = 2: saia do −3 e ande 5 casas para a direita. Comparar: o que está mais à direita é maior, então −1 > −4. O oposto de 6 é −6. O módulo é a distância até o zero: |−4| = 4. O conjunto dos inteiros é …, −2, −1, 0, 1, 2, … (Ênio, quadro do 7º ano, p. 305).',
+ ex:['Nível 1',['A temperatura é −3 °C e sobe 5 graus. Qual é a nova temperatura?','2','Ande 5 casas para a direita a partir de −3.','−3 + 5 = 2.'],['−7 + 4 = ?','-3','Ande 4 para a direita a partir de −7.','−3.'],['Qual é o oposto de 9? (com sinal)','-9','Mesma distância do zero, lado contrário.','−9.'],['|−12| (módulo) = ?','12','Distância até o zero.','12.'],'Nível 2',['3 − 8 = ?','-5','Ande 8 para a esquerda a partir de 3.','−5.'],['Qual é o menor: −9 ou −2? Digite o menor.','-9','O mais à esquerda é menor.','−9.'],['Joana tinha 20 reais e gastou 35. Qual é o saldo (com sinal)?','-15','20 − 35.','−15.'],['−5 + (−3) = ?','-8','Dívida mais dívida.','−8.']],
+ pr:[['−2 + 9 = ?','7','Ande 9 para a direita.','7.'],['4 − 10 = ?','-6','Ande 10 para a esquerda.','−6.'],['−6 + 6 = ?','0','Opostos se anulam.','0.'],['O elevador está no andar −2 e sobe 5 andares. Em qual andar fica?','3','−2 + 5.','Andar 3.']],
+ rev:['O que significa o sinal de menos antes de um número?','Como somar −7 + 4 na reta?']});
+
+LS('l5',2,'Adição e subtração',{
+ obj:'Somar e subtrair decompondo os números, desenhar o problema em barras e conferir pela prova real.',
+ obs:'Você tem 38 reais e ganha 27. Sem calculadora, qual jeito de somar é mais seguro: de cabeça, no papel ou decompondo?',
+ c:'Use barras de 10 e cubinhos: 38 é 3 barras e 8 cubos; 27 é 2 barras e 7 cubos. Junte barras com barras e cubos com cubos; 15 cubos viram 1 barra e 5 cubos.',
+ cv:()=>mtBr('38',[[3,'30',VC[1]],[1,'8',VC[0]]])+mtBr('27',[[2,'20',VC[1]],[1,'7',VC[0]]]),
+ p:'Parte-todo: as duas parcelas são as partes e o total é o todo. Se faltar uma parte, o todo menos a parte conhecida dá a outra.',
+ pv:()=>mtBr('65',[[38,'38',VC[1]],[27,'27',VC[0]]]),
+ a:'38 + 27: 30 + 20 = 50; 8 + 7 = 15; 50 + 15 = 65. Subtração: 62 − 38 = 62 − 30 − 8 = 32 − 8 = 24. Prova real (Laércio, cap. 4): na subtração, some o resultado com o número subtraído (24 + 38 = 62); na adição, tire uma parcela do total.',
+ ex:['Nível 1',['38 + 27 = ?','65','Some dezenas e unidades separadas.','65.'],['62 − 38 = ?','24','Tire 30 e depois 8.','24.'],['Prova real de 62 − 38 = 24: quanto dá 24 + 38?','62','Resultado mais subtraído.','62.'],'Nível 2',['Ana tem 145 figurinhas e ganhou 78. Quantas tem agora?','223','Parte + parte = todo.','145 + 78 = 223.'],['Pedro tinha 300 reais e gastou 124. Quanto sobrou?','176','Todo − parte.','300 − 124 = 176.'],'Nível 3',['Qual número somado a 47 dá 100?','53','Complete até 100.','100 − 47 = 53.'],['Um livro tem 256 páginas e Lia já leu 189. Quantas faltam?','67','Todo − parte.','256 − 189 = 67.']],
+ pr:[['456 + 278 = ?','734','Some as posições.','734.'],['1 000 − 387 = ?','613','Complete: 387 + 613.','613.'],['A soma de dois números é 90 e um deles é 58. Qual é o outro?','32','Todo − parte.','32.'],['Em uma barra o todo é 215 e uma parte é 98. Qual é a outra parte?','117','Todo − parte.','117.']],
+ rev:['Como a prova real confirma uma subtração?','Desenhe a barra parte-todo de 38 + 27.']});
+
+LS('l6',2,'Multiplicação e divisão',{
+ obj:'Entender a multiplicação como grupos iguais e a divisão como repartir ou formar grupos, usar a tabuada e a divisão com resto.',
+ obs:'Uma caixa tem 6 ovos. Quantos ovos há em 4 caixas? E se tenho 24 ovos, de quantas caixas de 6 preciso?',
+ c:'Desenhe 4 círculos com 6 fichas em cada um e conte. Para dividir 17 balas em grupos de 5, forme os grupos: dá 3 grupos e sobram 2 balas (o resto), como no caderno 1B, cap. 5.',
+ cv:()=>vArr(4,6),
+ p:'Multiplicação e divisão são o mesmo desenho lido em direções opostas: um todo dividido em partes iguais (Luz, Fig. 9 a 11).',
+ pv:()=>mtBr('24',[[1,'6',VC[1]],[1,'6',VC[1]],[1,'6',VC[1]],[1,'6',VC[1]]]),
+ a:'4 × 6 = 6 + 6 + 6 + 6 = 24. Divisão é a operação inversa: 24 ÷ 6 = 4 porque 4 × 6 = 24. Com resto: 17 = 5 × 3 + 2, e o resto é sempre menor que o divisor. Truque do 9: 9 × 7 = 10 × 7 − 7 = 63. Treine a tabuada no Laboratório ⚡.',
+ ex:['Nível 1',['4 × 6 = ?','24','Quatro grupos de 6.','24.'],['Quantas fichas há em 7 grupos de 8?','56','7 × 8.','56.'],['48 ÷ 6 = ?','8','Qual número vezes 6 dá 48?','8.'],'Nível 2',['Na divisão 17 ÷ 5, qual é o quociente?','3','Quantos grupos de 5 cabem?','3.'],['Na divisão 17 ÷ 5, qual é o resto?','2','17 − 15.','2.'],'Nível 3',['Um ônibus tem 40 lugares. Quantos ônibus são necessários para 130 pessoas?','4','Sobram pessoas depois de 3 ônibus.','130 ÷ 40 = 3 e sobram 10 pessoas, que precisam de mais 1 ônibus: 4.'],['Prova real: quociente 9, divisor 7 e resto 3. Qual é o dividendo?','66','Dividendo = divisor × quociente + resto.','7 × 9 + 3 = 66.']],
+ pr:[['9 × 7 = ?','63','Use 10 × 7 − 7.','63.'],['72 ÷ 8 = ?','9','8 × ? = 72.','9.'],['Qual é o resto de 100 ÷ 7?','2','7 × 14 = 98.','2.'],['Cada pacote tem 12 lápis. Quantos lápis em 15 pacotes?','180','15 × 12.','180.']],
+ rev:['Como a divisão desfaz a multiplicação?','Por que o resto é sempre menor que o divisor?']});
+
+LS('l7',2,'Expressões, ordem das operações e problemas com barras',{
+ obj:'Resolver expressões na ordem correta e problemas de comparação e parte-todo desenhando barras.',
+ obs:'2 + 3 × 4 dá 20 ou 14? Quem manda primeiro: a soma ou a multiplicação?',
+ c:'Coloque 2 fichas soltas e 3 sacos com 4 fichas cada. Quantas fichas há? Primeiro você descobre quanto vale cada saco (a multiplicação) e depois junta as soltas.',
+ cv:()=>mtBr('2 + 3×4',[[2,'2',VC[0]],[4,'4',VC[1]],[4,'4',VC[1]],[4,'4',VC[1]]]),
+ p:'Nos problemas, desenhe antes de calcular. Comparação: a barra maior mostra "a mais". Parte-todo: partes juntas formam o todo (Richit §3.1 e §3.2).',
+ pv:()=>mtBr('Luís',[[28,'28',VC[1]],[15,'15 a mais',VC[0]]])+mtBr('Rui',[[28,'28',VC[1]]]),
+ a:'Ordem: 1º parênteses; 2º potências e raízes; 3º × e ÷ da esquerda para a direita; 4º + e −. Então 2 + 3 × 4 = 2 + 12 = 14 e (2 + 3) × 4 = 20. Problema: Rui tem 28 e Luís tem 15 a mais; Luís tem 28 + 15 = 43.',
+ ex:['Nível 1',['2 + 3 × 4 = ?','14','Multiplique primeiro.','14.'],['(2 + 3) × 4 = ?','20','Parênteses primeiro.','20.'],['20 − 6 ÷ 2 = ?','17','Divida antes de subtrair.','17.'],'Nível 2',['(6 + 9) × (8 − 5) = ?','45','Resolva cada parênteses.','15 × 3 = 45.'],['8 + 12 ÷ 4 × 2 = ?','14','12 ÷ 4 = 3 e 3 × 2 = 6.','8 + 6 = 14.'],'Nível 3',['Luís tem 15 balas a mais que Rui. Rui tem 28. Quantas tem Luís?','43','Desenhe duas barras.','28 + 15 = 43.'],['Dois irmãos têm juntos 90 reais e o mais velho tem 20 a mais. Quanto tem o mais novo?','35','Tire os 20 e divida o resto por 2.','(90 − 20) ÷ 2 = 35.']],
+ pr:[['3 × (4 + 5) − 7 = ?','20','Parênteses, depois ×, depois −.','27 − 7 = 20.'],['50 − 4 × 5 + 2 = ?','32','Multiplique primeiro.','50 − 20 + 2 = 32.'],['Uma caneta custa 4 reais e um caderno custa 3 vezes mais. Quanto custam os dois juntos?','16','Caderno = 3 × 4.','4 + 12 = 16.'],['Ana e Beto têm 100 figurinhas. Ana tem 30 a mais que Beto. Quantas tem Ana?','65','Tire os 30 e divida por 2.','Beto 35 e Ana 65.']],
+ rev:['Por que a multiplicação vem antes da soma?','Desenhe as barras do problema dos irmãos.']});
+
+LS('l8',3,'Pares, ímpares, primos e critérios de divisibilidade',{
+ obj:'Reconhecer números pares, ímpares, primos e compostos e usar os critérios de divisibilidade.',
+ obs:'Com 12 fichas dá para montar vários retângulos. Com 7 fichas, quantos? O que isso diz sobre cada número?',
+ c:'Monte retângulos com fichas: 12 forma 1×12, 2×6 e 3×4. Já 7 só forma 1×7. Número com mais de um retângulo (composto) tem outros divisores; o que só tem 1×n é primo.',
+ cv:()=>vArr(3,4)+vArr(1,7),
+ p:'Primos até 30: 2, 3, 5, 7, 11, 13, 17, 19, 23, 29. Os números famosos do Laércio: 2, 3, 5 e 7 aparecem em quase todo problema.',
+ pv:()=>vNL(1,20,[2,3,5,7,11,13,17,19]),
+ a:'Critérios: por 2, termina em 0, 2, 4, 6 ou 8. Por 3, a soma dos algarismos é divisível por 3. Por 5, termina em 0 ou 5. Por 9, a soma dos algarismos é divisível por 9. Por 10, termina em 0. Por 4, os dois últimos algarismos formam número divisível por 4. Por 6, divisível por 2 e por 3. O 1 não é primo nem composto.',
+ ex:['Nível 1',['Quantos números primos existem de 1 a 20?','8','2, 3, 5, 7, 11, 13, 17, 19.','Oito primos.'],['Qual é o menor número primo?','2','O 1 não é primo.','2.'],['972 é divisível por 3? (1 = sim, 0 = não)','1','Some os algarismos.','9 + 7 + 2 = 18, divisível por 3.'],'Nível 2',['Qual é o menor algarismo x para 4x5 ser divisível por 3?','0','4 + x + 5 deve ser múltiplo de 3.','4 + 0 + 5 = 9. Serve x = 0.'],['Quantos múltiplos de 7 existem de 1 a 50?','7','7, 14, … até 49.','Sete múltiplos.'],'Nível 3',['1 001 é divisível por 7? (1 = sim, 0 = não)','1','Divida.','1 001 = 7 × 143.'],['91 é primo? (1 = sim, 0 = não)','0','Teste o 7.','91 = 7 × 13.']],
+ pr:[['Quantos números primos existem entre 20 e 40?','4','23, 29, 31, 37.','Quatro.'],['Qual é a soma dos algarismos de 8 451?','18','8 + 4 + 5 + 1.','18.'],['8 451 é divisível por 9? (1 = sim, 0 = não)','1','Soma 18.','18 é múltiplo de 9.'],['Quantos números pares existem de 1 a 99?','49','2, 4, …, 98.','49.']],
+ rev:['Por que o 1 não é primo?','Teste 357 por 3 e por 5.']});
+
+LS('l9',3,'Múltiplos, divisores e fatoração',{
+ obj:'Encontrar múltiplos e divisores, decompor um número em fatores primos e contar divisores.',
+ obs:'Quantas maneiras há de dividir 36 alunos em grupos iguais, sem sobrar ninguém? Liste todas.',
+ c:'Com 12 tampinhas, forme grupos iguais: 1 grupo de 12, 2 de 6, 3 de 4, 4 de 3, 6 de 2, 12 de 1. Cada tamanho de grupo é um divisor de 12.',
+ cv:()=>vArr(2,6)+vArr(3,4),
+ p:'Árvore de fatores: 60 = 6 × 10 = (2 × 3) × (2 × 5). Fatores primos de 60: 2, 2, 3 e 5.',
+ pv:()=>mtBr('60',[[6,'6',VC[1]],[10,'10',VC[0]]])+mtBr('6 e 10',[[2,'2',VC[2]],[3,'3',VC[2]],[2,'2',VC[2]],[5,'5',VC[2]]]),
+ a:'Divisores de 12: 1, 2, 3, 4, 6, 12. Múltiplos de 8: 8, 16, 24, 32, 40, … Fatoração: divida pelos primos em ordem: 60 ÷ 2 = 30; 30 ÷ 2 = 15; 15 ÷ 3 = 5; 5 ÷ 5 = 1, então 60 = 2² × 3 × 5. Para contar divisores, some 1 a cada expoente e multiplique: 60 = 2² × 3¹ × 5¹ → 3 × 2 × 2 = 12 divisores.',
+ ex:['Nível 1',['Quantos divisores positivos tem o 12?','6','1, 2, 3, 4, 6, 12.','Seis.'],['Qual é o 5º múltiplo de 8 (sem contar o 0)?','40','8, 16, 24, 32, 40.','40.'],'Nível 2',['Quantos divisores tem o 36?','9','1, 2, 3, 4, 6, 9, 12, 18, 36.','Nove.'],['Na fatoração 60 = 2 × 2 × 3 × 5, quantos fatores primos há contando os repetidos?','4','Conte um a um.','Quatro.'],['Quanto vale 2 × 2 × 3 × 3 × 5?','180','4 × 9 × 5.','180.'],'Nível 3',['Quantos divisores tem o 49?','3','49 = 7 × 7.','1, 7 e 49.'],['Qual é a soma dos fatores primos distintos de 60?','10','2 + 3 + 5.','10.']],
+ pr:[['Quantos divisores tem o 20?','6','1, 2, 4, 5, 10, 20.','Seis.'],['Quantos múltiplos de 6 há entre 1 e 100?','16','100 ÷ 6.','6 × 16 = 96: dezesseis.'],['Quantos divisores tem o 30?','8','1, 2, 3, 5, 6, 10, 15, 30.','Oito.'],['Qual é o menor número que tem exatamente 3 divisores?','4','É o quadrado de um primo.','4: 1, 2 e 4.']],
+ rev:['Fatore 90 em primos.','Todo divisor de 12 também divide 36?']});
+
+LS('l10',3,'MMC e MDC',{
+ obj:'Calcular o mínimo múltiplo comum e o máximo divisor comum e resolver problemas de coincidência e de repartição.',
+ obs:'Um sinal toca a cada 6 segundos e outro a cada 8. Eles tocaram juntos agora. Quando tocam juntos de novo?',
+ c:'Faça duas fileiras de passos: uma de 6 em 6 e outra de 8 em 8. O primeiro ponto em que as duas fileiras se encontram é o MMC. Para cortar fitas de 24 cm e 36 cm em pedaços iguais, o maior pedaço possível é o MDC.',
+ cv:()=>vNL(0,24,[0,6,12,18,24],2)+vNL(0,24,[0,8,16,24],2),
+ p:'Múltiplos de 6: 6, 12, 18, 24. Múltiplos de 8: 8, 16, 24. O primeiro em comum é 24. Divisores de 24 e 36: o maior em comum é 12.',
+ pv:()=>mtBr('24 cm',[[1,'12',VC[1]],[1,'12',VC[1]]])+mtBr('36 cm',[[1,'12',VC[1]],[1,'12',VC[1]],[1,'12',VC[1]]]),
+ a:'MMC: fatore e use os fatores com o maior expoente: 6 = 2×3 e 8 = 2³, então MMC = 2³ × 3 = 24. MDC: use os fatores comuns com o menor expoente: 24 = 2³×3 e 36 = 2²×3², então MDC = 2² × 3 = 12. Relação: para dois números, MMC × MDC = produto deles (6 × 8 = 48 = 24 × 2).',
+ ex:['Nível 1',['MMC(6, 8) = ?','24','Liste os múltiplos.','24.'],['MDC(24, 36) = ?','12','Maior divisor comum.','12.'],['MMC(4, 10) = ?','20','Múltiplos de 10: 10, 20.','20.'],['MDC(18, 27) = ?','9','Divisores de 18 e 27.','9.'],'Nível 2',['Dois relógios apitam, um a cada 12 min e outro a cada 18 min. Apitam juntos agora. Em quantos minutos apitam juntos de novo?','36','É um problema de MMC.','MMC(12, 18) = 36.'],['Fitas de 48 cm e 60 cm serão cortadas em pedaços iguais, o maior possível. Quanto mede cada pedaço?','12','É um problema de MDC.','MDC(48, 60) = 12.'],['Quantos pedaços saem no problema anterior, ao todo?','9','48 ÷ 12 + 60 ÷ 12.','4 + 5 = 9.']],
+ pr:[['MMC(5, 6) = ?','30','Primos entre si.','30.'],['MDC(30, 45) = ?','15','Divisores comuns.','15.'],['MMC(12, 15) = ?','60','12 = 2²×3 e 15 = 3×5.','60.'],['Três luzes piscam a cada 2, 3 e 4 segundos. De quantos em quantos segundos piscam juntas?','12','MMC(2, 3, 4).','12.']],
+ rev:['Quando usar MMC e quando usar MDC?','Calcule MMC(8, 12) e MDC(8, 12).']});
+
+/* ===== Aulas 11 a 19 (Etapas 4 a 6) ===== */
+LS('l11',4,'O que são frações, equivalentes e simplificação',{
+ obj:'Entender a fração como partes iguais de um todo, reconhecer frações equivalentes e simplificar.',
+ obs:'Duas pessoas dividem uma pizza: uma come 1/2 e outra come 2/4. Quem comeu mais?',
+ c:'Dobre uma tira de papel em 2, 4 e 8 partes iguais e pinte. Veja que 1 parte de 2, 2 partes de 4 e 4 partes de 8 cobrem o mesmo comprimento (régua de frações, Luz, Fig. 12).',
+ cv:()=>vFrac(1,2,VC[0],'1/2')+vFrac(2,4,VC[0],'2/4')+vFrac(4,8,VC[0],'4/8'),
+ p:'Em a/b, o denominador b conta quantas partes iguais formam o todo e o numerador a conta quantas partes foram tomadas. Frações equivalentes ocupam o mesmo espaço na barra.',
+ pv:()=>vFrac(2,3,VC[1],'2/3')+vFrac(4,6,VC[1],'4/6')+vFrac(8,12,VC[1],'8/12'),
+ a:'Para achar equivalentes, multiplique ou divida numerador e denominador pelo mesmo número: 2/3 = 4/6 = 8/12. Simplificar é dividir pelo MDC: 12/18 = 2/3 (MDC = 6). Fração própria: numerador menor que o denominador. Imprópria: numerador maior ou igual. A fração também é uma divisão: 3/4 = 3 ÷ 4 = 0,75 (Laércio, cap. 6, p. 215).',
+ ex:['Nível 1',['Uma barra tem 8 partes iguais e 3 estão pintadas. Qual é o numerador da fração?','3','O numerador conta as partes tomadas.','3/8.'],['Complete: 1/2 = ?/8','4','Multiplique em cima e embaixo por 4.','4/8.'],['Quantos quartos há em 3 inteiros?','12','Cada inteiro tem 4 quartos.','3 × 4 = 12.'],'Nível 2',['Qual é o MDC de 12 e 18?','6','Maior divisor comum.','6.'],['Simplifique 12/18 e digite a fração.','2/3','Divida os dois por 6.','12/18 = 2/3.'],['Simplifique 20/50 e digite a fração.','2/5','Divida por 10.','2/5.'],'Nível 3',['Qual é o valor decimal de 3/4?','0.75','Divida 3 por 4.','0,75.']],
+ pr:[['Complete: 2/3 = ?/12','8','Multiplique por 4.','8/12.'],['Simplifique 15/45 e digite a fração.','1/3','Divida por 15.','1/3.'],['Quantos oitavos há em 1/2?','4','1/2 = 4/8.','4.'],['Quantos terços há em 5 inteiros?','15','5 × 3.','15.']],
+ rev:['Por que 1/2 e 2/4 são iguais?','Como simplificar 24/36?']});
+
+LS('l12',4,'Comparar, somar e subtrair frações',{
+ obj:'Comparar frações e somar e subtrair com denominadores iguais e diferentes usando barras e MMC.',
+ obs:'Quem tem mais pizza: quem comeu 1/3 ou quem comeu 1/4? E se juntarmos as duas partes?',
+ c:'Com a régua de frações, coloque 1/3 e 1/4. As peças têm tamanhos diferentes e não dá para juntar assim. Troque as duas por peças do mesmo tamanho: 12 avos.',
+ cv:()=>vFrac(1,3,VC[0],'1/3')+vFrac(1,4,VC[1],'1/4'),
+ p:'Redesenhe as duas barras com 12 partes: 1/3 = 4/12 e 1/4 = 3/12. Agora as partes são do mesmo tamanho e podem ser somadas.',
+ pv:()=>vFrac(4,12,VC[0],'4/12')+vFrac(3,12,VC[1],'3/12')+vFrac(7,12,VC[3],'7/12'),
+ a:'Mesmo denominador: some ou subtraia os numeradores e mantenha o denominador. Denominadores diferentes: ache o MMC dos denominadores. 1/3 + 1/4 = 4/12 + 3/12 = 7/12. Para comparar 2/3 e 3/5, use 15 avos: 10/15 e 9/15, então 2/3 é maior. Digite frações como 7/12.',
+ ex:['Nível 1',['1/3 + 1/4 = ?','7/12','Passe para 12 avos.','4/12 + 3/12 = 7/12.'],['3/4 − 1/2 = ?','1/4','1/2 = 2/4.','1/4.'],['1 − 3/8 = ?','5/8','1 = 8/8.','5/8.'],'Nível 2',['Qual é a maior: 2/3 ou 3/5? Digite a maior.','2/3','Compare em 15 avos.','10/15 > 9/15.'],['2/5 + 3/10 = ?','7/10','2/5 = 4/10.','7/10.'],'Nível 3',['Joana comeu 1/4 de uma pizza e Lia comeu 2/5. Quanto comeram juntas?','13/20','Use 20 avos.','5/20 + 8/20 = 13/20.'],['Quanto da pizza do problema anterior sobrou?','7/20','1 − 13/20.','7/20.']],
+ pr:[['1/2 + 1/6 = ?','2/3','3/6 + 1/6 = 4/6.','2/3.'],['5/6 − 1/3 = ?','1/2','1/3 = 2/6.','3/6 = 1/2.'],['3/4 + 1/8 = ?','7/8','3/4 = 6/8.','7/8.'],['Uma jarra tem 2/3 de suco e bebem 1/4 da jarra. Quanto sobra?','5/12','8/12 − 3/12.','5/12.']],
+ rev:['Por que não se somam os denominadores?','Compare 3/4 e 5/8.']});
+
+LS('l13',4,'Multiplicar e dividir frações; fração de uma quantidade',{
+ obj:'Multiplicar e dividir frações com barras e calcular a fração de uma quantidade.',
+ obs:'Você tem 4 barras de chocolate e quer dividir cada uma em pedaços de 1/2 barra. Quantos pedaços terá?',
+ c:'Dê 4 tiras de papel inteiras aos alunos e peça para dividir cada uma em pedaços de 1/2. Contam-se 8 pedaços: 4 ÷ 1/2 = 8 (Luz, sequência didática, Etapa 1).',
+ cv:()=>vFrac(2,2,VC[0],'1')+vFrac(2,2,VC[0],'1')+vFrac(2,2,VC[0],'1')+vFrac(2,2,VC[0],'1'),
+ p:'Desenhe as 4 barras divididas em seções de 1/2 e conte as seções (Luz, Fig. 13). Para a fração de uma quantidade, divida a barra do todo em partes iguais e tome as que pedem: 3/5 de 40.',
+ pv:()=>mtBr('40',[[1,'8',VC[1]],[1,'8',VC[1]],[1,'8',VC[1]],[1,'8',VC[0]],[1,'8',VC[0]]]),
+ a:'Multiplicação: a/b × c/d = (a×c)/(b×d). Fração de fração: 1/2 de 1/2 = 1/4. Divisão: multiplique pelo inverso: 4 ÷ 1/2 = 4 × 2 = 8. Fração de uma quantidade: 3/5 de 40 = 40 ÷ 5 × 3 = 24 (Laércio, cap. 6, tipos clássicos de problemas, p. 237).',
+ ex:['Nível 1',['4 ÷ 1/2 = ?','8','Quantas metades cabem em 4?','8.'],['1/2 de 1/2 = ?','1/4','Metade da metade.','1/4.'],['3/5 de 40 = ?','24','40 ÷ 5 × 3.','24.'],'Nível 2',['2/3 × 3/4 = ?','1/2','Multiplique em cima e embaixo.','6/12 = 1/2.'],['1/2 ÷ 1/4 = ?','2','Quantos quartos cabem em meio?','2.'],'Nível 3',['Uma receita usa 3/4 de xícara de açúcar. Para metade da receita, quanto de açúcar?','3/8','Metade de 3/4.','3/8.'],['Quantos pedaços de 1/3 de metro cabem em 4 metros de fita?','12','4 ÷ 1/3.','4 × 3 = 12.']],
+ pr:[['5 ÷ 1/4 = ?','20','5 × 4.','20.'],['3/4 × 8 = ?','6','8 ÷ 4 × 3.','6.'],['2/5 ÷ 2 = ?','1/5','Metade de 2/5.','1/5.'],['De 60 alunos, 2/3 foram à excursão. Quantos foram?','40','60 ÷ 3 × 2.','40.']],
+ rev:['Por que dividir por 1/2 aumenta o resultado?','Explique 4 ÷ 1/2 com um desenho.']});
+
+LS('l14',5,'Números decimais e operações',{
+ obj:'Ler números decimais, entender as casas decimais e operar com eles, inclusive com dinheiro.',
+ obs:'R$ 0,50 mais R$ 0,25: quanto dá? Como o dinheiro nos ajuda a entender a vírgula?',
+ c:'Use moedas: 1 real = 100 centavos. 0,25 é 25 centavos, ou seja, 25 de 100 partes. Uma barra dividida em 10 partes dá os décimos, e cada décimo dividido em 10 dá os centésimos.',
+ cv:()=>vFrac(5,10,VC[0],'0,5')+vFrac(3,10,VC[1],'0,3'),
+ p:'A grade de 100 quadradinhos mostra os centésimos: 25 pintados são 0,25. Cada casa depois da vírgula é 10 vezes menor que a anterior.',
+ pv:()=>vG100(25),
+ a:'Casas decimais: 0,5 = 5/10 e 0,05 = 5/100. Some e subtraia alinhando as vírgulas. Multiplique ignorando a vírgula e depois conte as casas: 1,2 × 0,3 = 12 × 3 = 36 com 2 casas = 0,36. Divida multiplicando os dois por 10 até o divisor ser inteiro: 12 ÷ 0,5 = 120 ÷ 5 = 24 (Laércio, cap. 7, p. 285). Digite com vírgula.',
+ ex:['Nível 1',['0,5 + 0,25 = ?','0.75','Alinhe as vírgulas.','0,75.'],['3,2 − 1,45 = ?','1.75','Complete as casas: 3,20.','1,75.'],['2,5 × 4 = ?','10','Quatro vezes 2,5.','10.'],'Nível 2',['12 ÷ 0,5 = ?','24','Quantas metades cabem em 12?','24.'],['1,2 × 0,3 = ?','0.36','12 × 3 = 36 e 2 casas.','0,36.'],'Nível 3',['Uma camisa custa 45,90 e uma bermuda custa 32,10. Quanto custam as duas juntas?','78','Alinhe as vírgulas.','78,00.'],['Quantos centavos tem R$ 3,75?','375','1 real = 100 centavos.','375.']],
+ pr:[['0,7 + 0,35 = ?','1.05','0,70 + 0,35.','1,05.'],['5 − 2,6 = ?','2.4','5,0 − 2,6.','2,4.'],['0,4 × 0,5 = ?','0.2','4 × 5 = 20 com 2 casas.','0,20.'],['9 ÷ 0,3 = ?','30','90 ÷ 3.','30.']],
+ rev:['O que muda quando a vírgula anda uma casa para a direita?','Calcule 0,6 × 0,2.']});
+
+LS('l15',5,'Fração e decimal; porcentagem',{
+ obj:'Passar de fração para decimal e para porcentagem e calcular porcentagens de uma quantidade.',
+ obs:'Uma loja anuncia "25% de desconto". Quanto isso é em fração e em decimal?',
+ c:'Pinte 25 quadradinhos numa grade de 100. Eles são 25/100, que é 25%, que é 0,25, que é 1/4 da grade.',
+ cv:()=>vG100(25),
+ p:'A barra do todo vale 100%. Divida em partes: 50% é metade, 25% é um quarto, 10% é um décimo, 20% é um quinto.',
+ pv:()=>mtBr('100%',[[25,'25%',VC[0]],[25,'25%',VC[1]],[25,'25%',VC[2]],[25,'25%',VC[3]]]),
+ a:'Porcentagem é fração de denominador 100: 25% = 25/100 = 0,25 = 1/4. Para calcular: 10% é dividir por 10; 50% é dividir por 2; 25% é dividir por 4; 20% é dividir por 5. 20% de 150 = 150 ÷ 5 = 30. 5% é metade de 10%. (Laércio, cap. 9, p. 353.)',
+ ex:['Nível 1',['Escreva 3/4 como decimal.','0.75','3 ÷ 4.','0,75.'],['25% de 80 = ?','20','Divida por 4.','20.'],['10% de 350 = ?','35','Divida por 10.','35.'],'Nível 2',['50% de 46 = ?','23','Metade.','23.'],['18 é quantos por cento de 20? (número)','90','18/20.','18/20 = 0,90 = 90%.'],['Escreva 1/5 como porcentagem (número).','20','100 ÷ 5.','20%.'],'Nível 3',['Em uma turma de 40 alunos, 35% são meninas. Quantas meninas?','14','10% = 4.','3 × 4 + metade de 4 = 14.']],
+ pr:[['75% de 200 = ?','150','Três quartos.','150.'],['5% de 120 = ?','6','10% é 12.','6.'],['3/5 em porcentagem?','60','3/5 = 60/100.','60%.'],['20% de 45 = ?','9','Divida por 5.','9.']],
+ rev:['Escreva 40% como fração e como decimal.','Como calcular 15% de 200?']});
+
+LS('l16',5,'Aumentos, descontos e juros',{
+ obj:'Calcular aumentos, descontos e juros simples e compostos, e entender as porcentagens combinadas.',
+ obs:'Uma camisa de 80 reais está com 25% de desconto. E se tiver mais 10% depois? Dá 35% de desconto no total?',
+ c:'Cartões de preço: corte a barra de 80 em 4 partes iguais. O desconto de 25% remove uma parte (20 reais) e o preço fica com 3 partes: 60.',
+ cv:()=>mtBr('80',[[1,'20 desconto',VC[2]],[3,'60 preço final',VC[3]]]),
+ p:'No aumento, a barra cresce: 100% + 10% = 110%. Em aumentos sucessivos, o segundo percentual incide sobre o novo valor (Laércio, cap. 9, porcentagens combinadas).',
+ pv:()=>mtBr('100',[[100,'100',VC[1]]])+mtBr('+10%',[[100,'100',VC[1]],[10,'10',VC[0]]])+mtBr('+20%',[[110,'110',VC[1]],[22,'22',VC[0]]]),
+ a:'Desconto: preço × (1 − taxa). Aumento: preço × (1 + taxa). 80 com 25% de desconto = 80 × 0,75 = 60. Juros simples: J = C × i × t. Juros compostos: M = C × (1 + i)ᵗ, porque os juros de cada período entram no capital (Ênio, cap. 11). Aumentos de 10% e 20% juntos: 1,1 × 1,2 = 1,32, ou seja, 32%, e não 30%.',
+ ex:['Nível 1',['Um produto de 80 reais tem 25% de desconto. Qual o novo preço?','60','80 × 0,75.','60.'],['Um salário de 1 200 recebe aumento de 10%. Qual o novo salário?','1320','1 200 × 1,10.','1 320.'],['Juros simples: 500 reais a 2% ao mês durante 6 meses. Quantos reais de juros?','60','500 × 0,02 × 6.','60.'],'Nível 2',['Dois aumentos sucessivos de 10% e depois 20%. Um preço de 100 passa a quanto?','132','100 × 1,1 × 1,2.','132.'],['Um preço de 200 tem 10% de desconto e depois mais 10% de desconto. Preço final?','162','200 × 0,9 × 0,9.','162.'],'Nível 3',['Um capital de 1 000 rende 10% ao ano em juros compostos. Depois de 2 anos, o montante é?','1210','1 000 × 1,1 × 1,1.','1 210.'],['De 50 para 65, o aumento é de quantos por cento?','30','Aumento ÷ valor original.','15/50 = 30%.']],
+ pr:[['Desconto de 15% sobre 40 reais. Qual o preço final?','34','40 × 0,85.','34.'],['Aumento de 20% sobre 150. Novo valor?','180','150 × 1,2.','180.'],['Juros simples: 300 a 5% ao mês por 4 meses. Quantos reais de juros?','60','300 × 0,05 × 4.','60.'],['De 80 para 60, a queda é de quantos por cento?','25','Queda ÷ valor original.','20/80 = 25%.']],
+ rev:['Por que dois descontos de 10% não somam 20%?','Qual a diferença entre juros simples e compostos?']});
+
+LS('l17',6,'Razão e proporção',{
+ obj:'Entender razão como comparação, resolver proporções e usar o Modelo de Razão em barras.',
+ obs:'Uma mistura de suco usa 2 copos de suco concentrado para 3 de água. Quantos copos de cada para 10 copos de mistura?',
+ c:'Monte a mistura com copos: 2 de suco e 3 de água formam 5. Para 10 copos, repita o conjunto duas vezes: 4 de suco e 6 de água.',
+ cv:()=>vArr(1,2,VC[0])+vArr(1,3,VC[1]),
+ p:'Modelo de Razão (Richit §3.4): desenhe as unidades da razão. Na razão 2:3, a barra tem 5 partes iguais e cada parte vale o total ÷ 5.',
+ pv:()=>mtBr('10',[[1,'2',VC[0]],[1,'2',VC[0]],[1,'2',VC[1]],[1,'2',VC[1]],[1,'2',VC[1]]]),
+ a:'Razão a:b compara duas quantidades. Proporção é a igualdade de duas razões: 2/3 = 4/6. Nas proporções, o produto dos meios é igual ao produto dos extremos: 2 × 6 = 3 × 4. Com um total e uma razão, use a unidade: 1 parte = total ÷ soma das partes (Ênio, quadro do 7º ano, p. 305 a 307).',
+ ex:['Nível 1',['Na razão 2:3 para 10 copos, quantos são de suco?','4','1 parte = 10 ÷ 5.','2 × 2 = 4.'],['Simplifique a razão 12 para 20 e digite a fração.','3/5','Divida por 4.','12/20 = 3/5.'],['Em x/6 = 4/3, quanto vale x?','8','Meios × extremos.','3x = 24 e x = 8.'],'Nível 2',['Três sócios dividem 90 reais na razão 2:3:4. O maior recebe?','40','1 parte = 90 ÷ 9.','4 × 10 = 40.'],['Em 24 alunos, a razão meninas:meninos é 5:3. Quantas meninas?','15','1 parte = 24 ÷ 8.','5 × 3 = 15.'],'Nível 3',['Um mapa tem escala 1:100 000. Quantos km reais há em 3 cm do mapa?','3','3 cm × 100 000 = 300 000 cm.','300 000 cm = 3 km.'],['A razão entre as idades de pai e filho é 7:2 e a soma é 45. Qual a idade do pai?','35','1 parte = 45 ÷ 9.','7 × 5 = 35.']],
+ pr:[['Divida 60 na razão 1:2. Qual a parte maior?','40','3 partes: 20 cada.','40.'],['Divida 63 na razão 4:5. Qual a parte menor?','28','9 partes de 7.','28.'],['Em x/10 = 6/15, quanto vale x?','4','15x = 60.','4.'],['Escala 1:50. Um objeto de 2 m aparece com quantos cm no desenho?','4','200 cm ÷ 50.','4 cm.']],
+ rev:['Desenhe a barra da razão 3:5 para 40.','Qual a diferença entre razão e proporção?']});
+
+LS('l18',6,'Regra de três simples',{
+ obj:'Resolver regras de três simples, diretas e inversas, usando tabela, unidade e proporção.',
+ obs:'Se 3 cadernos custam 12 reais, quanto custam 5? E se 6 operários fazem um muro em 8 dias, em quantos dias 12 operários fazem?',
+ c:'Preço de 1 caderno: 12 ÷ 3 = 4 reais. Assim 5 cadernos custam 5 × 4 = 20. Com os operários, o dobro de gente termina na metade do tempo.',
+ cv:()=>vTbl(['Cadernos','1','3','5'],[['Preço (R$)','4','12','20']]),
+ p:'Organize numa tabela com setas. Se as duas grandezas crescem juntas, são diretamente proporcionais; se uma cresce enquanto a outra diminui, são inversamente proporcionais.',
+ pv:()=>vTbl(['Operários','6','12'],[['Dias','8','4']]),
+ a:'Direta: 12/3 = x/5, então x = 20. Inversa: inverta uma razão: 6 × 8 = 12 × x, então x = 4. Passos (Ênio, 7º ano, cap. 10): 1) identifique as grandezas; 2) veja se são direta ou inversamente proporcionais; 3) monte a proporção; 4) resolva e confira.',
+ ex:['Nível 1',['3 cadernos custam 12 reais. Quanto custam 5?','20','Preço de 1 caderno × 5.','20.'],['6 operários fazem um muro em 8 dias. Em quantos dias 12 operários fazem?','4','Mais operários, menos dias.','6 × 8 = 12 × x e x = 4.'],['2 kg de arroz custam 11 reais. Quanto custam 5 kg?','27.5','11 ÷ 2 × 5.','27,50.'],'Nível 2',['Um carro faz 90 km em 1,5 h. Quantos km faz em 4 h, na mesma velocidade?','240','Velocidade: 60 km/h.','240.'],['Uma torneira enche 120 L em 15 min. Quantos litros em 40 min?','320','8 L por minuto.','320.'],'Nível 3',['4 máquinas fazem um serviço em 9 horas. Com 6 máquinas, em quantas horas?','6','Inversa.','4 × 9 = 6 × x, x = 6.'],['Uma receita para 4 pessoas usa 300 g de farinha. Para 10 pessoas, quantos g?','750','75 g por pessoa.','750.']],
+ pr:[['5 canetas custam 15 reais. Quanto custam 8?','24','3 reais cada.','24.'],['12 pedreiros fazem uma obra em 10 dias. Com 15 pedreiros, em quantos dias?','8','Inversa.','12 × 10 = 15 × x, x = 8.'],['60 km em 45 min. Quantos km em 3 h?','240','60 km em 45 min é 80 km/h.','240.'],['2 bombas esvaziam um tanque em 6 h. Com 3 bombas, em quantas horas?','4','Inversa.','4.']],
+ rev:['Como saber se a regra de três é direta ou inversa?','Resolva: 5 kg custam 40 reais, quanto custam 7 kg?']});
+
+LS('l19',6,'Regra de três composta e escalas',{
+ obj:'Resolver regras de três com mais de duas grandezas e usar escalas em mapas e plantas.',
+ obs:'Se 3 máquinas fazem 60 peças em 4 dias, quantas peças fazem 6 máquinas em 2 dias?',
+ c:'Mude uma coisa de cada vez. Dobre as máquinas: 120 peças em 4 dias. Divida os dias ao meio: 60 peças em 2 dias.',
+ cv:()=>vTbl(['','Máquinas','Dias','Peças'],[['Antes','3','4','60'],['Depois','6','2','?']]),
+ p:'Compare cada grandeza com a incógnita, uma por vez, e use setas: se cresce junto, direta; se cresce em sentido oposto, inversa.',
+ pv:()=>vTbl(['Passo','Fator'],[['Máquinas 3 → 6 (direta)','× 2'],['Dias 4 → 2 (direta)','× 1/2'],['Peças','60 × 2 × 1/2 = 60']]),
+ a:'Regra de três composta: multiplique pelo fator de cada grandeza. Escala: razão entre o desenho e o real: 1:200 significa 1 cm no desenho para 200 cm na realidade. Planta de 5 cm na escala 1:200 vale 1 000 cm = 10 m.',
+ ex:['Nível 1',['3 máquinas fazem 60 peças em 4 dias. Quantas peças fazem 6 máquinas em 2 dias?','60','Cada fator é direto.','60 × 2 × 1/2 = 60.'],['4 operários fazem 20 m de muro em 5 dias. Quantos metros fazem 6 operários em 5 dias?','30','Direta.','30.'],['Escala 1:200. Uma planta de 5 cm vale quantos metros?','10','5 × 200 cm = 1 000 cm.','10 m.'],'Nível 2',['Em 10 dias, 5 homens trabalhando 8 h por dia constroem 100 m. Quantos metros fazem 10 homens em 5 dias, 8 h por dia?','100','Dobra os homens e metade dos dias.','100.'],['Num mapa 1:200 000, uma distância real de 12 km aparece com quantos cm?','6','12 km = 1 200 000 cm.','6 cm.'],'Nível 3',['5 pedreiros levantam 30 m² de parede em 3 dias. Quantos m² levantam 10 pedreiros em 6 dias?','120','Dobra ambos.','30 × 2 × 2 = 120.'],['A planta de uma sala mede 4 cm por 3 cm na escala 1:100. Qual é a área real em m²?','12','4 m × 3 m.','12 m².']],
+ pr:[['2 máquinas fazem 40 peças em 5 dias. Quantas fazem 4 máquinas em 5 dias?','80','Dobra as máquinas.','80.'],['Escala 1:500. 8 cm no mapa valem quantos m?','40','8 × 500 cm = 4 000 cm.','40 m.'],['6 pessoas lavam 12 carros em 2 h. Quantos carros lavam 3 pessoas em 2 h?','6','Metade das pessoas.','6.'],['Um desenho de 10 cm representa 5 m. Qual é a escala? Digite o número depois de 1:','50','5 m = 500 cm.','1:50.']],
+ rev:['Por que cada grandeza é comparada com a incógnita separadamente?','Invente um problema com escala.']});
+
+/* ===== Aulas 20 a 29 (Etapas 7 a 9) ===== */
+LS('l20',7,'Potenciação e suas propriedades',{
+ obj:'Entender a potência como multiplicação repetida e usar as propriedades do produto, do quociente e da potência de potência.',
+ obs:'Um tabuleiro tem 3 linhas e 3 colunas de quadradinhos. Quantos quadradinhos? E um cubo de 3 por 3 por 3 cubinhos?',
+ c:'Monte quadrados de 2×2, 3×3 e 4×4 com quadradinhos e conte: 4, 9 e 16. Com cubinhos, monte cubos de aresta 2 e 3: 8 e 27 (Laércio, "Quadrados e cubos", cap. 8, p. 326).',
+ cv:()=>vSq(3),
+ p:'Desenhe o quadrado de lado 3: a área é 3 × 3 = 3² = 9. O expoente diz quantas vezes a base se multiplica por ela mesma.',
+ pv:()=>vSq(4),
+ a:'aⁿ = a × a × … (n fatores). Casos especiais: a¹ = a, a⁰ = 1 e 1ⁿ = 1. Propriedades: aᵐ · aⁿ = aᵐ⁺ⁿ; aᵐ ÷ aⁿ = aᵐ⁻ⁿ; (aᵐ)ⁿ = aᵐⁿ; (ab)ⁿ = aⁿbⁿ. Exemplo: 2³ · 2⁴ = 2⁷ = 128. Potência de base negativa: (−2)³ = −8 e (−2)² = 4 (Ênio, cap. 1, p. 13).',
+ ex:['Nível 1',['5² = ?','25','5 × 5.','25.'],['2⁵ = ?','32','Multiplique 5 vezes o 2.','32.'],['10³ = ?','1000','Três zeros.','1 000.'],'Nível 2',['3⁴ ÷ 3² = ?','9','Subtraia os expoentes.','3² = 9.'],['2³ × 2⁴ = ?','128','Some os expoentes.','2⁷ = 128.'],['(2³)² = ?','64','Multiplique os expoentes.','2⁶ = 64.'],'Nível 3',['(−2)³ = ?','-8','Três fatores negativos.','−8.'],['Em 2ˣ = 64, quanto vale x?','6','Dobre até chegar a 64.','2⁶ = 64.']],
+ pr:[['4³ = ?','64','4 × 4 × 4.','64.'],['5⁰ = ?','1','Todo número (menos 0) elevado a zero é 1.','1.'],['2⁶ ÷ 2⁴ = ?','4','2².','4.'],['(−3)² = ?','9','Negativo vezes negativo.','9.']],
+ rev:['Por que a⁰ = 1?','Calcule 2⁴ × 2² usando a propriedade.']});
+
+LS('l21',7,'Raiz quadrada, raiz cúbica e potências de 10',{
+ obj:'Calcular raízes exatas como o caminho de volta da potência e usar potências de 10.',
+ obs:'Um quadrado de 49 quadradinhos tem quantos quadradinhos de lado? E um cubo de 27 cubinhos?',
+ c:'Monte com 49 quadradinhos um quadrado e conte o lado: 7. Com 27 cubinhos, monte um cubo: aresta 3. A raiz é o lado que procuramos quando conhecemos a área ou o volume.',
+ cv:()=>vSq(7),
+ p:'√49 = 7, porque 7 × 7 = 49. ∛27 = 3, porque 3 × 3 × 3 = 27. A raiz desfaz a potência.',
+ pv:()=>vSq(5),
+ a:'Quadrados perfeitos: 1, 4, 9, 16, 25, 36, 49, 64, 81, 100, 121, 144, 169, 196, 225. Cubos: 1, 8, 27, 64, 125. Se a raiz não é exata, fica entre dois inteiros: √20 está entre 4 e 5. Potências de 10: 10² = 100, 10³ = 1 000. Multiplicar por 10ⁿ move a vírgula n casas para a direita: 3,2 × 10² = 320. Cuidado: √(9 + 16) = √25 = 5, e não 3 + 4.',
+ ex:['Nível 1',['√81 = ?','9','9 × 9.','9.'],['√144 = ?','12','12 × 12.','12.'],['∛27 = ?','3','3 × 3 × 3.','3.'],'Nível 2',['√20 está entre dois inteiros. Qual é o menor deles?','4','4² = 16 e 5² = 25.','Entre 4 e 5.'],['3,2 × 10² = ?','320','Ande a vírgula 2 casas.','320.'],['Um quadrado tem área de 169 m². Quanto mede o lado?','13','√169.','13 m.'],'Nível 3',['√(9 + 16) = ?','5','Some antes de tirar a raiz.','√25 = 5.'],['∛125 = ?','5','5 × 5 × 5.','5.']],
+ pr:[['√64 = ?','8','8 × 8.','8.'],['4,5 × 10³ = ?','4500','Três casas.','4 500.'],['Um quadrado tem área 225. Quanto mede o lado?','15','√225.','15.'],['∛8 = ?','2','2 × 2 × 2.','2.']],
+ rev:['Por que a raiz quadrada de um número negativo não existe entre os reais?','Calcule √100 + ∛8.']});
+
+LS('l22',7,'Radicais: simplificação e operações',{
+ obj:'Simplificar radicais e somar, multiplicar e dividir radicais simples.',
+ obs:'√12 não é exato. Dá para escrevê-lo de um jeito mais simples? Pense em 12 = 4 × 3.',
+ c:'Monte um retângulo de 4 por 3 quadradinhos. Se o quadrado de 4 tem lado 2, extraia o 2 e o resto fica dentro da raiz: √12 = √(4 × 3) = 2√3.',
+ cv:()=>vArr(4,3,VC[0]),
+ p:'Pense em duas raízes como duas peças: √a · √b = √(a·b). Para simplificar, procure o maior quadrado perfeito dentro do número.',
+ pv:()=>mtBr('√12',[[2,'2',VC[1]],[1,'√3',VC[0]]]),
+ a:'√a · √b = √(ab); √a ÷ √b = √(a/b). Simplificar: √50 = √(25 · 2) = 5√2. Soma: só radicais iguais somam, como 2√3 + 5√3 = 7√3. Também (√5)² = 5 (Ênio, cap. 1, p. 26 a 32).',
+ ex:['Nível 1',['√50 = a√2. Quanto vale a?','5','50 = 25 × 2.','5√2.'],['√12 = a√3. Quanto vale a?','2','12 = 4 × 3.','2√3.'],['(√5)² = ?','5','A raiz e o quadrado se desfazem.','5.'],'Nível 2',['√2 × √8 = ?','4','√16.','4.'],['√18 ÷ √2 = ?','3','√9.','3.'],['2√3 + 5√3 = a√3. Quanto vale a?','7','Some os coeficientes.','7√3.'],'Nível 3',['O lado de um quadrado de área 72 mede a√2. Quanto vale a?','6','72 = 36 × 2.','6√2.']],
+ pr:[['√75 = a√3. Quanto vale a?','5','75 = 25 × 3.','5√3.'],['√3 × √12 = ?','6','√36.','6.'],['4√2 − √2 = a√2. Quanto vale a?','3','4 − 1.','3√2.'],['√45 = a√5. Quanto vale a?','3','45 = 9 × 5.','3√5.']],
+ rev:['Por que √2 + √3 não é √5?','Simplifique √98.']});
+
+LS('l23',8,'O que é álgebra: letras, incógnitas e variáveis',{
+ obj:'Entender as letras como incógnitas, variáveis e generalizações, e passar da barra para a letra.',
+ obs:'Pensei num número, somei 5 e deu 12. Qual era o número? Como escrever isso sem dizer "o número"?',
+ c:'Uma caixa fechada guarda um número secreto de fichas. Na balança, a caixa mais 5 fichas pesam o mesmo que 12 fichas. Tire 5 fichas dos dois lados: a caixa tem 7.',
+ cv:()=>vBal('<b>x</b> + 5','12'),
+ p:'Troque a caixa por uma barra com ponto de interrogação, e depois pela letra x (Richit §3.1: x + c = d). A barra e a letra dizem a mesma coisa.',
+ pv:()=>mtBr('12',[[7,'x',VC[1]],[5,'5',VC[0]]]),
+ a:'Letras podem ser incógnita (valor fixo desconhecido: x + 5 = 12), variável (valor que muda: y = 2x) ou generalização (a + b = b + a). Substituir é trocar a letra por um número: se a = 4 e b = 3, então a + 2b = 10 (Ênio, quadro de Álgebra, p. 308).',
+ ex:['Nível 1',['x + 5 = 12. Quanto vale x?','7','Tire 5 dos dois lados.','7.'],['3x = 21. Quanto vale x?','7','21 ÷ 3.','7.'],['Se a = 4 e b = 3, quanto vale a + 2b?','10','4 + 6.','10.'],'Nível 2',['O triplo de n menos 4, para n = 5, vale quanto?','11','3 × 5 − 4.','11.'],['Um número dobrado e somado a 3 dá 15. Qual é o número?','6','2n + 3 = 15.','6.'],'Nível 3',['O perímetro de um quadrado de lado L é 4L. Para L = 6,5, qual é o perímetro?','26','4 × 6,5.','26.'],['7a − 2a = ?a. Quanto vale o coeficiente?','5','7 − 2.','5a.']],
+ pr:[['x − 9 = 4. Quanto vale x?','13','Some 9.','13.'],['5x = 35. Quanto vale x?','7','35 ÷ 5.','7.'],['2a + 1, para a = 8, vale?','17','2 × 8 + 1.','17.'],['9b − 4b, para b = 3, vale?','15','5b = 15.','15.']],
+ rev:['Qual a diferença entre incógnita e variável?','Escreva "o dobro de x mais 1".']});
+
+LS('l24',8,'Expressões algébricas, termos semelhantes e propriedade distributiva',{
+ obj:'Simplificar expressões somando termos semelhantes e aplicar a propriedade distributiva.',
+ obs:'3 caixas e 2 caixas são quantas caixas? E 3 caixas mais 2 bolas?',
+ c:'Separe fichas verdes (x) e azuis (y). 3 verdes + 2 verdes são 5 verdes, mas 3 verdes + 2 azuis não se juntam em um tipo só.',
+ cv:()=>mtBr('3x + 2x',[[3,'3x',VC[3]],[2,'2x',VC[3]]])+mtBr('3x + 2y',[[3,'3x',VC[3]],[2,'2y',VC[1]]]),
+ p:'Propriedade distributiva como área de retângulo: base 3 e altura (x + 4). A área total é 3·x + 3·4 = 3x + 12.',
+ pv:()=>mtBr('3(x + 4)',[[1,'x',VC[3]],[4,'4',VC[0]]])+mtBr('',[[1,'x',VC[3]],[4,'4',VC[0]]])+mtBr('',[[1,'x',VC[3]],[4,'4',VC[0]]]),
+ a:'Termos semelhantes têm a mesma parte literal e se somam: 3x + 2x = 5x. A distributiva: a(b + c) = ab + ac, e 4(2x − 1) = 8x − 4. Exemplo completo: 2(x + 3) + 3(x − 1) = 2x + 6 + 3x − 3 = 5x + 3 (Ênio, 8º ano, cap. 3).',
+ ex:['Nível 1',['3x + 2x = ax. Quanto vale a?','5','Some os coeficientes.','5x.'],['3(x + 4) = 3x + ?','12','3 × 4.','12.'],['4(2x − 1) = 8x − ?','4','4 × 1.','4.'],'Nível 2',['5a + 3b − 2a + b = ma + nb. Quanto vale m?','3','5 − 2.','3a.'],['Na mesma expressão, quanto vale n?','4','3 + 1.','4b.'],'Nível 3',['Se x = 2, quanto vale 3(x + 4)?','18','3 × 6.','18.'],['2(x + 3) + 3(x − 1) = ax + b. Quanto vale a?','5','2 + 3.','5x + 3.']],
+ pr:[['2(x + 5) = 2x + ?','10','2 × 5.','10.'],['7x − 3x = ax. Quanto vale a?','4','7 − 3.','4x.'],['5(2a − 3) = 10a − ?','15','5 × 3.','15.'],['Se a = 3, quanto vale 4a + 2a?','18','6a.','18.']],
+ rev:['Por que 3x + 2y não se junta?','Desenhe 2(x + 5) como área.']});
+
+LS('l25',8,'Valor numérico, produtos notáveis e fatoração',{
+ obj:'Calcular valores numéricos e usar os produtos notáveis para multiplicar e fatorar.',
+ obs:'Calcule 101 × 99 de cabeça. Existe um caminho mais curto usando 100?',
+ c:'Quadrado de lado a + b: dentro dele cabem um quadrado a × a, um b × b e dois retângulos a × b. Corte um quadrado de papel e confira.',
+ cv:()=>mtBr('lado a + b',[[3,'a²',VC[1]],[2,'ab',VC[0]]])+mtBr('',[[3,'ab',VC[0]],[2,'b²',VC[2]]]),
+ p:'Área total: (a + b)² = a² + ab + ab + b² = a² + 2ab + b². Faltou o 2ab? Veja o par de retângulos.',
+ pv:()=>vTbl(['','a','b'],[['a','a²','ab'],['b','ab','b²']]),
+ a:'(a + b)² = a² + 2ab + b². (a − b)² = a² − 2ab + b². (a + b)(a − b) = a² − b². Fatoração é o caminho de volta: x² − 25 = (x − 5)(x + 5). Truque: 99 × 101 = (100 − 1)(100 + 1) = 10 000 − 1 = 9 999.',
+ ex:['Nível 1',['(x + 3)² = x² + mx + 9. Quanto vale m?','6','2 × x × 3.','6.'],['Calcule 5² + 2 × 5 × 3 + 3².','64','25 + 30 + 9.','64 = 8².'],['Se a = 7 e b = 3, quanto vale (a − b)(a + b)?','40','4 × 10.','40.'],'Nível 2',['x² − 25 = (x − 5)(x + n). Quanto vale n?','5','Diferença de quadrados.','5.'],['101² = ?','10201','(100 + 1)².','10 000 + 200 + 1.'],'Nível 3',['99 × 101 = ?','9999','(100 − 1)(100 + 1).','9 999.'],['x² + 10x + 25 = (x + a)². Quanto vale a?','5','10 ÷ 2.','5.']],
+ pr:[['(2 + 5)² = ?','49','7².','49.'],['x² − 49 = (x − 7)(x + n). Quanto vale n?','7','√49.','7.'],['103 × 97 = ?','9991','(100 + 3)(100 − 3).','10 000 − 9.'],['(x + 1)² tem o termo mx. Quanto vale m?','2','2 × x × 1.','2.']],
+ rev:['Por que (a + b)² não é a² + b²?','Fatore x² − 16.']});
+
+LS('l26',9,'Equações do 1º grau',{
+ obj:'Resolver equações do 1º grau mantendo a balança em equilíbrio, com parênteses e frações.',
+ obs:'Na balança, de um lado há 2 caixas e 3 fichas, do outro 11 fichas. Quantas fichas tem cada caixa?',
+ c:'Faça uma balança de dois pratos (régua sobre um lápis). Tire 3 fichas dos dois lados: 2 caixas = 8 fichas. Divida os dois lados por 2: 1 caixa = 4 (Math in Focus 8.1).',
+ cv:()=>vBal('2<b>x</b> + 3','11'),
+ p:'Desenhe a barra do 11 dividida em 2 caixas e um pedaço de 3. A caixa vale (11 − 3) ÷ 2.',
+ pv:()=>mtBr('11',[[4,'x',VC[1]],[4,'x',VC[1]],[3,'3',VC[0]]]),
+ a:'Regra de ouro: tudo o que você faz de um lado, faça do outro. 2x + 3 = 11 → 2x = 8 → x = 4. Com parênteses: 3(x − 1) = 12 → x − 1 = 4 → x = 5. Com frações: x/2 + 1 = 4 → x/2 = 3 → x = 6. Sempre confira substituindo. Equações com x dos dois lados: 5x − 7 = 3x + 9 → 2x = 16 → x = 8.',
+ ex:['Nível 1',['2x + 3 = 11. Quanto vale x?','4','Tire 3 e divida por 2.','4.'],['x/3 = 7. Quanto vale x?','21','Multiplique por 3.','21.'],['3(x − 1) = 12. Quanto vale x?','5','Divida por 3 primeiro.','5.'],'Nível 2',['x/2 + 1 = 4. Quanto vale x?','6','Tire 1 e dobre.','6.'],['5x − 7 = 3x + 9. Quanto vale x?','8','Junte os x de um lado.','8.'],'Nível 3',['4(x + 2) = 2x + 14. Quanto vale x?','3','4x + 8 = 2x + 14.','3.'],['Três números consecutivos somam 36. Qual é o menor?','11','x + (x+1) + (x+2) = 36.','11.']],
+ pr:[['3x + 5 = 20. Quanto vale x?','5','Tire 5 e divida por 3.','5.'],['2(x + 4) = 18. Quanto vale x?','5','Divida por 2.','5.'],['x/4 − 2 = 1. Quanto vale x?','12','Some 2 e multiplique por 4.','12.'],['6x − 4 = 2x + 12. Quanto vale x?','4','4x = 16.','4.']],
+ rev:['Por que somamos o mesmo número nos dois lados?','Resolva 2x − 5 = 9 e confira.']});
+
+LS('l27',9,'Problemas com equações e sistemas',{
+ obj:'Traduzir problemas em equações usando barras e resolver sistemas simples de duas incógnitas.',
+ obs:'O pai tem o triplo da idade do filho e juntos têm 48 anos. Desenhe a situação antes de calcular.',
+ c:'Use fichas: o filho é 1 bloco e o pai são 3 blocos iguais, ao todo 4 blocos que valem 48. Cada bloco vale 12 (Richit §3.1 e §3.3).',
+ cv:()=>mtBr('Filho',[[1,'x',VC[1]]])+mtBr('Pai',[[1,'x',VC[1]],[1,'x',VC[1]],[1,'x',VC[1]]]),
+ p:'Bloco = x. Pai + filho = 4x = 48. Para sistemas, some ou subtraia as barras: se x + y = 10 e x − y = 2, somando 2x = 12.',
+ pv:()=>mtBr('10',[[6,'x = 6',VC[1]],[4,'y = 4',VC[0]]]),
+ a:'Passos (Ênio, "Resolvendo em equipe"): 1) interprete e identifique os dados; 2) planeje e escolha as incógnitas; 3) resolva; 4) verifique no enunciado; 5) responda por extenso. Sistema: x + y = 10 e x − y = 2 → somando, 2x = 12, x = 6 e y = 4. Também vale substituir: y = 10 − x.',
+ ex:['Nível 1',['Um pai tem o triplo da idade do filho e juntos têm 48 anos. Qual a idade do filho?','12','4 blocos valem 48.','12.'],['Dois números somam 20 e diferem em 4. Qual é o maior?','12','(20 + 4) ÷ 2.','12.'],['Se x + y = 10 e x − y = 2, quanto vale x?','6','Some as duas.','6.'],'Nível 2',['Uma caneta e um lápis custam 7 reais juntos. A caneta custa 3 a mais que o lápis. Quanto custa o lápis?','2','(7 − 3) ÷ 2.','2.'],['Se x + y = 15 e 2x + y = 22, quanto vale x?','7','Subtraia as duas equações.','7.'],'Nível 3',['Em uma fazenda há 20 cabeças e 56 pés entre galinhas e porcos. Quantos porcos?','8','Cada animal tem 2 pés; os porcos têm 2 a mais.','56 − 40 = 16 pés extras, 16 ÷ 2 = 8.'],['Comprei 3 canetas e 2 cadernos por 30 reais. O caderno custa 5 a mais que a caneta. Quanto custa a caneta?','4','3c + 2(c + 5) = 30.','5c = 20 e c = 4.']],
+ pr:[['Dois números somam 30 e diferem em 6. Qual é o maior?','18','(30 + 6) ÷ 2.','18.'],['O triplo de um número menos 4 é 20. Qual é o número?','8','3n − 4 = 20.','8.'],['Se x + y = 9 e x − y = 1, quanto vale y?','4','x = 5.','4.'],['A mãe tem 4 vezes a idade da filha e a diferença é 27 anos. Qual a idade da filha?','9','3 blocos valem 27.','9.']],
+ rev:['Quais são os 5 passos de resolução?','Desenhe as barras do problema das galinhas e porcos.']});
+
+LS('l28',9,'Equações do 2º grau',{
+ obj:'Resolver equações do 2º grau pelo método geométrico de Al-Khwarizmi, pela fórmula de Bhaskara e pelas relações entre as raízes.',
+ obs:'Um terreno quadrado de lado x recebe uma faixa de 5 m em cada lado e a área total aumenta. Como descobrir x se a área ocupada é conhecida?',
+ c:'Recorte um quadrado de lado x e dois retângulos x por 5. Juntos têm área x² + 10x = 39 (Ênio, p. 51). Falta um quadradinho de 5 por 5 para completar um quadrado maior.',
+ cv:()=>mtBr('x² + 10x',[[3,'x²',VC[1]],[1,'5x',VC[0]],[1,'5x',VC[0]]]),
+ p:'Complete o quadrado: some 25 aos dois lados. x² + 10x + 25 = 39 + 25 = 64, e o quadrado de lado (x + 5) tem área 64. Então x + 5 = 8 e x = 3.',
+ pv:()=>vTbl(['','x','5'],[['x','x²','5x'],['5','5x','25']]),
+ a:'Bhaskara: ax² + bx + c = 0 → Δ = b² − 4ac e x = (−b ± √Δ) ÷ 2a. Se Δ > 0, duas raízes; Δ = 0, uma; Δ < 0, nenhuma real. Relações: soma das raízes = −b/a e produto = c/a. Exemplo: x² − 5x + 6 = 0 → Δ = 1 → x = (5 ± 1)/2 = 3 ou 2 (soma 5, produto 6).',
+ ex:['Nível 1',['Em x² + 10x = 39, qual é a raiz positiva?','3','Complete o quadrado.','(x + 5)² = 64 e x = 3.'],['Em x² − 9 = 0, qual é a raiz positiva?','3','x² = 9.','3.'],['Qual é o Δ de x² − 6x + 8 = 0?','4','36 − 32.','4.'],'Nível 2',['Em x² − 6x + 8 = 0, qual é a menor raiz?','2','(6 ± 2)/2.','2 e 4.'],['Em x² − 5x + 6 = 0, qual é a maior raiz?','3','Δ = 1.','3.'],'Nível 3',['Qual é a soma das raízes de x² − 7x + 10 = 0?','7','−b/a.','7.'],['Qual é o produto das raízes de x² − 7x + 10 = 0?','10','c/a.','10.']],
+ pr:[['Em x² = 49, qual é a raiz positiva?','7','Raiz de 49.','7.'],['Em x² − 4x + 3 = 0, qual é a maior raiz?','3','(4 ± 2)/2.','3 e 1.'],['Em x² + 2x − 8 = 0, qual é a raiz positiva?','2','Δ = 36.','2 e −4.'],['Qual é o Δ de x² + 2x + 5 = 0?','-16','4 − 20.','−16: sem raízes reais.']],
+ rev:['Quando uma equação do 2º grau não tem raízes reais?','Desenhe x² + 6x = 7 com áreas.']});
+
+LS('l29',9,'Funções: tabelas, fórmulas e gráficos',{
+ obj:'Entender a ideia de função, calcular valores, ler tabelas e gráficos e reconhecer funções afim e quadrática.',
+ obs:'Um táxi cobra 5 reais de bandeirada mais 2 reais por quilômetro. Como saber o preço de qualquer corrida?',
+ c:'Faça a tabela do táxi: 0 km custa 5; 1 km custa 7; 2 km custa 9. A cada quilômetro, o preço sobe 2 (Math in Focus 8.2: variável independente é a distância; a dependente é o preço).',
+ cv:()=>vTbl(['km (x)','0','1','2','3'],[['preço (y)','5','7','9','11']]),
+ p:'Marque os pontos (0, 5), (1, 7), (2, 9) no plano cartesiano. Eles ficam alinhados numa reta: uma função afim.',
+ pv:()=>vTbl(['x','y = 2x + 5'],[['0','5'],['1','7'],['2','9'],['3','11']]),
+ a:'Função: cada x tem um único y. Afim: y = ax + b, em que a é quanto y muda a cada 1 de x e b é o valor em x = 0. Quadrática: y = ax² + bx + c e o gráfico é uma parábola. No plano cartesiano, um ponto é (abscissa, ordenada). Para achar o x de um y dado, resolva a equação (Ênio, cap. 3 e 4).',
+ ex:['Nível 1',['Em y = 2x + 5, para x = 4, quanto vale y?','13','2 × 4 + 5.','13.'],['Em y = 3x − 2, para x = 5, quanto vale y?','13','15 − 2.','13.'],['Um táxi cobra 5 de bandeirada mais 2 por km. Quanto custa uma corrida de 12 km?','29','5 + 2 × 12.','29.'],'Nível 2',['Em y = 2x + 1, qual é x quando y = 9?','4','2x = 8.','4.'],['O gráfico de y = −x + 6 corta o eixo y em que valor?','6','Faça x = 0.','6.'],'Nível 3',['Se f(x) = x² − 4, quanto vale f(3)?','5','9 − 4.','5.'],['Qual é a raiz positiva de f(x) = x² − 4?','2','x² = 4.','2.']],
+ pr:[['Em y = 4x − 3, para x = 2, quanto vale y?','5','8 − 3.','5.'],['Em y = x² + 1, para x = −3, quanto vale y?','10','9 + 1.','10.'],['Qual é a ordenada do ponto (3, −2)?','-2','A ordenada é o 2º número.','−2.'],['Em y = 5x, qual é x quando y = 35?','7','35 ÷ 5.','7.']],
+ rev:['Qual a diferença entre variável independente e dependente?','O que significa o b em y = ax + b?']});
+
+/* ===== Aulas 30 a 39 (Etapas 10 a 12 e fase final) ===== */
+LS('l30',10,'Ponto, reta, plano e ângulos',{
+ obj:'Reconhecer pontos, retas e planos, medir e classificar ângulos e usar ângulos complementares, suplementares e opostos pelo vértice.',
+ obs:'Quando você dobra uma folha, o vinco é uma reta. Quando dobra de novo, onde as duas dobras se cruzam surge um ponto e quatro ângulos. Como compará-los?',
+ c:'Dobre uma folha de papel duas vezes: o canto forma um ângulo reto (90°). Dobre esse canto ao meio: dois ângulos de 45°. Use as mãos como ponteiros de relógio para mostrar 90° e 180°.',
+ cv:()=>vAng(90),
+ p:'Desenhe ângulos com régua e transferidor: agudo (menor que 90°), reto (90°), obtuso (entre 90° e 180°) e raso (180°).',
+ pv:()=>vAng(135),
+ a:'Complementares somam 90° e suplementares somam 180°. Ângulos opostos pelo vértice são iguais. Em retas paralelas cortadas por uma transversal, os ângulos correspondentes são iguais. A soma dos ângulos internos de um triângulo é 180°. Uma volta completa tem 360° (Ênio, 7º e 8º anos, quadro de conteúdos, p. 305 e 307).',
+ ex:['Nível 1',['Qual é o complemento de 35°?','55','90 − 35.','55°.'],['Qual é o suplemento de 130°?','50','180 − 130.','50°.'],['Quantos graus tem um quarto de volta?','90','360 ÷ 4.','90°.'],'Nível 2',['Em um triângulo, dois ângulos medem 50° e 60°. Quanto mede o terceiro?','70','180 − 110.','70°.'],['Dois ângulos opostos pelo vértice: um mede 75°. Quanto mede o outro?','75','São iguais.','75°.'],['Retas paralelas cortadas por uma transversal: um ângulo mede 110°. Quanto mede o correspondente?','110','Correspondentes são iguais.','110°.'],'Nível 3',['O ponteiro das horas anda das 3 h às 6 h. Quantos graus girou?','90','Cada hora vale 30°.','3 × 30 = 90°.']],
+ pr:[['Qual é o complemento de 72°?','18','90 − 72.','18°.'],['Qual é o suplemento de 45°?','135','180 − 45.','135°.'],['Um triângulo tem ângulos 90° e 35°. Quanto mede o terceiro?','55','180 − 125.','55°.'],['Quantos graus gira o ponteiro dos minutos em 10 minutos?','60','Cada minuto vale 6°.','60°.']],
+ rev:['Como saber se dois ângulos são complementares?','Desenhe um ângulo de 60°.']});
+
+LS('l31',10,'Triângulos, quadriláteros e polígonos',{
+ obj:'Classificar triângulos e quadriláteros e calcular a soma dos ângulos internos e o número de diagonais de um polígono.',
+ obs:'Quantos triângulos você consegue formar dentro de um hexágono ligando um vértice aos outros? O que isso diz sobre a soma dos ângulos?',
+ c:'Recorte um polígono de papel e corte-o em triângulos a partir de um vértice. Um quadrilátero vira 2 triângulos, um pentágono vira 3 e um hexágono vira 4.',
+ cv:()=>vTbl(['Lados','3','4','5','6'],[['Triângulos','1','2','3','4']]),
+ p:'Cada triângulo tem 180°, então a soma dos ângulos internos de um polígono de n lados é (n − 2) × 180°. Um hexágono regular tem 6 ângulos iguais.',
+ pv:()=>vTbl(['n','Soma'],[['3','180°'],['4','360°'],['5','540°'],['6','720°']]),
+ a:'Soma dos ângulos internos: (n − 2) × 180°. Número de diagonais: n(n − 3) ÷ 2. Triângulo isósceles tem 2 lados iguais e os ângulos da base também. Paralelogramo: lados opostos paralelos e ângulos consecutivos suplementares. Polígono regular tem lados e ângulos iguais; seu ângulo interno é a soma dividida por n (Ênio, cap. 9, p. 226).',
+ ex:['Nível 1',['Qual é a soma dos ângulos internos de um quadrilátero?','360','2 triângulos.','360°.'],['Qual é a soma dos ângulos internos de um hexágono?','720','(6 − 2) × 180.','720°.'],['Quantas diagonais tem um pentágono?','5','5 × 2 ÷ 2.','5.'],'Nível 2',['Quanto mede cada ângulo interno de um hexágono regular?','120','720 ÷ 6.','120°.'],['Um triângulo isósceles tem o ângulo do vértice de 40°. Quanto mede cada ângulo da base?','70','(180 − 40) ÷ 2.','70°.'],['Um paralelogramo tem um ângulo de 65°. Quanto mede o ângulo consecutivo?','115','180 − 65.','115°.'],'Nível 3',['Um polígono tem soma dos ângulos internos igual a 1 080°. Quantos lados tem?','8','(n − 2) × 180 = 1 080.','n − 2 = 6, n = 8.']],
+ pr:[['Qual é a soma dos ângulos internos de um octógono?','1080','(8 − 2) × 180.','1 080°.'],['Quantas diagonais tem um hexágono?','9','6 × 3 ÷ 2.','9.'],['Quanto mede cada ângulo interno de um pentágono regular?','108','540 ÷ 5.','108°.'],['Um triângulo equilátero tem quantos graus em cada ângulo?','60','180 ÷ 3.','60°.']],
+ rev:['Por que a soma dos ângulos de um polígono usa n − 2?','Desenhe as diagonais de um pentágono.']});
+
+LS('l32',10,'Perímetro, área e círculo',{
+ obj:'Calcular perímetro e área de figuras planas e o comprimento e a área do círculo.',
+ obs:'Para cercar um terreno e para plantar grama nele, usamos a mesma medida? Qual a diferença entre contornar e cobrir?',
+ c:'Cubra um retângulo de 8 por 5 com quadradinhos de 1 cm: são 5 fileiras de 8, ou 40 quadradinhos. Contorne com barbante: o comprimento do barbante é o perímetro (Math in Focus, cap. 10).',
+ cv:()=>vArr(5,8,VC[3]),
+ p:'Um triângulo é metade de um retângulo de mesma base e altura. Um trapézio vira um paralelogramo se você juntar dois iguais. Um círculo tem área πr² e circunferência 2πr.',
+ pv:()=>mtBr('retângulo',[[8,'base 8 × altura 5',VC[1]]])+mtBr('triângulo',[[8,'metade: 8 × 5 ÷ 2',VC[0]]]),
+ a:'Retângulo: A = b·h; quadrado: A = L²; paralelogramo: A = b·h; triângulo: A = b·h ÷ 2; trapézio: A = (B + b)·h ÷ 2; círculo: A = πr² e comprimento C = 2πr, com π ≈ 3,14. Perímetro é a soma dos lados (Ênio, cap. 10, p. 244; Laércio, cap. 12, p. 469).',
+ ex:['Nível 1',['Qual é a área de um retângulo de 8 por 5?','40','8 × 5.','40.'],['Qual é a área de um triângulo de base 10 e altura 6?','30','10 × 6 ÷ 2.','30.'],['Qual é o perímetro de um quadrado de lado 7?','28','4 × 7.','28.'],'Nível 2',['Qual é a área de um trapézio de bases 8 e 4 e altura 5?','30','(8 + 4) × 5 ÷ 2.','30.'],['Um terreno retangular mede 20 m por 15 m. Quantos metros de cerca para dar uma volta?','70','2 × (20 + 15).','70 m.'],'Nível 3',['Qual é a área de um círculo de raio 10, com π = 3,14?','314','3,14 × 100.','314.'],['Qual é o comprimento da circunferência de raio 5, com π = 3,14?','31.4','2 × 3,14 × 5.','31,4.']],
+ pr:[['Qual é a área de um quadrado de lado 9?','81','9 × 9.','81.'],['Qual é a área de um paralelogramo de base 12 e altura 4?','48','12 × 4.','48.'],['Qual é a área de um triângulo de base 7 e altura 4?','14','7 × 4 ÷ 2.','14.'],['Qual é a área de um círculo de raio 2, com π = 3,14?','12.56','3,14 × 4.','12,56.']],
+ rev:['Qual a diferença entre perímetro e área?','Desenhe um trapézio e calcule a área.']});
+
+LS('l33',10,'Sólidos geométricos, volume e Pitágoras',{
+ obj:'Reconhecer sólidos, calcular o volume de prismas e cilindros e usar o teorema de Pitágoras.',
+ obs:'Quantos cubinhos cabem numa caixa de 5 por 4 por 3? E se a caixa for um cubo de aresta 4?',
+ c:'Monte uma caixa de 5 × 4 com cubinhos (uma camada tem 20) e empilhe 3 camadas: 60 cubinhos. Planifique um cubo e conte as 6 faces (Math in Focus 12.1).',
+ cv:()=>vArr(4,5,VC[1]),
+ p:'Teorema de Pitágoras (Ênio, p. 180): num triângulo retângulo, o quadrado da hipotenusa é a soma dos quadrados dos catetos. Com catetos 3 e 4: 9 + 16 = 25, e a hipotenusa é 5.',
+ pv:()=>mtBr('3² + 4² = 5²',[[9,'9',VC[0]],[16,'16',VC[1]]])+mtBr('',[[25,'25',VC[2]]]),
+ a:'Volume do prisma: V = área da base × altura. Cubo: V = a³. Cilindro: V = πr²h. 1 m³ = 1 000 L. Pitágoras: a² = b² + c². Exemplo: escada de 5 m com a base a 3 m da parede atinge 4 m de altura, porque 5² − 3² = 16.',
+ ex:['Nível 1',['Qual é o volume de um cubo de aresta 4?','64','4 × 4 × 4.','64.'],['Qual é o volume de uma caixa de 5 × 4 × 3?','60','5 × 4 × 3.','60.'],['Quantas faces tem um cubo?','6','Conte no desenho planificado.','6.'],'Nível 2',['Um triângulo retângulo tem catetos 6 e 8. Quanto mede a hipotenusa?','10','36 + 64 = 100.','10.'],['Um prisma tem base de 12 m² e altura 5 m. Qual é o volume?','60','12 × 5.','60 m³.'],'Nível 3',['Um cilindro tem raio 2 e altura 5, com π = 3. Qual é o volume?','60','3 × 4 × 5.','60.'],['Uma escada de 5 m apoiada na parede tem a base a 3 m da parede. Que altura atinge?','4','5² − 3².','16, então 4 m.']],
+ pr:[['Qual é o volume de um cubo de aresta 5?','125','5 × 5 × 5.','125.'],['Um triângulo retângulo tem hipotenusa 13 e um cateto 5. Quanto mede o outro?','12','169 − 25.','144, então 12.'],['Uma caixa de 2 × 3 × 4 tem volume?','24','2 × 3 × 4.','24.'],['Quantos litros cabem num cubo de aresta 1 m?','1000','1 m³.','1 000 L.']],
+ rev:['O que é a hipotenusa?','Calcule o volume de uma caixa de 6 × 5 × 2.']});
+
+LS('l34',11,'Comprimento, massa, capacidade e conversão de unidades',{
+ obj:'Medir e converter unidades de comprimento, massa e capacidade no sistema métrico decimal.',
+ obs:'Uma garrafa de 2 litros enche quantos copos de 250 mililitros? Como saber sem ir à cozinha?',
+ c:'Meça a carteira com uma régua e uma trena em centímetros e em metros. Pese objetos em gramas e em quilogramas. Encha copos de 250 mL com uma garrafa de 2 L e conte (Math in Focus: experimentos e comparações).',
+ cv:()=>vTbl(['km','hm','dam','m','dm','cm','mm'],[['×10','×10','×10','×10','×10','×10','']]),
+ p:'Na escada das unidades, cada degrau para a direita multiplica por 10 e para a esquerda divide por 10. 1 kg = 1 000 g, 1 L = 1 000 mL e 1 t = 1 000 kg.',
+ pv:()=>mtBr('2 L',[[1,'250 mL',VC[1]],[1,'250 mL',VC[1]],[1,'250 mL',VC[1]],[1,'250 mL',VC[1]],[1,'250 mL',VC[1]],[1,'250 mL',VC[1]],[1,'250 mL',VC[1]],[1,'250 mL',VC[1]]]),
+ a:'Para converter, ande na escada: 3,5 km = 3 500 m (três casas à direita). 250 cm = 2,5 m (duas casas à esquerda). 2 kg 300 g = 2 300 g. Velocidades: 72 km/h ÷ 3,6 = 20 m/s (Laércio, cap. 11, p. 432).',
+ ex:['Nível 1',['3,5 km valem quantos metros?','3500','Três casas à direita.','3 500 m.'],['250 cm valem quantos metros?','2.5','Duas casas à esquerda.','2,5 m.'],['2 kg 300 g valem quantos gramas?','2300','2 000 + 300.','2 300 g.'],'Nível 2',['1,5 L valem quantos mL?','1500','1 L = 1 000 mL.','1 500 mL.'],['Uma tonelada tem quantos kg?','1000','1 t = 1 000 kg.','1 000 kg.'],['Uma garrafa de 2 L enche quantos copos de 250 mL?','8','2 000 ÷ 250.','8.'],'Nível 3',['72 km/h valem quantos m/s?','20','72 ÷ 3,6.','20 m/s.']],
+ pr:[['Quantos centímetros há em 3,2 m?','320','Duas casas à direita.','320 cm.'],['Quantos gramas há em 0,75 kg?','750','Três casas à direita.','750 g.'],['Quantos mL há em 3 L?','3000','3 × 1 000.','3 000 mL.'],['Quantos km há em 4 500 m?','4.5','Três casas à esquerda.','4,5 km.']],
+ rev:['Em que sentido se anda na escada para converter m em cm?','Converta 0,6 L em mL.']});
+
+LS('l35',11,'Tempo e volume',{
+ obj:'Operar com horas, minutos e segundos e relacionar volume e capacidade.',
+ obs:'Um filme começa às 19h40 e dura 2h35. A que horas termina? E quantos minutos de filme são?',
+ c:'Use o relógio de ponteiros de papel: gire o ponteiro dos minutos 60 vezes e veja a hora andar uma casa. Meça 5 minutos de verdade com um cronômetro (Singapore 1B, cap. 7).',
+ cv:()=>vTbl(['1 h','1 min','1 dia'],[['60 min','60 s','24 h']]),
+ p:'Linha do tempo: marque a hora de início e some os intervalos em partes, completando a hora cheia: 19h40 + 20 min = 20h; + 2h = 22h; + 15 min = 22h15.',
+ pv:()=>vNL(0,5,[0,2,5]),
+ a:'1 h = 60 min = 3 600 s. Some completando a hora cheia (ou converta tudo para minutos). Volume e capacidade: 1 m³ = 1 000 L e 1 dm³ = 1 L. Uma caixa de 2 m × 1 m × 0,5 m tem 1 m³ = 1 000 L (Laércio, cap. 11).',
+ ex:['Nível 1',['2 h 45 min valem quantos minutos?','165','2 × 60 + 45.','165.'],['Quantos segundos tem 1 hora?','3600','60 × 60.','3 600.'],['1 m³ equivale a quantos litros?','1000','1 m³ = 1 000 L.','1 000.'],'Nível 2',['Um filme de 2 h 35 min dura quantos minutos?','155','120 + 35.','155.'],['Um ônibus parte às 7h45 e chega às 10h20. Quantos minutos de viagem?','155','De 7h45 até 10h20.','2 h 35 min = 155.'],'Nível 3',['Uma caixa de 2 m × 1 m × 0,5 m comporta quantos litros?','1000','V = 1 m³.','1 000 L.'],['Um reservatório de 3 m × 2 m × 1,5 m comporta quantos litros?','9000','3 × 2 × 1,5 = 9 m³.','9 000 L.']],
+ pr:[['3 h 20 min valem quantos minutos?','200','180 + 20.','200.'],['Quantos minutos há em 1 dia?','1440','24 × 60.','1 440.'],['Um aquário de 1 m × 0,5 m × 0,4 m comporta quantos litros?','200','0,2 m³.','200 L.'],['Um trem parte às 14h50 e chega às 16h10. Quantos minutos?','80','10 min até as 15h e 70 depois.','80.']],
+ rev:['Como somar horas sem errar a virada de 60 minutos?','Converta 1 m³ em litros.']});
+
+LS('l36',12,'Tabelas e gráficos',{
+ obj:'Ler tabelas, pictogramas e gráficos de barras e responder perguntas sobre dados.',
+ obs:'Os alunos escolheram a fruta favorita: maçã 8, banana 5 e uva 7. Como mostrar isso de modo que todos entendam de relance?',
+ c:'Pergunte à turma e faça uma pilha de tampinhas por resposta. Cada tampinha é um voto; a pilha mais alta ganhou (Singapore 1B, cap. 2: gráficos).',
+ cv:()=>mtBr('Maçã',[[8,'8',VC[2]]])+mtBr('Banana',[[5,'5',VC[0]]])+mtBr('Uva',[[7,'7',VC[1]]]),
+ p:'No gráfico de barras, o comprimento da barra mostra a quantidade. Leia o título, os eixos e a escala antes de responder (Math in Focus, cap. 13).',
+ pv:()=>vTbl(['Fruta','Votos'],[['Maçã','8'],['Banana','5'],['Uva','7']]),
+ a:'Passos para ler dados: 1) leia o título; 2) veja o que cada eixo mede; 3) cheque a escala; 4) extraia os valores; 5) calcule o que se pede (total, diferença, parte do todo). Total = 8 + 5 + 7 = 20. Quantos a mais: 8 − 5 = 3. Porcentagem de um grupo: 8/20 = 40%.',
+ ex:['Nível 1',['Votos: maçã 8, banana 5 e uva 7. Quantos alunos votaram no total?','20','Some tudo.','20.'],['Quantos votos a mais teve a maçã que a banana?','3','8 − 5.','3.'],['Que porcentagem dos votos foi na maçã?','40','8/20.','40%.'],'Nível 2',['Uma tabela mostra vendas de segunda a quarta: 12, 15 e 9. Qual é o total?','36','12 + 15 + 9.','36.'],['Na tabela anterior, quanto a terça vendeu a mais que a quarta?','6','15 − 9.','6.'],'Nível 3',['Um gráfico mostra 4 barras: 10, 20, 30 e 40. Qual fração do total tem a barra de 30?','3/10','30/100.','3/10.'],['Em um pictograma, cada figura vale 5 alunos e há 7 figuras. Quantos alunos?','35','7 × 5.','35.']],
+ pr:[['Notas: matemática 8, português 7 e ciências 9. Qual é o total?','24','8 + 7 + 9.','24.'],['Na tabela anterior, ciências é quantos pontos maior que português?','2','9 − 7.','2.'],['Cada figura vale 3 livros. Há 9 figuras. Quantos livros?','27','9 × 3.','27.'],['Em um gráfico, as barras são 15, 25 e 10. Qual é a diferença entre a maior e a menor?','15','25 − 10.','15.']],
+ rev:['Quais são os 5 passos para ler um gráfico?','Invente uma tabela com 3 dados.']});
+
+LS('l37',12,'Média, moda e mediana',{
+ obj:'Calcular e interpretar média aritmética, moda e mediana.',
+ obs:'Quatro amigos têm 4, 8, 6 e 10 figurinhas. Se repartissem igualmente, quanto cada um teria?',
+ c:'Faça pilhas de fichas com 4, 8, 6 e 10. Passe fichas das pilhas altas para as baixas até todas ficarem iguais: cada pilha vai ter 7. Esse é o nivelamento que a média mede (Math in Focus 14.1).',
+ cv:()=>mtBr('Antes',[[4,'4',VC[1]],[8,'8',VC[1]],[6,'6',VC[1]],[10,'10',VC[1]]])+mtBr('Depois',[[7,'7',VC[0]],[7,'7',VC[0]],[7,'7',VC[0]],[7,'7',VC[0]]]),
+ p:'Média: soma ÷ quantidade. Moda: o valor que mais aparece. Mediana: o valor do meio, depois de colocar os dados em ordem.',
+ pv:()=>vTbl(['Dados','Ordem','Mediana'],[['7, 1, 9, 3, 5','1, 3, 5, 7, 9','5']]),
+ a:'Média = (4 + 8 + 6 + 10) ÷ 4 = 7. Moda de 3, 5, 5, 7, 5, 9 é 5. Mediana: ordene os dados; se a quantidade é par, tire a média dos dois do meio (2, 4, 6, 8 → (4 + 6) ÷ 2 = 5). Média ↔ soma: se a média de 5 notas é 7, a soma é 35 (Math in Focus, cap. 14; Ênio, cap. 5, p. 106).',
+ ex:['Nível 1',['Qual é a média de 4, 8, 6 e 10?','7','28 ÷ 4.','7.'],['Qual é a moda de 3, 5, 5, 7, 5 e 9?','5','O que mais aparece.','5.'],['Qual é a mediana de 7, 1, 9, 3 e 5?','5','Ordene: 1, 3, 5, 7, 9.','5.'],'Nível 2',['Qual é a mediana de 2, 4, 6 e 8?','5','Média dos dois do meio.','(4 + 6) ÷ 2 = 5.'],['A média de 5 notas é 7. Qual é a soma das notas?','35','5 × 7.','35.'],'Nível 3',['As notas 6, 7, 8 e x têm média 7. Quanto vale x?','7','Soma deve ser 28.','x = 7.'],['A média de alturas de 5 pavões é 3,8; 5,2; 4,8; 5,0; 4,6. Qual é a média?','4.68','23,4 ÷ 5.','4,68.']],
+ pr:[['Qual é a média de 5, 9 e 7?','7','21 ÷ 3.','7.'],['Qual é a moda de 2, 2, 3, 4, 4, 4 e 5?','4','Aparece 3 vezes.','4.'],['Qual é a mediana de 10, 3, 8, 6 e 12?','8','Ordene: 3, 6, 8, 10, 12.','8.'],['A média de 4 números é 9. Qual é a soma?','36','4 × 9.','36.']],
+ rev:['Quando a mediana é melhor que a média?','Calcule a média, a moda e a mediana de 2, 3, 3, 4, 8.']});
+
+LS('l38',12,'Probabilidade',{
+ obj:'Calcular a probabilidade de um evento simples e contar combinações.',
+ obs:'Num dado comum, qual a chance de sair um número par? Ela é maior ou menor que a de sair o 6?',
+ c:'Jogue um dado 30 vezes e anote. Faça o mesmo com uma moeda. Observe que os resultados variam, mas os casos possíveis são sempre os mesmos.',
+ cv:()=>vTbl(['Dado','1','2','3','4','5','6'],[['Par?','','sim','','sim','','sim']]),
+ p:'Para contar combinações, desenhe uma tabela ou uma árvore: 3 camisas e 4 bermudas formam 3 × 4 = 12 trajes diferentes.',
+ pv:()=>vTbl(['','b1','b2','b3','b4'],[['c1','✓','✓','✓','✓'],['c2','✓','✓','✓','✓'],['c3','✓','✓','✓','✓']]),
+ a:'Probabilidade = casos favoráveis ÷ casos possíveis. Fica sempre entre 0 (evento impossível) e 1 (evento certo). Em um dado, P(par) = 3/6 = 1/2. Numa urna com 3 bolas vermelhas e 7 azuis, P(vermelha) = 3/10. Princípio multiplicativo: 3 × 4 = 12 (Ênio, cap. 5, p. 106).',
+ ex:['Nível 1',['No lançamento de um dado, qual é a probabilidade de sair 4? Digite a fração.','1/6','1 caso favorável em 6.','1/6.'],['No lançamento de um dado, qual é a probabilidade de sair um número par?','1/2','2, 4 e 6.','3/6 = 1/2.'],['Qual é a probabilidade de sair 7 num dado comum?','0','Evento impossível.','0.'],'Nível 2',['Uma urna tem 3 bolas vermelhas e 7 azuis. Qual é a probabilidade de tirar uma vermelha?','3/10','3 em 10.','3/10.'],['Lançando uma moeda duas vezes, quantos resultados são possíveis?','4','CC, CK, KC, KK.','4.'],'Nível 3',['Lançando uma moeda duas vezes, qual é a probabilidade de dar duas caras?','1/4','1 em 4.','1/4.'],['Quantos trajes diferentes há com 3 camisas e 4 bermudas?','12','3 × 4.','12.']],
+ pr:[['Qual é a probabilidade de tirar um número maior que 4 num dado?','1/3','5 e 6.','2/6 = 1/3.'],['Uma urna tem 2 bolas pretas e 8 brancas. Qual é a probabilidade de sair preta?','1/5','2 em 10.','1/5.'],['Quantos números de 2 algarismos diferentes dá para formar com 1, 2 e 3?','6','3 × 2.','6.'],['Qual é a probabilidade de um evento certo?','1','Sempre acontece.','1.']],
+ rev:['Por que a probabilidade nunca passa de 1?','Quantos resultados tem o lançamento de dois dados?']});
+
+LS('l39',13,'Simulado final: revisão de todo o curso',{
+ obj:'Revisar as 12 etapas com questões misturadas, no estilo das provas do Laércio, e montar o caderno de erros.',
+ obs:'Você já passou por números, operações, frações, porcentagem, razão, potências, álgebra, equações, geometria, medidas e estatística. O que ainda trava? Liste três tópicos antes de começar.',
+ c:'Antes de resolver, escolha um tópico que travou e reexplique-o com objetos (CPA ao contrário). Se você consegue ensinar com fichas, aprendeu.',
+ cv:()=>vTbl(['Etapas','1 a 3','4 a 6','7 a 9','10 a 12'],[['Foco','números','frações e razão','álgebra','geometria e dados']]),
+ p:'Desenhe as barras antes de calcular nos problemas de parte-todo, comparação, antes-depois e razão. Só depois escolha a operação.',
+ pv:()=>mtBr('Todo',[[1,'parte',VC[1]],[1,'parte',VC[0]],[1,'?',VC[2]]]),
+ a:'Roteiro de prova (Laércio, cap. 14 e Ênio, "Resolvendo em equipe"): leia todas as questões; resolva primeiro as fáceis; deixe as difíceis para o fim; confira cada resposta com a prova real. No mês 6 faça as Provas 1 a 5 e a do CMRJ/2010 (p. 564 a 622) e refaça os testes de Calcule rápido.',
+ ex:['Nível 1 · Números e operações',['3 × (4 + 5) − 7 = ?','20','Parênteses e depois multiplicação.','20.'],['MMC(12, 15) = ?','60','Múltiplos.','60.'],['3/4 + 1/8 = ?','7/8','Oitavos.','7/8.'],'Nível 2 · Porcentagem, razão e regra de três',['Um produto de 200 tem 20% de desconto. Qual é o preço?','160','200 × 0,8.','160.'],['Divida 90 na razão 2:3:4. Qual é a maior parte?','40','9 partes de 10.','40.'],['6 operários fazem uma obra em 8 dias. Com 12 operários, em quantos dias?','4','Inversa.','4.'],'Nível 3 · Álgebra e equações',['5x − 7 = 3x + 9. Quanto vale x?','8','2x = 16.','8.'],['Em x² − 5x + 6 = 0, qual é a maior raiz?','3','Δ = 1.','3 e 2.'],['Se y = 2x + 5 e x = 4, quanto vale y?','13','8 + 5.','13.'],'Nível 4 · Geometria e dados',['Qual é a área de um trapézio de bases 8 e 4 e altura 5?','30','(8 + 4) × 5 ÷ 2.','30.'],['Catetos 6 e 8. Quanto mede a hipotenusa?','10','36 + 64.','10.'],['Qual é a média de 4, 8, 6 e 10?','7','28 ÷ 4.','7.'],['No lançamento de um dado, qual é a probabilidade de sair par?','1/2','3 em 6.','1/2.']],
+ pr:[['√144 + 3² = ?','21','12 + 9.','21.'],['Qual é a soma dos ângulos internos de um hexágono?','720','(6 − 2) × 180.','720°.'],['25% de 80 mais 10% de 50 = ?','25','20 + 5.','25.'],['Se 2x + 3 = 11, quanto vale 3x?','12','x = 4.','12.']],
+ rev:['Quais tópicos ainda travam? Escreva no caderno de erros.','Escolha 3 questões erradas e refaça com barras.']});
 
 /* ===== início ===== */
 fixDays();
