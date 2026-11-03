@@ -1402,7 +1402,7 @@ function viewHojeBody(){
  h+=revTodayCard();h+=card('c-eng','🌙','Diário do Imperador','Diary','diary','<span class="lab">Escreva em inglês, mesmo errando. Tente usar as frases da semana.</span><textarea data-f="diary" id="diary" placeholder="Today I woke up at...">'+esc(d.diary)+'</textarea><div class="bar"><i id="wcb" style="width:0"></i></div><p class="sub" id="wc"></p><div class="chips">'+['Today I woke up at ','I walked ','I studied ','I read the news about ','I feel ','Tomorrow I will '].map(p=>'<button class="chip" data-a="chip" data-v="'+esc(p)+'">'+esc(p.trim())+'…</button>').join('')+'</div>');
  h+='<h2>💰 Reino</h2>';
  h+=card('c-news','📰','Notícias (Mercúrio)','News','news','<p class="sub">Leia '+c.newsGoal+' artigos de fontes diferentes: dinheiro, mundo e cultura.</p><div class="step"><button class="btn" data-a="art" data-v="-1">−</button><b id="artv">'+d.arts+'</b><button class="btn" data-a="art" data-v="1">+</button></div><span class="lab" style="margin-top:10px">Manchete que mais chamou atenção</span><input data-f="head" value="'+esc(d.head)+'" placeholder="Ex.: Banco central mantém juros"><span class="lab" style="margin-top:10px">O que aprendi com isso</span><textarea data-f="lesson" style="min-height:70px">'+esc(d.lesson)+'</textarea><div class="row" style="margin-top:10px"><button class="btn alt sm" data-a="gomente" data-v="fontes">Abrir as fontes</button></div>');
- h+=card('c-fin','💰','Finanças (Plutos)','Finance','fin','<p class="sub">Preencha o acompanhamento financeiro na sua planilha do Excel e marque aqui.</p><div class="row"><button class="btn '+(d.fin?'':'alt')+'" data-a="fin">'+(d.fin?'✅ Registrei na planilha':'Registrei na planilha')+'</button><button class="btn ghost" data-a="nosp">'+(d.nosp?'🧘 Dia sem gasto ✔':'🧘 Dia sem gasto')+'</button></div><p class="small" style="margin:8px 0 0">Registrar vale 40 XP; dia sem gasto vale 15 XP e também cumpre o pilar.</p>');
+ h+=card('c-fin','💰','Finanças (Plutos)','Finance','fin','<p class="sub">Registre os gastos no app Finanças: ele marca aqui sozinho. Ou marque manualmente abaixo.</p><div class="row"><button class="btn" onclick="window.finWin=window.open(\'financas.html\',\'financas\')">💰 Abrir Finanças</button><button class="btn '+(d.fin?'':'alt')+'" data-a="fin">'+(d.fin?'✅ Registrei na planilha':'Registrei na planilha')+'</button><button class="btn ghost" data-a="nosp">'+(d.nosp?'🧘 Dia sem gasto ✔':'🧘 Dia sem gasto')+'</button></div><p class="small" style="margin:8px 0 0">Registrar vale 40 XP; dia sem gasto vale 15 XP e também cumpre o pilar.</p>');
  h+='<section class="card"><h3><span class="ic">🌙</span><span class="tt">'+L('Humor do dia','Mood')+'</span></h3><div class="moods" style="margin-top:10px">'+['😫','😕','😐','🙂','🤩'].map(m=>'<button class="mood '+(d.mood===m?'on':'')+'" data-a="mood" data-v="'+m+'">'+m+'</button>').join('')+'</div></section>';
  const ch=st.chests[s];
  if(complete(d,s)||ch)h+='<section class="card"><div class="chest '+(ch?'open':'')+'"><div class="big">'+(ch?'📜':'🎁')+'</div>'+(ch?'<b>'+esc(ch.txt)+'</b>':'<b>'+L('Baú do Oráculo','Oracle chest')+'</b><button class="btn" data-a="chest">Abrir baú</button>')+'</div></section>';
@@ -3905,6 +3905,16 @@ render();
 if(!st.onb)onboard();
 cloudBoot();
 
+</script>
+<script id="fin-sync">
+(function(){
+ function ap(m){if(!m||m.t!=='fin'||!/^\d{4}-\d\d-\d\d$/.test(m.d))return false;const d=dayRec(m.d);if(m.k==='nosp'){d.nosp=1;d.fin=0}else{d.fin=1;d.nosp=0}return true}
+ function drain(){try{const q=JSON.parse(localStorage.getItem('financas_fila')||'[]');if(!q.length)return;let ch=false;q.forEach(m=>{if(ap(m))ch=true});localStorage.removeItem('financas_fila');if(ch){save();render();toast('💰 Finanças atualizadas pelo app')}}catch(e){}}
+ addEventListener('storage',e=>{if(e.key==='financas_fila'||e.key==='financas_sinal')drain()});
+ addEventListener('message',e=>{try{if(e.data&&e.data.t==='fin'&&ap(e.data)){save();render();toast('💰 Finanças atualizadas pelo app')}}catch(x){}});
+ addEventListener('focus',drain);document.addEventListener('visibilitychange',()=>{if(!document.hidden)drain()});
+ setTimeout(drain,600);
+})();
 </script>
 </body>
 </html>
