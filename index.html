@@ -839,7 +839,7 @@ function curWeight(upTo){const w=st.weights.filter(x=>!upTo||x.d<=upTo).sort((a,
 
 /* ===== inteligência (1 a 100) ===== */
 const INT_T=['Curioso','Aprendiz das Musas','Escriba','Filósofo','Erudito','Sábio','Mestre','Oráculo','Arquiteto do Saber','Titã do Conhecimento','Mente de Zeus'];
-const intCum=L=>100*(L-1)+5*(L-1)*L/2;
+const intCum=L=>INT_A*(L-1)+INT_B*(L-1)*L/2;
 function intLevel(p){let L=1;while(L<100&&p>=intCum(L+1))L++;return L}
 const intTitle=L=>L>=100?INT_T[10]:INT_T[Math.floor((L-1)/10)];
 const TIPOS={livro:['📖','Livro',150],curso:['🎓','Curso',120],projeto:['🛠️','Projeto',100],artigo:['📄','Artigo longo',40],doc:['🎬','Documentário',40],palestra:['🎤','Palestra',30]};
@@ -879,7 +879,7 @@ function compute(){
  S.chests=Object.keys(st.chests).length;
  for(let k=0;k<S.done;k++){const i=k%STK.length;S.inv[i]=(S.inv[i]||0)+1}
  Object.keys(st.extraStk).forEach(k=>{S.inv[k]=(S.inv[k]||0)+st.extraStk[k]});S.uniq=Object.keys(S.inv).length;
- st.books.forEach(b=>{if(b.end){S.books++;S.intPts+=bookPts(b);if(b.tipo==='livro')S.pagesRead+=b.pages||0}});S.mathPts=mathPts();S.intPts+=S.mathPts;S.gramPts=gramPts();S.intPts+=S.gramPts;S.artPts=alPts();S.intPts+=S.artPts;S.art=alStats();S.intLv=intLevel(S.intPts);
+ st.books.forEach(b=>{if(b.end){S.books++;S.intPts+=bookPts(b);if(b.tipo==='livro')S.pagesRead+=b.pages||0}});S.mathPts=mathPts();S.intPts+=S.mathPts;S.gramPts=gramPts();S.intPts+=S.gramPts;S.artPts=alPts();S.intPts+=S.artPts;S.art=alStats();S.intLv=intGate(S);
  st.goals.forEach(x=>{});
  MIS.forEach(m=>{if(m.v(S)>=m.t)S.misDone.add(m.id)});
  ACH.forEach(a=>{if(a.t(S))S.earned.add(a.id)});
@@ -1195,8 +1195,8 @@ function renderTop(){
  $('#lim').textContent='Limitado por: '+ATT[S.lim].i+' '+ATT[S.lim].n+' (nível '+S.al[S.lim].lv+')';
  $('#phr').textContent='“'+PHR[vl-1]+'”';
  $('#attrs').innerHTML=ATT.map((a,i)=>{const x=S.al[i];return '<div class="at'+(i===S.lim?' lim':'')+'" title="'+a.n+'"><span>'+a.i+'</span><b>'+x.lv+'</b><i><u style="width:'+Math.round(x.p*100)+'%"></u></i></div>'}).join('');
- const il=S.intLv,span=(il<100?intCum(il+1):intCum(il)+1)-intCum(il),ip=il>=100?1:Math.max(0,Math.min(1,(S.intPts-intCum(il))/span));
- $('#int').innerHTML=(window.atlasInt?atlasInt(il,IMG['i'+il]):'<img src="'+IMG['i'+il]+'" alt="">')+'<b>INT '+il+'</b><i><u style="width:'+Math.round(ip*100)+'%"></u></i>';
+ const il=S.intLv,ip=intProg(S);
+ $('#int').innerHTML=(window.atlasInt?atlasInt(il,IMG['i'+il]):'<img src="'+IMG['i'+il]+'" alt="">')+'<b>INT '+il+(S.intLock?' 🔒':'')+'</b><i><u style="width:'+Math.round(ip*100)+'%"></u></i>';
  const dayNo=Math.max(0,diffDays(c.start,todayS())+1),mult=Math.min(2,1+0.1*Math.floor(S.streak/7));
  $('#pills').innerHTML='<div class="pill"><span class="flame">🔥</span><b>'+S.streak+'</b>'+L('sequência','streak')+' · x'+nf(mult)+'</div><div class="pill">'+L('Dia','Day')+'<b>'+(dayNo?roman(dayNo):'—')+'</b>'+(S.frozen?'❄️ '+S.frozen+' congelado(s)':'sem fim ∞')+'</div><div class="pill"><span class="coin">Δ</span><b>'+nf(S.coins,0)+'</b>'+L('moedas','coins')+'</div>';
  const tp=eyeTier(S.streak),td=todayS(),dd=getDay(td),pc=pcount(dd,td),ei=Math.min(1,tp[1]+(pc>=5?.15:pc>0?.05:0)),rs=document.documentElement.style;
@@ -1399,7 +1399,7 @@ function viewHojeBody(){
  h+=card('c-code','💻','Código (Hefesto)','Code','code','<p class="sub">Três missões do Reino. A 1ª do dia dá bônus; as três abrem o baú.</p>'+QN.map((n,i)=>'<button class="qrow '+(d.q[i]?'on':'')+'" data-a="q" data-v="'+i+'"><span>'+(d.q[i]?'✅':'⬜')+'</span><b>'+n+'</b><i>+'+QXP[i]+' XP</i></button>').join('')+'<div class="row" style="margin-top:10px"><button class="btn alt sm" data-a="goreino">Abrir o Reino do Código</button></div>');
  h+=mtCard();
  h+=card('c-phr','🗣️','Frases do dia (Atena)','Phrases','phr','<p class="sub">Uma frase nova por dia, revisada por 7 dias. Leia em voz alta e marque.</p><div id="phlist">'+phrList(s,true)+'</div><div class="chips" style="margin-top:8px"><button class="chip" data-a="pkall">Marcar todas</button><label class="chk" style="margin-left:4px"><input type="checkbox" data-f="phu" '+(d.phu?'checked':'')+'><span>Usei uma frase hoje (+15 XP)</span></label></div>');
- h+=card('c-eng','🌙','Diário do Imperador','Diary','diary','<span class="lab">Escreva em inglês, mesmo errando. Tente usar as frases da semana.</span><textarea data-f="diary" id="diary" placeholder="Today I woke up at...">'+esc(d.diary)+'</textarea><div class="bar"><i id="wcb" style="width:0"></i></div><p class="sub" id="wc"></p><div class="chips">'+['Today I woke up at ','I walked ','I studied ','I read the news about ','I feel ','Tomorrow I will '].map(p=>'<button class="chip" data-a="chip" data-v="'+esc(p)+'">'+esc(p.trim())+'…</button>').join('')+'</div>');
+ h+=revTodayCard();h+=card('c-eng','🌙','Diário do Imperador','Diary','diary','<span class="lab">Escreva em inglês, mesmo errando. Tente usar as frases da semana.</span><textarea data-f="diary" id="diary" placeholder="Today I woke up at...">'+esc(d.diary)+'</textarea><div class="bar"><i id="wcb" style="width:0"></i></div><p class="sub" id="wc"></p><div class="chips">'+['Today I woke up at ','I walked ','I studied ','I read the news about ','I feel ','Tomorrow I will '].map(p=>'<button class="chip" data-a="chip" data-v="'+esc(p)+'">'+esc(p.trim())+'…</button>').join('')+'</div>');
  h+='<h2>💰 Reino</h2>';
  h+=card('c-news','📰','Notícias (Mercúrio)','News','news','<p class="sub">Leia '+c.newsGoal+' artigos de fontes diferentes: dinheiro, mundo e cultura.</p><div class="step"><button class="btn" data-a="art" data-v="-1">−</button><b id="artv">'+d.arts+'</b><button class="btn" data-a="art" data-v="1">+</button></div><span class="lab" style="margin-top:10px">Manchete que mais chamou atenção</span><input data-f="head" value="'+esc(d.head)+'" placeholder="Ex.: Banco central mantém juros"><span class="lab" style="margin-top:10px">O que aprendi com isso</span><textarea data-f="lesson" style="min-height:70px">'+esc(d.lesson)+'</textarea><div class="row" style="margin-top:10px"><button class="btn alt sm" data-a="gomente" data-v="fontes">Abrir as fontes</button></div>');
  h+=card('c-fin','💰','Finanças (Plutos)','Finance','fin','<p class="sub">Preencha o acompanhamento financeiro na sua planilha do Excel e marque aqui.</p><div class="row"><button class="btn '+(d.fin?'':'alt')+'" data-a="fin">'+(d.fin?'✅ Registrei na planilha':'Registrei na planilha')+'</button><button class="btn ghost" data-a="nosp">'+(d.nosp?'🧘 Dia sem gasto ✔':'🧘 Dia sem gasto')+'</button></div><p class="small" style="margin:8px 0 0">Registrar vale 40 XP; dia sem gasto vale 15 XP e também cumpre o pilar.</p>');
@@ -1543,9 +1543,9 @@ function bookCard(b,done){
  let rv='';if(!b.r7&&age>=7)rv+='<button class="btn alt sm" data-a="brev" data-v="'+b.id+':7">Revisão de 7 dias (+50)</button>';if(!b.r30&&age>=30)rv+='<button class="btn alt sm" data-a="brev" data-v="'+b.id+':30">Revisão de 30 dias (+50)</button>';
  return '<details class="li" style="display:block"><summary><b>'+t[0]+' '+esc(b.t)+'</b> · '+'⭐'.repeat(b.rating||0)+' · +'+bookPts(b)+' pts</summary><div class="sub" style="margin-top:8px"><b>O que aprendi:</b> '+esc(b.learned)+'</div>'+((b.les||[]).filter(Boolean).length?'<ul class="small">'+b.les.filter(Boolean).map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>':'')+(b.quote?'<p class="small">“'+esc(b.quote)+'”</p>':'')+(b.apply?'<p class="small"><b>Vou aplicar:</b> '+esc(b.apply)+'</p>':'')+'<div class="row" style="margin-top:6px">'+rv+'<button class="btn ghost sm" data-a="bedit" data-v="'+b.id+'">Editar</button></div></details>'}
 function viewBiblioteca(){
- const S=ST,il=S.intLv,span=(il<100?intCum(il+1):intCum(il)+1)-intCum(il),ip=il>=100?1:Math.max(0,Math.min(1,(S.intPts-intCum(il))/span));
- let h='<section class="card"><div style="display:flex;gap:14px;align-items:center"><img src="'+IMG['i'+il]+'" style="width:84px;height:84px;border-radius:50%;flex:none" alt=""><div style="flex:1"><div class="small">Inteligência</div><div style="font:800 26px Cinzel,serif">Nível '+il+' / 100</div><div class="small">'+intTitle(il)+' · '+nf(S.intPts,0)+' pts</div><div class="bar"><i style="width:'+Math.round(ip*100)+'%"></i></div><div class="small" style="margin-top:4px">'+(il<100?'faltam '+nf(intCum(il+1)-S.intPts,0)+' pts para o nível '+(il+1):'nível máximo!')+'</div></div></div></section>';
- h+='<div class="stat"><div><b>'+S.books+'</b>concluídos</div><div><b>'+nf(S.pagesRead,0)+'</b>páginas</div><div><b>'+st.books.filter(b=>!b.end).length+'</b>em andamento</div></div>';
+ const S=ST,il=S.intLv,ip=intProg(S);
+ let h='<section class="card"><div style="display:flex;gap:14px;align-items:center"><img src="'+IMG['i'+il]+'" style="width:84px;height:84px;border-radius:50%;flex:none" alt=""><div style="flex:1"><div class="small">Inteligência</div><div style="font:800 26px Cinzel,serif">Nível '+il+' / 100</div><div class="small">'+intTitle(il)+' · '+nf(S.intPts,0)+' pts</div><div class="bar"><i style="width:'+Math.round(ip*100)+'%"></i></div><div class="small" style="margin-top:4px">'+intNeedTxt(S)+'</div></div></div></section>';
+ h+=intGateCard(S);h+='<div class="stat"><div><b>'+S.books+'</b>concluídos</div><div><b>'+nf(S.pagesRead,0)+'</b>páginas</div><div><b>'+st.books.filter(b=>!b.end).length+'</b>em andamento</div></div>';
  const cur2=st.books.filter(b=>!b.end);
  h+='<section class="card"><h3><span class="ic">📖</span><span class="tt">Em andamento</span></h3>'+(cur2.length?cur2.map(b=>bookCard(b,false)).join(''):'<div class="empty">Nenhum livro ou curso em andamento.</div>')+'</section>';
  h+='<section class="card"><h3><span class="ic">➕</span><span class="tt">Começar um livro ou curso</span></h3><div class="row" style="margin-top:8px"><input id="bk-t" placeholder="Título"><input id="bk-a" placeholder="Autor ou plataforma"></div><div class="row" style="margin-top:8px"><select id="bk-k">'+Object.keys(TIPOS).map(k=>'<option value="'+k+'">'+TIPOS[k][0]+' '+TIPOS[k][1]+'</option>').join('')+'</select><input id="bk-p" type="number" inputmode="numeric" placeholder="Páginas (se livro)"></div><button class="btn sm" style="margin-top:8px" data-a="badd">Começar</button></section>';
@@ -1556,9 +1556,82 @@ function viewBiblioteca(){
 function bookForm(id){
  const b=st.books.find(x=>x.id===id);if(!b)return;const done=!!b.end,t=TIPOS[b.tipo]||TIPOS.livro;
  openOv('<div style="text-align:left"><h2 style="font-size:20px;text-align:center">'+(done?'Editar':'Terminei')+': '+esc(b.t)+'</h2><span class="lab">Nota (1 a 5)</span><select id="bf-r">'+[5,4,3,2,1].map(n=>'<option value="'+n+'" '+((b.rating||5)===n?'selected':'')+'>'+'⭐'.repeat(n)+'</option>').join('')+'</select><span class="lab" style="margin-top:8px">O que aprendi (mínimo de 30 palavras para pontuar)</span><textarea id="bf-l" style="min-height:110px">'+esc(b.learned||'')+'</textarea><span class="lab" style="margin-top:8px">Três lições principais</span><input id="bf-1" value="'+esc((b.les||[])[0]||'')+'" placeholder="Lição 1"><input id="bf-2" style="margin-top:6px" value="'+esc((b.les||[])[1]||'')+'" placeholder="Lição 2"><input id="bf-3" style="margin-top:6px" value="'+esc((b.les||[])[2]||'')+'" placeholder="Lição 3"><span class="lab" style="margin-top:8px">Citação favorita</span><input id="bf-q" value="'+esc(b.quote||'')+'"><span class="lab" style="margin-top:8px">Como vou aplicar na minha vida</span><textarea id="bf-a" style="min-height:70px">'+esc(b.apply||'')+'</textarea><button class="btn" style="width:100%;margin-top:12px" data-a="bsave" data-v="'+id+'">'+(done?'Salvar':'Concluir e ganhar pontos')+'</button><button class="btn ghost" style="width:100%;margin-top:8px" data-a="close">Cancelar</button></div>')}
+/* ===== INT mais difícil + meta mensal de leitura ===== */
+/* Ajuste aqui: A = pontos base por nível, B = quanto cada nível fica mais caro, MIN_PAGES = páginas mínimas para o livro do mês contar */
+const INT_A=300,INT_B=10,INT_MIN_PAGES=80;
+function monthBooks(mo){return st.books.filter(b=>b.end&&String(b.end).slice(0,7)===mo&&b.tipo==='livro'&&(b.pages||0)>=INT_MIN_PAGES).length}
+function intGate(S){
+ const lp=intLevel(S.intPts),mo=todayS().slice(0,7),bm=monthBooks(mo);let g=st.intGate,ch=false;
+ if(!g||typeof g!=='object'){g=st.intGate={m:mo,lv:lp,eff:lp};ch=true}
+ else if(g.m!==mo){g.m=mo;g.lv=g.eff;ch=true}
+ const eff=bm>0?lp:Math.min(lp,g.lv);
+ if(g.eff!==eff){g.eff=eff;ch=true}
+ S.intLvPts=lp;S.intBm=bm;S.intLock=bm===0;S.intPend=lp-eff;
+ if(ch){try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){}}
+ return eff}
+function intProg(S){const il=S.intLv;if(il>=100)return 1;const span=intCum(il+1)-intCum(il);return Math.max(0,Math.min(1,(S.intPts-intCum(il))/span))}
+function intNeedTxt(S){const il=S.intLv;if(il>=100)return 'nível máximo!';
+ if(S.intLock&&S.intPts>=intCum(il+1))return '🔒 Pontos prontos! Conclua 1 livro (mín. '+INT_MIN_PAGES+' páginas) neste mês para liberar o nível '+(il+1);
+ return 'faltam '+nf(intCum(il+1)-S.intPts,0)+' pts para o nível '+(il+1)+(S.intLock?' · 🔒 precisa de 1 livro no mês':'')}
+function intGateCard(S){
+ const mo=parse(todayS()).toLocaleDateString('pt-BR',{month:'long',year:'numeric'}),cur=st.books.filter(b=>!b.end&&b.tipo==='livro');
+ const last=parse(todayS());last.setMonth(last.getMonth()+1,0);const left=last.getDate()-parse(todayS()).getDate();
+ let h='<section class="card"><h3><span class="ic">📖</span><span class="tt">Meta de leitura do mês</span></h3>';
+ if(S.intBm>0)h+='<div class="empty" style="color:var(--gold2)">✅ Você já concluiu '+S.intBm+' livro'+(S.intBm>1?'s':'')+' em '+mo+'. O seu INT está liberado este mês.</div>';
+ else{h+='<p class="sub">🔒 <b>Nenhum livro concluído em '+mo+'.</b> Os pontos continuam acumulando, mas o INT <b>não sobe de nível</b> até você terminar 1 livro (tipo Livro, mín. '+INT_MIN_PAGES+' páginas, com resumo de 30+ palavras). Faltam '+left+' dia'+(left===1?'':'s')+' no mês.</p>';
+  if(S.intPend>0)h+='<p class="sub" style="color:var(--gold2)">⏳ '+S.intPend+' nível'+(S.intPend>1?'s':'')+' esperando por você (nível '+S.intLvPts+' pelos pontos).</p>';
+  if(cur.length)h+=cur.map(b=>{const p=b.pages?Math.min(100,Math.round((b.pgRead||0)/b.pages*100)):0;return '<div class="li"><div><b>📖 '+esc(b.t)+'</b><small>'+(b.pages?(b.pgRead||0)+'/'+b.pages+' páginas · '+p+'%':'sem total de páginas')+'</small></div></div>'}).join('');
+  else h+='<p class="small">Nenhum livro em andamento. Comece um logo abaixo em “Começar um livro ou curso”.</p>'}
+ return h+'</section>'}
+
+/* ===== Revisão diária de frases (repetição espaçada) ===== */
+const REV_INT=[1,3,7,14,30,60],REV_NEW=10;let RS={day:'',ids:null,i:0,show:false,done:0,again:{}};
+function RV(){const r=st.rev||(st.rev={});r.c=r.c||{};r.my=r.my||{};r.log=r.log||{};if(!r.nd||typeof r.nd!=='object')r.nd={d:'',n:0};return r}
+function diaryMine(){const out=[],seen={};Object.keys(st.days).sort().reverse().forEach(k=>{const d=st.days[k];if(!d||!d.diary)return;(String(d.diary).replace(/\s+/g,' ').match(/[^.!?]+[.!?]*/g)||[]).forEach(x=>{x=x.trim();if(wc(x)<4)return;const id='d'+hash(x.toLowerCase());if(seen[id])return;seen[id]=1;out.push({id:id,k:k,en:x})})});return out}
+function revDeck(){const t=todayS(),n=diffDays(st.cfg.start,t),deck=[];
+ for(let i=n;i>=0;i--){const p=phrFor(i);deck.push({id:'p'+i,en:p[0],pt:p[1],src:'Frase do dia '+(i+1)})}
+ const r=RV();diaryMine().forEach(s=>{const m=r.my[s.id];if(m&&m.pt)deck.push({id:s.id,en:s.en,pt:m.pt,src:'Meu diário · '+parse(s.k).toLocaleDateString('pt-BR',{day:'2-digit',month:'short'})})});return deck}
+function revQueue(){const r=RV(),t=todayS(),deck=revDeck(),due=[],nw=[];
+ deck.forEach(c=>{const s=r.c[c.id];if(s){if(s.due<=t)due.push(c)}else nw.push(c)});
+ due.sort((a,b)=>r.c[a.id].due<r.c[b.id].due?-1:1);
+ if(r.nd.d!==t)r.nd={d:t,n:0};
+ const room=Math.max(0,REV_NEW-r.nd.n);return{due:due,nw:nw.slice(0,room),newTotal:nw.length,deck:deck}}
+function revStart(){const q=revQueue(),t=todayS();RS={day:t,ids:q.due.map(c=>c.id).concat(q.nw.map(c=>c.id)),i:0,show:false,done:0,again:{}}}
+function revTodayCard(){if(diffDays(st.cfg.start,todayS())<0)return '';const q=revQueue(),tot=q.due.length+q.nw.length,r=RV(),done=r.log[todayS()]||0;
+ return '<section class="card"><h3><span class="ic">🔁</span><span class="tt">Revisão de frases (Diário)</span></h3>'+(tot?'<p class="sub"><b>'+tot+'</b> frase'+(tot>1?'s':'')+' para revisar hoje ('+q.due.length+' de revisão + '+q.nw.length+' nova'+(q.nw.length===1?'':'s')+'). Leva uns 5 minutos.</p>':'<p class="sub">✅ Revisão de hoje em dia'+(done?' ('+done+' frases revisadas)':'')+'.</p>')+'<div class="row" style="margin-top:8px"><button class="btn alt sm" data-a="gomente" data-v="rev">'+(tot?'Revisar agora':'Ver revisão')+'</button></div></section>'}
+function viewRevisao(){
+ const t=todayS(),r=RV(),n=diffDays(st.cfg.start,t);
+ if(n<0)return '<section class="card"><div class="empty">As frases começam em '+parse(st.cfg.start).toLocaleDateString('pt-BR')+'.</div></section>';
+ if(RS.day!==t||!RS.ids)revStart();
+ const deck=revDeck(),byId={};deck.forEach(c=>byId[c.id]=c);
+ let h='<section class="card"><h3><span class="ic">🔁</span><span class="tt">Revisão diária de frases</span></h3>';
+ const id=RS.ids[RS.i],c=id&&byId[id];
+ if(c){
+  const tot=RS.ids.length,isNew=!r.c[c.id];
+  h+='<div class="bar"><i style="width:'+Math.round(RS.i/tot*100)+'%"></i></div><p class="small" style="margin:6px 0 0">Cartão '+(RS.i+1)+' de '+tot+' · '+(isNew?'🆕 nova':'🔁 revisão')+' · '+esc(c.src)+'</p>';
+  h+='<div class="wotd"><div class="w" style="font-size:22px">'+esc(c.en)+'</div>'+(RS.show?'<div class="p" style="margin-top:10px">'+esc(c.pt)+'</div>':'<p class="small" style="margin-top:10px">Leia em voz alta e tente lembrar o significado antes de ver a resposta.</p>')+'</div>';
+  h+='<div class="row" style="margin-top:10px"><button class="btn ghost sm" data-a="speak" data-v="'+esc(c.en)+'">🔊 Ouvir</button>'+(RS.show?'<button class="btn alt sm" data-a="rv_bad" data-v="'+c.id+'">😕 Errei</button><button class="btn sm" data-a="rv_ok" data-v="'+c.id+'">✅ Lembrei</button>':'<button class="btn sm" data-a="rv_show">Mostrar significado</button>')+'</div>'}
+ else{
+  const q=revQueue(),more=q.newTotal>0;
+  h+='<div class="empty">🏛️ '+(RS.done?'Revisão de hoje concluída! '+RS.done+' cartões revisados.':'Nada para revisar agora.')+' As próximas aparecem nos dias certos (1, 3, 7, 14, 30 e 60 dias).</div>'+(more?'<div class="row" style="margin-top:8px"><button class="btn alt sm" data-a="rv_more">Estudar mais '+Math.min(REV_NEW,q.newTotal)+' frases novas</button></div>':'')}
+ h+='</section>';
+ const learned=Object.keys(r.c).filter(k=>r.c[k].b>=3).length,seen=Object.keys(r.c).length;
+ h+='<div class="stat"><div><b>'+deck.length+'</b>frases no banco</div><div><b>'+seen+'</b>já estudadas</div><div><b>'+learned+'</b>bem fixadas</div></div>';
+ const mine=diaryMine();
+ h+='<section class="card"><h3><span class="ic">🌙</span><span class="tt">Frases do meu diário</span></h3><p class="sub">Frases que você escreveu no Diário do Imperador. Escreva o significado em português para <b>incluí-las na revisão diária</b>.</p>';
+ h+=mine.length?mine.slice(0,40).map(s=>{const m=r.my[s.id]||{};return '<div class="li" style="display:block"><div style="display:flex;gap:8px;align-items:flex-start"><div style="flex:1"><b>'+esc(s.en)+'</b><small>'+parse(s.k).toLocaleDateString('pt-BR',{day:'2-digit',month:'short'})+(m.pt?' · ✅ na revisão':'')+'</small></div><button class="btn ghost sm" data-a="speak" data-v="'+esc(s.en)+'">🔊</button></div><div class="row" style="margin-top:6px"><input id="rvm-'+s.id+'" value="'+esc(m.pt||'')+'" placeholder="Significado em português"><button class="btn sm" data-a="rv_my" data-v="'+s.id+'">Salvar</button></div></div>'}).join('')+(mine.length>40?'<p class="small">Mostrando as 40 mais recentes.</p>':''):'<div class="empty">Escreva no diário (aba Hoje) e suas frases aparecem aqui.</div>';
+ return h+'</section>'}
+function revGrade(id,ok){const r=RV(),t=todayS(),s=r.c[id],isNew=!s;
+ if(r.nd.d!==t)r.nd={d:t,n:0};
+ if(RS.again[id]===1){RS.again[id]=2}
+ else{let b=s?s.b:0;if(isNew)r.nd.n++;
+  b=ok?Math.min(REV_INT.length-1,isNew?1:b+1):0;
+  r.c[id]={b:b,due:addDays(t,ok?REV_INT[b]:1)};
+  if(!ok){RS.again[id]=1;RS.ids.push(id)}}
+ RS.done++;r.log[t]=(r.log[t]||0)+1;RS.i++;RS.show=false;save()}
 function viewMente(){
  const sub=SUB.mente;
- return subnav('mente',[['ing','🗣️ Inglês'],['mat','<img class="pit-s" src="'+MT_PIT+'" alt="">Matemática'],['gram',gramIco('pit-s')+'Gramática'],['bib','📚 Biblioteca'],['fontes','📰 Notícias']])+(sub==='gram'?viewGram():sub==='mat'?viewMat():sub==='bib'?viewBiblioteca():sub==='fontes'?viewFontes():viewIngles())}
+ return subnav('mente',[['ing','🗣️ Inglês'],['mat','<img class="pit-s" src="'+MT_PIT+'" alt="">Matemática'],['gram',gramIco('pit-s')+'Gramática'],['rev','🔁 Revisão'],['bib','📚 Biblioteca'],['fontes','📰 Notícias']])+(sub==='rev'?viewRevisao():sub==='gram'?viewGram():sub==='mat'?viewMat():sub==='bib'?viewBiblioteca():sub==='fontes'?viewFontes():viewIngles())}
 function viewReino(){return '<div id="reino"><nav id="rnav" class="rnav"></nav><div id="rapp"></div></div>'}
 
 /* ===== Notícias ao vivo (lidas do noticias.js gerado pelo script em Python) ===== */
@@ -1985,6 +2058,10 @@ function act(a,v,el){
  case 'notiftest':{notify('🔔 Teste do Olimpo','As notificações estão funcionando!','teste').then(ok=>{toast(ok?'Enviada! Veja a barra de notificações.':'Permita as notificações primeiro.');if(ok)sfx('win')});return}
  case 'goreino':tab='reino';window.scrollTo(0,0);render();return;
  case 'gocal':tab='cal';window.scrollTo(0,0);render();return;
+ case 'rv_show':RS.show=true;render();return;
+ case 'rv_ok':case 'rv_bad':revGrade(v,a==='rv_ok');sfx('tick');render();window.scrollTo(0,0);return;
+ case 'rv_more':{const r=RV();r.nd={d:todayS(),n:Math.max(0,r.nd.n-REV_NEW)};save();revStart();render();return}
+ case 'rv_my':{const el2=document.getElementById('rvm-'+v),r=RV();if(!el2)return;const x=el2.value.trim();if(x){r.my[v]={pt:x};toast('✅ Frase incluída na revisão diária.')}else{delete r.my[v];toast('Frase removida da revisão.')}save();RS.ids=null;render();return}
  case 'gomente':SUB.mente=v||'ing';tab='mente';window.scrollTo(0,0);render();return;
  case 'sub2':{const p=v.split(':');SUB[p[0]]=p[1];render();return}
  case 'callayer':calLayer=v;render();return;
