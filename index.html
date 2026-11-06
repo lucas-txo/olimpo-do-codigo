@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
 <script src="config.js"></script>
 <script src="noticias.js"></script>
 <meta name="theme-color" content="#0d1440">
@@ -732,10 +732,173 @@ start();
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){scan(document.body)});else scan(document.body);
 })();
 </script>
+<style id="layout-s1">
+/* =====================================================================
+   SCRIPT 1 — REORGANIZAÇÃO ESTRUTURAL (dashboard responsivo)
+   Seção única e autocontida. Só altera ORGANIZAÇÃO/RESPONSIVIDADE:
+   não mexe em cores, ícones, tipografia, dados ou lógica.
+   Vem por último no <head> para prevalecer sobre as regras antigas
+   (que continuam intactas acima, inclusive o antigo limite de 560px).
+
+   Regiões (desktop):  A #rail (navegação) | B #stage (topo + #view) | C #side
+   Breakpoints:  <700 celular · 700-899 tablet (1 coluna) ·
+                 900-1179 notebook pequeno (A + B; C desce) · >=1180 (A + B + C)
+   Contratos para os próximos scripts:
+     --nav-cols ........ colunas da barra inferior (SCRIPT 2: 5 + "Mais")
+     #rail / #side ..... regiões reservadas e vazias (SCRIPT 2 / 3-5)
+     #mission-slot ..... missão do dia (SCRIPT 3)
+     .card[data-collapsible][data-state="collapsed"] ... recolher (SCRIPT 5)
+     body.dbg-layout ... contorna as regiões, para conferir o layout
+   ===================================================================== */
+
+/* 1. Tokens ---------------------------------------------------------- */
+:root{
+  --lay-pad:14px;--lay-gap:16px;
+  --rail-w:clamp(190px,17vw,230px);
+  --side-w:clamp(240px,20vw,290px);
+  --stage-max:900px;
+  --nav-cols:7;
+  --nav-clear:116px;
+  --sat:env(safe-area-inset-top,0px);--sab:env(safe-area-inset-bottom,0px);
+  --sal:env(safe-area-inset-left,0px);--sar:env(safe-area-inset-right,0px);
+}
+
+/* 2. Base (celular primeiro) ----------------------------------------- */
+html{overflow-x:hidden;scroll-padding-top:calc(var(--sat) + 12px);scroll-padding-bottom:calc(var(--nav-clear) + var(--sab))}
+body{min-height:100vh;min-height:100dvh}
+body #app{
+  width:100%;max-width:680px;margin:0 auto;
+  display:grid;grid-template-columns:minmax(0,1fr);grid-template-areas:"stage" "side";gap:var(--lay-gap);
+  padding:calc(var(--sat) + 10px) max(var(--lay-pad),var(--sar)) calc(var(--nav-clear) + var(--sab)) max(var(--lay-pad),var(--sal));
+}
+#rail{grid-area:rail;display:none}
+#stage{grid-area:stage;display:flex;flex-direction:column;min-width:0}
+#side{grid-area:side;min-width:0}
+#side:empty,#mission-slot:empty{display:none}
+#mission-slot{min-width:0;margin-top:14px}
+#view,#top{min-width:0}
+#view{flex:1 0 auto}
+#view img{max-width:100%}
+body #nav{grid-template-columns:repeat(var(--nav-cols),1fr)}
+
+/* Proteção contra rolagem horizontal: 1fr não encolhe abaixo do conteúdo mínimo
+   (causava estouro no Templo, também no original); minmax(0,1fr) resolve. */
+.grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+.tile{min-width:0;overflow-wrap:anywhere}
+@media (max-width:479px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+
+/* Ganchos de painel recolhível (apenas o contrato; a lógica é do SCRIPT 5) */
+.card[data-collapsible]>h3{cursor:pointer}
+.card[data-collapsible][data-state="collapsed"]>:not(h3){display:none}
+
+/* Ajuda de conferência: document.body.classList.add('dbg-layout') */
+body.dbg-layout .region{outline:1px dashed var(--gold);outline-offset:-1px;min-height:160px;border-radius:14px}
+body.dbg-layout #side:empty{display:block}
+
+/* 3. Tablet em pé: uma coluna mais larga ------------------------------ */
+@media (min-width:700px) and (max-width:899px){
+  body #app{max-width:760px}
+  body #nav{left:50%;right:auto;width:min(640px,calc(100vw - 20px));transform:translateX(-50%)}
+}
+
+/* 4. Celular: cabeçalho compacto -------------------------------------- */
+@media (max-width:699px){
+  body #top{padding:10px 12px;border-radius:20px}
+  #top .hrow{display:grid;grid-template-columns:72px minmax(0,1fr) 58px;grid-template-areas:"av info int";gap:0 10px;align-items:center}
+  #top .avcol{grid-area:av;width:72px}
+  #top .hinfo{grid-area:info}
+  #top .intb{grid-area:int;width:58px;font-size:10px}
+  #top .intb .intf{width:54px;height:54px}
+  .emp-wrap,.emp-slot{width:72px;height:72px}
+  .prow{flex-wrap:wrap;gap:0 1px;margin-top:3px}
+  .prow span{font-size:9px}
+  .hinfo .hello{font-size:15px;line-height:1.15}
+  .hinfo .ep{font-size:10px}
+  .lvl{font-size:12px;margin:1px 0}
+  .lim{font-size:10px;line-height:1.25}
+  .phr{font-size:11px;margin-top:3px}
+  #top #attrs{grid-template-columns:repeat(4,minmax(0,1fr));gap:4px 8px;margin-top:8px}
+  #top .at{font-size:11px;gap:3px}
+  #top .at span{font-size:13px}
+  #top .pills{margin-top:8px;gap:6px;flex-wrap:nowrap}
+  #top .pill{min-width:0;padding:5px 6px;font-size:10.5px;border-radius:14px;display:flex;flex-wrap:wrap;align-items:baseline;justify-content:center;gap:0 4px;line-height:1.2}
+  #top .pill b{display:inline;font-size:15px}
+}
+@media (max-width:340px){#top #attrs{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* 5. Toque: alvos confortáveis (celular ou ponteiro "coarse") ---------- */
+@media (max-width:699px),(pointer:coarse){
+  .btn{min-height:44px}
+  .btn.sm{min-height:40px;padding:9px 12px}
+  .chip,.pc{min-height:40px;display:inline-flex;align-items:center;gap:.35em}
+  .opt,.qrow,.al-mi,.mood{min-height:44px}
+  input:not([type=checkbox]):not([type=radio]):not([type=range]),select{min-height:44px}
+  input[type=checkbox]{width:26px;height:26px}
+  body #nav button{min-height:48px}
+}
+
+/* 6. Teclado virtual: a barra inferior sai do caminho ao digitar -------- */
+@media (max-width:899px){
+  body:has(textarea:focus,select:focus,input:not([type]):focus,input[type=text]:focus,input[type=number]:focus,input[type=search]:focus,input[type=email]:focus,input[type=password]:focus,input[type=date]:focus,input[type=time]:focus,input[type=url]:focus,input[type=tel]:focus) #nav{display:none}
+}
+
+/* 7. Celular deitado: barra mais baixa --------------------------------- */
+@media (max-height:500px) and (orientation:landscape){
+  :root{--nav-clear:84px}
+  body #nav{padding:4px 6px}
+  body #nav button{min-height:40px}
+  body #nav button span{font-size:18px}
+}
+/* ...e o cabeçalho em duas colunas (como no desktop) para não ocupar a altura toda */
+@media (min-width:700px) and (max-height:500px) and (orientation:landscape){
+  body #top{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);grid-template-areas:"hrow attrs" "pills pills";gap:8px 20px;align-items:center;padding:10px 14px}
+  #top .hrow{grid-area:hrow}
+  #top #attrs{grid-area:attrs;margin-top:0}
+  #top .pills{grid-area:pills;margin-top:0}
+  #top .pill{padding:6px 8px}
+}
+
+/* 8. Notebook pequeno / tablet deitado: A + B; C desce ----------------- */
+@media (min-width:900px){
+  :root{--rail-w:clamp(180px,16vw,200px);--lay-gap:18px;--lay-pad:16px}
+  body #app{
+    max-width:calc(var(--rail-w) + var(--stage-max) + var(--lay-gap) + 2*var(--lay-pad));
+    grid-template-columns:var(--rail-w) minmax(0,1fr);grid-template-areas:"rail stage" ". side";
+    align-items:start;padding-bottom:24px;
+  }
+  #rail,#side{position:sticky;top:calc(var(--sat) + 10px);align-self:start;max-height:calc(100dvh - 20px);overflow:auto}
+  #rail{display:block}
+  #stage{min-height:calc(100dvh - 20px - var(--sat))}
+  #view{padding-bottom:16px}
+  /* A barra inferior vira "sticky" na base da região B (mesmo elemento, mesmo markup) */
+  body #nav{position:sticky;left:auto;right:auto;bottom:calc(10px + var(--sab));width:auto;transform:none;margin-top:auto}
+  /* Cabeçalho horizontal: identidade à esquerda, atributos à direita, indicadores embaixo */
+  body #top{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);grid-template-areas:"hrow attrs" "pills pills";gap:12px 20px;align-items:center}
+  #top .hrow{grid-area:hrow}
+  #top #attrs{grid-area:attrs;margin-top:0}
+  #top .pills{grid-area:pills;margin-top:0}
+  /* Grades quadradas não devem crescer sem limite na região B larga */
+  .cweek,.cgrid,.calnav,.heat,.photos{max-width:620px;margin-inline:auto}
+}
+
+/* 9. Desktop / notebook: A + B + C ------------------------------------ */
+@media (min-width:1180px){
+  :root{--rail-w:clamp(210px,16vw,240px)}
+  body #app{
+    max-width:calc(var(--rail-w) + var(--side-w) + var(--stage-max) + 2*var(--lay-gap) + 2*var(--lay-pad));
+    grid-template-columns:var(--rail-w) minmax(0,1fr) var(--side-w);grid-template-areas:"rail stage side";
+  }
+  body #side,body #side:empty{display:block}
+}
+</style>
 </head>
 <body>
 <div id="bg"><div class="bgi" id="bgA"><i class="fb"></i><i class="fm"></i></div><div class="bgi" id="bgB"><i class="fb"></i><i class="fm"></i></div><div class="bgshade"></div><div id="fxl"></div></div>
-<div id="app">
+<div id="app" data-layout="dashboard">
+ <!-- SCRIPT 1 · REGIÃO A: coluna reservada p/ navegação lateral (vazia; o #nav atual segue intacto — migração no SCRIPT 2). aria-hidden sai quando houver conteúdo. -->
+ <aside id="rail" class="region" data-region="nav" aria-hidden="true"></aside>
+ <!-- SCRIPT 1 · REGIÃO B: conteúdo central = cabeçalho #top + slot da missão + #view (+ #nav, que o JS continua preenchendo por id) -->
+ <div id="stage" data-region="main">
  <header id="top">
  <div class="hrow">
   <div class="avcol"><div class="emp-wrap"><div class="emp-slot frame-gold" id="emp" data-a="spin"></div></div><div class="prow" id="prow"></div></div>
@@ -745,9 +908,13 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
  <div id="attrs"></div>
  <div class="pills" id="pills"></div>
 </header>
- <main id="view"></main>
+ <div id="mission-slot" data-slot="mission"></div>
+  <main id="view"></main>
+  <nav id="nav"></nav>
+ </div>
+ <!-- SCRIPT 1 · REGIÃO C: painel complementar reservado (vazio; widgets nos próximos scripts) -->
+ <aside id="side" class="region" data-region="side" aria-hidden="true"></aside>
 </div>
-<nav id="nav"></nav>
 <div id="ov"></div>
 <div id="toast"></div>
 <canvas id="fx"></canvas>
