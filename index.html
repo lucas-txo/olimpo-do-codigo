@@ -976,6 +976,139 @@ body #nav button:focus-visible,#rail button:focus-visible,#more button:focus-vis
 
 @media (prefers-reduced-motion:reduce){body #app,#rail .rl-b,body #nav button .ni{transition:none!important}#more .mo-panel{animation:none!important}}
 </style>
+<style id="layout-s3">
+/* =====================================================================
+   SCRIPT 3 · PAINEL INICIAL (centro de comando)
+   Só organiza/apresenta. Prefixo .hx-* para não colidir com o CSS antigo.
+   Cores vêm das variáveis dos temas (Olimpo, Vulcano, Hades...).
+   A padronização visual completa é do SCRIPT 4; animações, do SCRIPT 5.
+   ===================================================================== */
+.datenav .dt small.hx-hello{font:800 13px 'Nunito',sans-serif;color:var(--gold2);margin:0 0 2px}
+.hx-id{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:10px}
+.hx-c{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:10px;font:800 11px/1.5 'Nunito',sans-serif;background:rgba(255,255,255,.12);color:var(--ink);white-space:nowrap}
+.hx-c.cat{background:color-mix(in srgb,var(--purple2) 32%,transparent)}
+.hx-c.xp{background:color-mix(in srgb,var(--gold) 30%,transparent);color:var(--gold2)}
+.hx-c.cn{background:color-mix(in srgb,var(--sea) 25%,transparent)}
+.hx-c.idl,.hx-c.ide{padding:3px 10px;font-size:12px;border:1px solid var(--line);background:rgba(8,12,40,.72);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
+.hx-c.idl{color:var(--gold2)}
+.hx-chips{display:flex;flex-wrap:wrap;gap:4px;margin:6px 0 0}
+
+/* ações rápidas: faixa rolável, sem estourar a largura */
+.hx-qa{display:flex;gap:8px;overflow-x:auto;padding:12px 2px 2px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.hx-qa::-webkit-scrollbar{display:none}
+.hx-q{flex:none;min-height:40px;padding:8px 14px;border-radius:20px;border:2px solid var(--line);background:rgba(255,255,255,.08);color:var(--ink);font:800 13px 'Nunito',sans-serif;cursor:pointer;white-space:nowrap}
+.hx-q:hover{border-color:var(--gold2)}.hx-q:active{transform:translateY(1px)}
+
+/* estados (compartilhados) */
+.hx-s{display:inline-block;padding:2px 9px;border-radius:10px;font:800 11px/1.5 'Nunito',sans-serif;background:rgba(255,255,255,.14);white-space:nowrap}
+.hx-s.s-done{background:var(--laurel);color:#06280f}
+.hx-s.s-late{background:var(--red);color:#2b0300}
+.hx-s.s-soon{background:var(--gold);color:#2b1a00}
+.hx-s.s-future{background:color-mix(in srgb,var(--sea) 45%,transparent)}
+.hx-s.s-prog{background:color-mix(in srgb,var(--purple2) 55%,transparent)}
+.hx-i{flex:none;width:34px;height:34px;display:grid;place-items:center;font-size:20px;border-radius:12px;background:rgba(0,0,0,.28);border:1px solid var(--line)}
+.hx-b{flex:1;min-width:0}
+.hx-b>b{display:block;font-size:14px;line-height:1.25;overflow-wrap:anywhere}
+.hx-b small{display:block;color:var(--mut);font-weight:600;font-size:12px;margin-top:2px;overflow-wrap:anywhere}
+.hx-a{flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:6px;max-width:46%}
+.hx-bt{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.hx-bt .btn{padding:6px 12px;box-shadow:0 3px 0 var(--gdark)}
+.hx-bt .btn.ghost{box-shadow:none}
+.hx-bar{height:6px;border-radius:4px;background:rgba(255,255,255,.14);overflow:hidden;margin-top:6px}
+.hx-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--laurel),var(--gold));border-radius:4px}
+
+/* 2.2 missão principal: o componente mais forte da página */
+.hx-hero{position:relative;margin-top:14px;padding:16px;border-color:var(--gold);background:linear-gradient(140deg,color-mix(in srgb,var(--gold) 20%,var(--card)),var(--card) 62%);box-shadow:0 0 0 1px color-mix(in srgb,var(--gold) 40%,transparent),0 10px 28px rgba(0,0,0,.38)}
+.hx-kick{font:800 11px 'Cinzel',Georgia,serif;letter-spacing:1.6px;text-transform:uppercase;color:var(--gold2);margin-bottom:6px}
+.hx-ht{font-size:21px;gap:10px}.hx-ht .ic{font-size:30px}.hx-ht .hx-s{align-self:flex-start}
+.hx-obj{display:flex;align-items:baseline;gap:8px;margin:2px 0 4px;font-size:14px}.hx-obj span{font:800 11px 'Nunito',sans-serif;letter-spacing:1px;text-transform:uppercase;color:var(--mut)}
+.hx-pr{margin:6px 0 0;font-size:13px;font-weight:800}
+.hx-hb{margin-top:12px}.hx-hb .btn{flex:1 1 150px;min-height:44px}
+
+/* 3 central de missões */
+.hx-tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:12px 0 4px}
+.hx-tiles div{display:flex;flex-direction:column;align-items:center;gap:1px;padding:9px 4px;border-radius:14px;border:1px solid var(--line);font:800 12px 'Nunito',sans-serif;text-align:center}
+.hx-tiles b{font:800 20px 'Cinzel',Georgia,serif}.hx-tiles span{font-size:15px}
+.hx-tiles .t-ok{background:rgba(70,194,122,.2)}.hx-tiles .t-ok b{color:#7ee0a6}
+.hx-tiles .t-pd{background:rgba(245,197,66,.16)}.hx-tiles .t-pd b{color:var(--gold2)}
+.hx-tiles .t-fu{background:color-mix(in srgb,var(--sea) 18%,transparent)}.hx-tiles .t-fu b{color:#9be4ee}
+.hx-g{margin-top:14px}
+.hx-g h4,.hx-h4{margin:0 0 6px;font:800 13px 'Cinzel',Georgia,serif;letter-spacing:.6px;color:var(--gold2)}
+.hx-g h4 em{font:800 11px 'Nunito',sans-serif;font-style:normal;padding:1px 7px;border-radius:9px;background:rgba(255,255,255,.14);color:var(--ink);margin-left:4px}
+.hx-m,.hx-p{display:flex;gap:10px;align-items:flex-start;padding:10px;margin-top:6px;border-radius:16px;border:1px solid var(--line);background:rgba(255,255,255,.06)}
+.hx-m.main{border-color:var(--gold);background:color-mix(in srgb,var(--gold) 12%,transparent)}
+.hx-m.s-late,.hx-p.s-late{border-color:var(--red);background:rgba(255,90,77,.12)}
+.hx-p.s-soon{border-color:var(--gold)}
+.hx-p.s-future,.hx-p.s-pend{opacity:.9}
+.hx-pl{display:flex;flex-direction:column}
+.hx-done{display:flex;flex-direction:column;gap:4px}
+.hx-d{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:12px;background:rgba(70,194,122,.12);font-size:13px}
+.hx-d .ok{color:#7ee0a6;font-weight:900}.hx-d .hx-i{width:26px;height:26px;font-size:15px;border-radius:9px}
+.hx-d b{flex:1;min-width:0;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.hx-d i{font-style:normal;font-size:11px;color:var(--mut)}
+
+/* 5 rotina */
+.hx-sum{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-top:10px;text-align:center;font:700 11px 'Nunito',sans-serif;color:var(--mut)}
+.hx-sum div{padding:6px 2px;border-radius:12px;background:rgba(255,255,255,.07)}.hx-sum b{display:block;font:800 17px 'Cinzel',Georgia,serif;color:var(--ink)}
+.hx-tl{display:flex;flex-direction:column;gap:5px;margin-top:10px}
+.hx-r{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:14px;background:rgba(255,255,255,.06)}
+.hx-r>b{flex:none;min-width:46px;font-size:13px}
+.hx-r .hx-i{width:30px;height:30px;font-size:17px}
+.hx-r .hx-b>span{font-size:14px;font-weight:700}
+.hx-r.nx{background:var(--gold);color:#2b1a00}.hx-r.nx small{color:#5a3d00}.hx-r.nx .hx-i{background:rgba(255,255,255,.4);border-color:transparent}
+.hx-r.ok{opacity:.75}.hx-r.ok .hx-b>span{text-decoration:line-through;text-decoration-color:rgba(255,255,255,.4)}
+.hx-ck{flex:none;font-size:16px;font-weight:900;color:var(--mut)}.hx-r.ok .hx-ck{color:#7ee0a6}
+.hx-h4{margin-top:14px}
+
+/* 6 metas */
+.hx-gl{margin-top:10px}.hx-gl small{color:var(--mut);font-weight:600;font-size:12px}
+.hx-gl.late small{color:#ff9d94}
+.hx-gt{display:flex;justify-content:space-between;gap:8px;align-items:baseline;font-size:14px}.hx-gt b{min-width:0;overflow-wrap:anywhere}.hx-gt span{font:800 13px 'Cinzel',Georgia,serif;color:var(--gold2)}
+
+/* 7 painel complementar */
+.hx-sidew{display:flex;flex-direction:column;gap:12px}
+.hx-sc.card{margin-top:0;padding:12px;border-radius:20px}.hx-sc h3{font-size:15px}.hx-sc .ic{font-size:20px}
+.hx-lv{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin:8px 0 4px}.hx-lv b{font:800 20px 'Cinzel',Georgia,serif;color:var(--gold2)}.hx-lv span{font-size:12px;color:var(--mut)}
+.hx-st2{display:grid;grid-template-columns:repeat(auto-fit,minmax(70px,1fr));gap:6px;margin:8px 0;text-align:center;font:700 11px 'Nunito',sans-serif;color:var(--mut)}
+.hx-st2 div{padding:6px 2px;border-radius:12px;background:rgba(255,255,255,.07)}.hx-st2 b{display:block;font:800 16px 'Cinzel',Georgia,serif;color:var(--ink)}
+.hx-sqs{display:flex;gap:4px;justify-content:space-between}
+.hx-sq{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4px 0;min-height:44px;border-radius:12px;border:2px solid rgba(255,255,255,.22);background:var(--card2);color:var(--ink);font:800 12px 'Nunito',sans-serif;line-height:1.1}
+.hx-sq small{font-size:8.5px;font-weight:700;color:var(--mut)}
+.hx-sq.g{border-color:var(--gold);box-shadow:0 0 8px rgba(245,197,66,.45)}.hx-sq.h{border-color:var(--sea)}.hx-sq.m{border-color:rgba(255,90,77,.6)}.hx-sq.on{background:var(--purple)}
+.hx-calh{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:8px 0 6px;font-size:14px}
+.hx-sc .cgrid{gap:3px;max-width:none}.hx-sc .cweek{max-width:none;font-size:10px}
+.hx-sc .ccell{border-radius:8px;border-width:1px;font-size:11px;min-height:30px}.hx-sc .ccell.sel{outline-width:2px;transform:none}
+.hx-sc .ccell .dd{width:4px;height:4px;margin-left:-2px;bottom:2px}
+.hx-sc .ccell:disabled{cursor:default}
+.hx-nx{display:flex;gap:10px;align-items:center;padding:7px 10px;margin-top:6px;border-radius:12px;background:rgba(255,255,255,.07);font-size:13px}.hx-nx b{flex:none;min-width:44px}
+.hx-ach{display:flex;gap:10px;align-items:center;margin-top:8px}.hx-ach>span{flex:none;width:34px;height:34px;display:grid;place-items:center;font-size:20px;border-radius:50%;background:rgba(0,0,0,.28);border:1px solid var(--gold)}
+.hx-ach b{display:block;font-size:13px}.hx-ach small{display:block;font-size:11.5px;color:var(--mut);font-weight:600;line-height:1.3}
+
+/* "Próximas atividades": abaixo de 1180px o #side desce para depois de todo o registro do dia, então o cartão
+   também aparece no fluxo principal (logo após as metas); a partir de 1180px ele fica só no painel lateral. */
+.hx-nextcard{display:block}.hx-p-next{display:none}
+@media (min-width:1180px){.hx-nextcard{display:none}.hx-p-next{display:block}}
+@media (max-width:1179px){#side{padding-bottom:4px}}
+/* >=900px o #side fica "sticky" com rolagem própria; na mesma largura em tela baixa (celular deitado) ele volta ao fluxo */
+@media (min-width:900px) and (max-height:500px){
+  body #side:not(:empty){display:block;position:static;max-height:none}
+}
+/* Celular: cartões baixos (ícone | texto | botões; o estado fica sob o texto), botões confortáveis, sem repetir informação */
+@media (max-width:699px){
+  .hx-hero{padding:14px}.hx-ht{font-size:18px}.hx-ht .ic{font-size:26px}
+  .hx-m,.hx-p{display:grid;grid-template-columns:34px minmax(0,1fr) auto;grid-template-areas:"i b t" "i s t";column-gap:10px;row-gap:6px;align-items:start;padding:9px}
+  .hx-m>.hx-i,.hx-p>.hx-i{grid-area:i}
+  .hx-m>.hx-b,.hx-p>.hx-b{grid-area:b}
+  .hx-a{display:contents}
+  .hx-a>.hx-s{grid-area:s;justify-self:start;align-self:end;white-space:normal}
+  .hx-a>.hx-bt{grid-area:t;flex-direction:column;align-items:stretch;justify-content:center;align-self:center}
+  .hx-bt .btn{min-height:40px;min-width:44px}
+  .hx-p .hx-bar{display:none}
+  .hx-m .hx-chips{display:none}
+  .hx-m.main .hx-chips{display:flex}
+  .hx-sum{gap:4px}
+}
+@media (max-width:360px){.hx-tiles b{font-size:17px}.hx-sum b{font-size:15px}}
+</style>
 </head>
 <body>
 <div id="bg"><div class="bgi" id="bgA"><i class="fb"></i><i class="fm"></i></div><div class="bgi" id="bgB"><i class="fb"></i><i class="fm"></i></div><div class="bgshade"></div><div id="fxl"></div></div>
@@ -1525,8 +1658,8 @@ function mascot(){const d=getDay(cur),n=pcount(d,cur),h=new Date().getHours();le
  else if(cur!==todayS()){t='Dia anterior: ajuste o que esqueceu de marcar. Sem culpa.'}
  else{t=OWL[(hash(cur+'|'+Math.floor(h/3))+owlN)%OWL.length];if(n>0)sub='Sequência protegida com '+n+' pilar'+(n>1?'es':'')+'! Vamos buscar o dia forte (5).';else if(h<7){m='happy';sub='Bom dia, guerreiro! A manhã é sua. Acordou?'}}
  return '<div class="owl" data-a="owl">'+owlHTML(m)+'<div class="bub">'+t+(sub?'<small class="sm1">'+sub+'</small>':'')+'</div></div>'}
-function pendHTML(){const d=getDay(cur),p=pil(d,cur),ps=PIL.filter((x,i)=>!p[i]),mp=!mtDone(d);if(!ps.length&&!mp)return '<div class="empty">✨ Os sete pilares do dia e a matemática foram vencidos.</div>';return '<div class="pend">'+ps.map(x=>'<button class="pc" data-a="goto" data-v="'+x.id+'">'+x.i+' '+L(x.pt,x.en)+'</button>').join('')+(mp?'<button class="pc" data-a="goto" data-v="c-math">🔢 Matemática</button>':'')+'</div>'}
-function routineHTML(){const c=st.cfg,now=new Date().getHours()*60+new Date().getMinutes(),w=tmin(c.wake);const R=[[w,'☀️','Acordar'],[w+30,'🏃','Caminhar '+nf(c.kmGoal)+' km'],[w+30+Math.round(c.kmGoal*11)+30,'📰','Ler as notícias'],[19*60,'💻','Estudar código (2 blocos de 45 min)'],[20*60,'💰','Registrar gastos na planilha'],[21*60,'🌙','Diário do Imperador']];let nx=R.findIndex(r=>r[0]>now);if(cur!==todayS())nx=-1;return '<div class="tl">'+R.map((r,i)=>'<div class="'+(i===nx?'nx':'')+'"><b>'+minT(r[0]%1440)+'</b><span>'+r[1]+' '+r[2]+'</span></div>').join('')+'</div>'}
+/* pendHTML() e routineHTML() foram reimplementadas no bloco SCRIPT 3 (mesmos nomes e mesmos pontos de chamada). */
+
 function card(id,ico,pt,en,k,body){return '<section class="card" id="'+id+'"><h3><span class="ic">'+ico+'</span><span class="tt">'+L(pt,en)+'</span><span class="bd" data-st="'+k+'"></span></h3>'+body+'</section>'}
 
 /* ===== frases do dia a dia (1 nova por dia, revisão por 7 dias) ===== */
@@ -1688,14 +1821,21 @@ function phrList(s,editable){
 function viewHojeBody(){
  const c=st.cfg,s=cur,d=getDay(s),isT=s===todayS(),dayNo=diffDays(c.start,s)+1,q=QUOTES[hash(s)%QUOTES.length],r=ST.rows.find(x=>x.s===s);
  let h=stories();
- h+='<div class="datenav"><button class="btn ghost sm" data-a="prev" '+(s<=ST.first?'disabled':'')+'>◀</button><div class="dt">'+(dayNo>0?'DIES '+roman(dayNo):'Pré-jogo')+'<small>Conquiste '+pctDay()+'% dos seus objetivos</small><small class="dd2">'+parse(s).toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'})+'</small></div><button class="btn ghost sm" data-a="next" '+(s>=maxDate()?'disabled':'')+'>▶</button></div>';
+ h+='<div class="datenav"><button class="btn ghost sm" data-a="prev" '+(s<=ST.first?'disabled':'')+'>◀</button><div class="dt"><small class="hx-hello">'+hxHello()+'</small>'+(dayNo>0?'DIES '+roman(dayNo):'Pré-jogo')+'<small id="hx-pct">Conquiste '+pctDay()+'% dos seus objetivos</small><small class="dd2">'+parse(s).toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'})+'</small></div><button class="btn ghost sm" data-a="next" '+(s>=maxDate()?'disabled':'')+'>▶</button></div>';
+ h+='<div class="hx-id" id="hx-id">'+hxId()+'</div>';
  if(!isT)h+='<div class="row" style="margin-top:8px"><button class="btn ghost sm" data-a="today">Voltar para hoje</button></div>';
  if(r&&r.frozen)h+='<div class="empty">❄️ Congelador usado neste dia: a sequência foi mantida. Se você fez algo, é só marcar abaixo.</div>';
  if(s<c.start)h+='<div class="empty">Antes de '+parse(c.start).toLocaleDateString('pt-BR')+' só o estudo de código conta.</div>';
+ h+=hxQuick();
+ h+='<section class="card hx-hero" id="hx-hero">'+hxHero()+'</section>';
+ h+='<section class="card hx-cmd" id="hx-central">'+hxCentral()+'</section>';
+ h+='<section class="card hx-pend" id="hx-pendcard"><h3><span class="ic">🎯</span><span class="tt">'+L('Hoje falta','Left today')+'</span></h3><div id="pend">'+pendHTML()+'</div><p class="small" style="margin:8px 0 0">1 pilar já mantém a sequência · 3 = 🥉 · 5 = 🥈 dia forte · 7 = 🥇 dia de ouro.</p></section>';
+ h+='<section class="card hx-rot" id="hx-rotcard"><h3><span class="ic">⏱️</span><span class="tt">'+L('Rotina do dia','Daily routine')+'</span></h3><div id="hx-rot">'+routineHTML()+'</div></section>';
+ h+='<section class="card hx-goals" id="hx-goalscard"><h3><span class="ic">🎯</span><span class="tt">'+L('Progresso das metas','Goals progress')+'</span></h3><div id="hx-goals">'+hxGoals()+'</div></section>';
+ h+='<section class="card hx-nextcard" id="hx-nextcard" data-hx-panel="next"><h3><span class="ic">⏳</span><span class="tt">Próximas atividades</span></h3><div id="hx-nexts">'+hxNext()+'</div></section>';
  h+=mascot();
- h+='<section class="card"><h3><span class="ic">🎯</span><span class="tt">'+L('Hoje falta','Left today')+'</span></h3><div id="pend">'+pendHTML()+'</div><p class="small" style="margin:8px 0 0">1 pilar já mantém a sequência · 3 = 🥉 · 5 = 🥈 dia forte · 7 = 🥇 dia de ouro.</p></section>';
  h+='<section class="card"><h3><span class="ic">🔥</span><span class="tt">'+L('Por que eu comecei','Why I started')+'</span></h3><textarea data-c="why" style="min-height:70px;margin-top:8px">'+esc(c.why)+'</textarea></section>';
- h+='<section class="card"><h3><span class="ic">⏱️</span><span class="tt">'+L('Rotina do dia','Daily routine')+'</span></h3><div style="margin-top:10px">'+routineHTML()+'</div></section>';
+ h+='<h2 id="hx-reg">📋 Registro do dia</h2>';
  h+='<h2>🏃 Corpo</h2>';
  h+=card('c-wake','☀️','Acordar (Apolo)','Wake up','wake','<p class="sub">Bônus de XP até '+minT(tmin(c.wake)+c.wakeGrace)+' · conta como feito até '+c.wakeLimit+'.</p><div class="row"><input type="time" data-f="wake" value="'+esc(d.wake)+'" aria-label="Horário que acordou"><button class="btn" data-a="now">'+L('Acordei!','I woke up!')+'</button></div>');
  h+=card('c-walk','🏃','Caminhada (Hermes)','Walk','walk','<div class="walk"><div class="ringw"><svg viewBox="0 0 100 100"><circle class="rb" cx="50" cy="50" r="44"/><circle id="ringc" class="rf" cx="50" cy="50" r="44" transform="rotate(-90 50 50)"/></svg><div class="rt"><b id="kmv">0</b><small>de '+nf(c.kmGoal)+' km</small></div></div><div class="wcol"><div><span class="lab">Quilômetros (pode passar da meta)</span><input type="number" inputmode="decimal" step="0.1" min="0" data-f="km" value="'+(d.km||'')+'" placeholder="0"></div><div><span class="lab">Minutos andando</span><input type="number" inputmode="numeric" min="0" data-f="mins" value="'+(d.mins||'')+'" placeholder="0"></div></div></div><div class="chips" style="margin-top:10px"><button class="chip" data-a="km+" data-v="1">+1 km</button><button class="chip" data-a="km+" data-v="5">+5 km</button><button class="chip" data-a="kmset" data-v="'+c.kmGoal+'">Meta ('+nf(c.kmGoal)+')</button><button class="chip" data-a="km+" data-v="-1">−1 km</button></div><label class="chk" style="margin-top:12px"><input type="checkbox" data-f="minWalk" '+(d.minWalk?'checked':'')+'><span>Caminhada mínima: vale '+c.minMin+' min em dia ruim.</span></label><p class="sub" id="kinfo" style="margin-bottom:0"></p>');
@@ -1717,6 +1857,189 @@ const GODIMG=["data:image/webp;base64,UklGRnwEAQBXRUJQVlA4WAoAAAAQAAAA9wIAJwEAQU
 function blessHTML(){const n=Math.floor(Math.max(0,diffDays(st.cfg.start,todayS()))/2)%GODS.length,g=GODS[n];return '<section class="bless"><img src="'+GODIMG[n]+'" alt="Bênção de '+g[0]+': '+g[1]+'"></section>'}
 function pctDay(){const d=getDay(cur),p=pil(d,cur);return Math.round((p.filter(Boolean).length+(mtDone(d)?1:0))/(PIL.length+1)*100)}
 function viewHoje(){return viewHojeBody()+blessHTML()}
+/* ===== SCRIPT 3 · PAINEL INICIAL (centro de comando) =====
+   Camada de APRESENTAÇÃO: lê st / ST / pil / dayAtt / goalPct / ACH já existentes.
+   Não cria dados, regras de XP, recompensas nem fontes paralelas: todo botão chama o act() original
+   (q, fin, now, nread, goto, goday, gocal) ou uma navegação (gosub, no mesmo padrão de gomente/gocal).
+   Regiões reatualizadas por hxUpdate(): #hx-id #hx-pct #hx-hero #hx-central #pend #hx-rot #hx-goals #side */
+const HX_ATT={corpo:['🏃','Corpo'],codigo:['💻','Código'],ingles:['🦉','Inglês'],riqueza:['💰','Riqueza'],mente:['🧠','Inteligência']};
+const HX_QMIN=[90,30,10]; /* minutos citados no texto das missões QN (2×45, 30, 10) */
+const HX_STL={done:'Concluída',late:'Atrasada',soon:'Em breve',future:'Agendada',prog:'Em andamento',pend:'Pendente'};
+function hxNow(){const n=new Date();return n.getHours()*60+n.getMinutes()}
+function hxChip(c,t){return '<span class="hx-c '+c+'">'+t+'</span>'}
+function hxSet(el,html){const e=typeof el==='string'?document.getElementById(el):el;if(e&&e.__hx!==html){e.innerHTML=html;e.__hx=html}}
+
+/* agenda do dia (mesma lista que a rotina já usava; agora compartilhada) */
+function routineItems(){const c=st.cfg,w=tmin(c.wake);return [[w,'☀️','Acordar','wake'],[w+30,'🏃','Caminhar '+nf(c.kmGoal)+' km','walk'],[w+30+Math.round(c.kmGoal*11)+30,'📰','Ler as notícias','news'],[19*60,'💻','Estudar código (2 blocos de 45 min)','code'],[20*60,'💰','Registrar gastos na planilha','fin'],[21*60,'🌙','Diário do Imperador','diary']]}
+
+/* os 8 itens do dia (7 pilares + matemática), com o estado real de cada um */
+function hxPillars(s){
+ const d=getDay(s),c=st.cfg,p=pil(d,s),isT=s===todayS(),ps=phrSet(s),rt={};
+ routineItems().forEach(r=>{rt[r[3]]=r[0]});
+ const km=d.km||0,gD=diaryGoal(s)||1,nw=wc(d.diary),phn=ps.filter(n=>d.pk.includes(n)).length,qn=d.q.filter(Boolean).length,mb=Array.isArray(d.mb)?d.mb.filter(Boolean).length:0,ws=wakeStat(d);
+ const cl=x=>Math.max(0,Math.min(1,x));
+ const wexp=isT&&!d.wake&&hxNow()>tmin(c.wakeLimit); /* janela do despertar encerrada: o jogo já não conta mais hoje */
+ const o=[
+ {k:'wake',ico:'☀️',cat:'corpo',desc:'Bônus de XP até '+minT(tmin(c.wake)+c.wakeGrace)+' · conta como feito até '+c.wakeLimit+'.',obj:'Acordar às '+c.wake,done:p[0],prog:p[0]?1:0,ptxt:d.wake?(ws?'✔ '+d.wake:'tarde · '+d.wake):'pendente',min:null,exp:wexp,qa:(isT&&!d.wake&&!wexp)?{a:'now',l:'Acordei!'}:null},
+ {k:'walk',ico:'🏃',cat:'corpo',desc:'Caminhe para manter o corpo em movimento. Pode passar da meta.',obj:nf(c.kmGoal)+' km',done:p[1],prog:cl(km/c.kmGoal),ptxt:nf(km)+'/'+nf(c.kmGoal)+' km',min:Math.round(c.kmGoal*11),qa:null},
+ {k:'news',ico:'📰',cat:'riqueza',desc:'Leia artigos de fontes diferentes: dinheiro, mundo e cultura.',obj:c.newsGoal+' artigos',done:p[2],prog:cl(d.arts/c.newsGoal),ptxt:d.arts+'/'+c.newsGoal+' artigos',min:null,qa:isT?{a:'nread',l:'+1 artigo'}:null},
+ {k:'diary',ico:'🌙',cat:'ingles',desc:'Escreva em inglês, mesmo errando.',obj:gD+' palavras',done:p[3],prog:cl(nw/gD),ptxt:nw+'/'+gD+' palavras',min:null,qa:null},
+ {k:'code',ico:'💻',cat:'codigo',desc:'Três missões do Reino do Código.',obj:'3 missões',done:p[4],prog:qn/3,ptxt:qn+'/3 missões',min:null,qa:null},
+ {k:'phr',ico:'🗣️',cat:'ingles',desc:'Uma frase nova por dia, revisada por 7 dias.',obj:ps.length+' frase(s)',done:p[5],prog:ps.length?cl(phn/ps.length):0,ptxt:phn+'/'+ps.length+' frases',min:null,qa:null},
+ {k:'fin',ico:'💰',cat:'riqueza',desc:'Registre os gastos na planilha ou marque dia sem gasto.',obj:'Finanças em dia',done:p[6],prog:p[6]?1:0,ptxt:d.fin?'✔ registrado':d.nosp?'✔ sem gasto':'pendente',min:null,qa:!p[6]?{a:'fin',l:'Registrei'}:null},
+ {k:'math',ico:'🔢',cat:'mente',desc:'Quatro blocos: teoria, exemplos, exercícios e revisão.',obj:'4 blocos · 1 hora',done:mtDone(d),prog:mb/4,ptxt:mb+'/4 blocos',min:60,qa:null}
+ ];
+ o.forEach(x=>{const P=PIL.find(y=>y.k===x.k);x.id=P?P.id:'c-math';x.name=P?P.pt:'Matemática';x.t=rt[x.k]!=null?rt[x.k]:null;x.xp=null});
+ o.sort((a,b)=>(a.t==null?1e9:a.t)-(b.t==null?1e9:b.t));
+ return o}
+
+/* missões: o pilar Código vira as 3 missões do Reino (as únicas com XP fixo no projeto: QXP) */
+function hxMissions(s){
+ const d=getDay(s),out=[];
+ hxPillars(s).forEach(x=>{
+  if(x.k!=='code'){out.push(x);return}
+  QN.forEach((n,i)=>out.push({k:'q'+i,ico:'💻',cat:'codigo',name:n,desc:'Missão do Reino do Código.',obj:'1 missão',id:'c-code',done:!!d.q[i],prog:d.q[i]?1:0,ptxt:d.q[i]?'✔ feita':'a fazer',min:HX_QMIN[i],xp:QXP[i],t:x.t,qa:{a:'q',v:i,l:'Concluir'}}))});
+ return out}
+
+function hxState(m,isT,now){
+ if(m.done)return {k:'done'};
+ if(isT&&m.t!=null){if(m.t<now)return {k:'late'};if(m.t-now<=60)return {k:'soon'};return {k:'future'}}
+ return {k:m.prog>0?'prog':'pend'}}
+
+function hxGroups(s){
+ const all=hxMissions(s),isT=s===todayS(),now=hxNow();
+ all.forEach(m=>{m.s=hxState(m,isT,now)});
+ const pend0=all.filter(m=>!m.done),pend=pend0.filter(m=>!m.exp).concat(pend0.filter(m=>m.exp)); /* janelas encerradas vão para o fim da fila */
+ return {all:all,main:pend[0]||null,sec:pend.slice(1),done:all.filter(m=>m.done)}}
+
+function hxMeta(m){
+ const a=HX_ATT[m.cat];let h=hxChip('cat',a[0]+' '+a[1]);
+ if(m.xp)h+=hxChip('xp','+'+m.xp+' XP')+hxChip('cn','≈ +'+Math.floor(m.xp/5)+' Δ');
+ if(m.min)h+=hxChip('tm','⏱ ~'+m.min+' min');
+ if(m.t!=null)h+=hxChip('hr','🕒 '+minT(m.t%1440));
+ return h}
+function hxBtns(m,compact){
+ let h='';
+ if(m.qa)h+='<button type="button" class="btn sm" data-a="'+m.qa.a+'"'+(m.qa.v!=null?' data-v="'+m.qa.v+'"':'')+'>'+m.qa.l+'</button>';
+ h+='<button type="button" class="btn sm ghost" data-a="goto" data-v="'+m.id+'" aria-label="Abrir '+esc(m.name)+'">'+(compact?'↗':'Ir para a atividade')+'</button>';
+ return h}
+function hxBadge(m,extra){return '<span class="hx-s s-'+m.s.k+'">'+HX_STL[m.s.k]+(extra||'')+'</span>'}
+
+/* 2.2 · missão principal */
+function hxHero(){
+ const g=hxGroups(cur),m=g.main,kick='<div class="hx-kick">⚔️ '+L('Missão principal do dia','Main quest of the day')+'</div>';
+ if(!m)return kick+'<h3 class="hx-ht"><span class="ic">🏛️</span><span class="tt">'+(cur===todayS()?'Dia vencido!':'Dia concluído')+'</span></h3><p class="sub">Todas as '+g.done.length+' missões deste dia foram cumpridas. Revise o registro ou acompanhe suas metas.</p><div class="row"><button type="button" class="btn sm" data-a="goto" data-v="hx-reg">Ver registro do dia</button><button type="button" class="btn sm ghost" data-a="gosub" data-v="jornada:metas">Consultar metas</button></div>';
+ const d=getDay(cur),ax=m.cat!=='mente'?dayAtt(d,cur,1)[m.cat]:0,a=HX_ATT[m.cat],pc=Math.round(m.prog*100);
+ return kick+'<h3 class="hx-ht"><span class="ic">'+m.ico+'</span><span class="tt">'+esc(m.name)+'</span>'+hxBadge(m)+'</h3>'
+  +'<p class="sub">'+esc(m.desc)+'</p>'
+  +'<div class="hx-obj"><span>Objetivo</span><b>'+esc(m.obj)+'</b></div>'
+  +'<div class="bar"><i style="width:'+pc+'%"></i></div><p class="hx-pr">'+esc(m.ptxt)+' · '+pc+'%</p>'
+  +'<div class="hx-chips">'+hxMeta(m)+'</div>'
+  +(ax>0?'<p class="small">Hoje, '+a[0]+' '+a[1]+' já somou +'+nf(ax,0)+' XP.</p>':'')
+  +'<div class="row hx-hb">'+hxBtns(m,false)+'</div>'}
+
+/* 3 · central de missões */
+function hxRow(m,main){
+ const pc=Math.round(m.prog*100);
+ return '<div class="hx-m s-'+m.s.k+(main?' main':'')+'"><span class="hx-i">'+m.ico+'</span><div class="hx-b"><b>'+esc(m.name)+'</b><div class="hx-chips">'+hxMeta(m)+'</div><div class="hx-bar"><i style="width:'+pc+'%"></i></div><small>'+esc(m.ptxt)+'</small></div><div class="hx-a">'+hxBadge(m)+'<div class="hx-bt">'+hxBtns(m,true)+'</div></div></div>'}
+function hxCentral(){
+ const g=hxGroups(cur),fut=g.all.filter(m=>!m.done&&m.s.k==='future').length,pend=(g.main?1+g.sec.length:0)-fut;
+ let h='<h3><span class="ic">📜</span><span class="tt">'+L('Central de Missões','Quest board')+'</span></h3>';
+ h+='<div class="hx-tiles"><div class="t-ok"><span>✔</span><b>'+pad(g.done.length)+'</b>Concluídas</div><div class="t-pd"><span>⚔️</span><b>'+pad(pend)+'</b>Pendentes</div><div class="t-fu"><span>⏳</span><b>'+pad(fut)+'</b>Futuras</div></div>';
+ h+='<div class="hx-g"><h4>👑 Missão principal</h4>'+(g.main?hxRow(g.main,true):'<div class="empty">✨ Nenhuma missão pendente neste dia.</div>')+'</div>';
+ if(g.sec.length)h+='<div class="hx-g"><h4>🗡️ Missões secundárias <em>'+g.sec.length+'</em></h4>'+g.sec.map(m=>hxRow(m,false)).join('')+'</div>';
+ if(g.done.length)h+='<div class="hx-g"><h4>🏅 Missões concluídas <em>'+g.done.length+'</em></h4><div class="hx-done">'+g.done.map(m=>'<div class="hx-d"><span class="ok">✔</span><span class="hx-i">'+m.ico+'</span><b>'+esc(m.name)+'</b>'+(m.xp?'<i>+'+m.xp+' XP</i>':'')+'</div>').join('')+'</div></div>';
+ return h}
+
+/* 4 · atividades pendentes ("Hoje falta") */
+function pendHTML(){
+ const s=cur,isT=s===todayS(),now=hxNow(),ps=hxPillars(s).filter(x=>!x.done);
+ if(!ps.length)return '<div class="empty">✨ Os sete pilares do dia e a matemática foram vencidos.</div>';
+ ps.forEach(m=>{m.s=hxState(m,isT,now)});
+ const rk={late:0,soon:1,prog:2,future:3,pend:4};
+ ps.sort((a,b)=>((a.exp?1:0)-(b.exp?1:0))||(rk[a.s.k]-rk[b.s.k]));
+ return '<div class="hx-pl">'+ps.map(m=>{const a=HX_ATT[m.cat],pr=m.s.k==='late'?' · prioridade alta':m.s.k==='soon'?' · prioridade média':'';
+  return '<div class="hx-p s-'+m.s.k+'"><span class="hx-i">'+m.ico+'</span><div class="hx-b"><b>'+esc(m.name)+'</b><small>'+a[0]+' '+a[1]+(m.t!=null?' · 🕒 '+minT(m.t%1440):'')+' · '+esc(m.ptxt)+'</small></div><div class="hx-a">'+hxBadge(m,pr)+'<div class="hx-bt">'+hxBtns(m,true)+'</div></div></div>'}).join('')+'</div>'}
+
+/* 5 · rotina diária */
+function routineHTML(){
+ const s=cur,isT=s===todayS(),now=hxNow(),P=hxPillars(s),by={};
+ P.forEach(x=>{x.s=hxState(x,isT,now);by[x.k]=x});
+ const tot=P.length,dn=P.filter(x=>x.done).length,pc=Math.round(dn/tot*100),items=routineItems();
+ const nx=isT?items.findIndex(r=>r[0]>now&&!by[r[3]].done):-1;
+ const row=(time,m,cls)=>{const a=HX_ATT[m.cat];return '<div class="hx-r '+(m.done?'ok ':'')+(cls||'')+'"><b>'+time+'</b><span class="hx-i">'+m.ico+'</span><div class="hx-b"><span>'+esc(m.k==='wake'||m.k==='walk'||m.k==='news'||m.k==='code'||m.k==='fin'||m.k==='diary'?(items.find(r=>r[3]===m.k)||[0,0,m.name])[2]:m.name)+'</span><small>'+a[0]+' '+a[1]+' · '+HX_STL[m.s.k]+'</small></div><span class="hx-ck" aria-label="'+(m.done?'concluída':'pendente')+'">'+(m.done?'✔':'○')+'</span></div>'};
+ let h='<div class="hx-sum"><div><b>'+tot+'</b>previstas</div><div><b>'+dn+'</b>concluídas</div><div><b>'+(tot-dn)+'</b>pendentes</div><div><b>'+pc+'%</b>do dia</div></div><div class="bar"><i style="width:'+pc+'%"></i></div>';
+ h+='<div class="hx-tl">'+items.map((r,i)=>row(minT(r[0]%1440),by[r[3]],i===nx?'nx':'')).join('')+'</div>';
+ const un=P.filter(x=>x.t==null);
+ if(un.length)h+='<h4 class="hx-h4">Sem horário fixo</h4><div class="hx-tl">'+un.map(m=>row('—',m,'')).join('')+'</div>';
+ return h}
+
+/* 6 · metas */
+function hxGoals(){
+ const t=todayS(),G=st.goals.map(g=>({g:g,p:goalPct(g),dl:g.deadline?diffDays(t,g.deadline):null}));
+ const go='<div class="row" style="margin-top:10px"><button type="button" class="btn sm ghost" data-a="gosub" data-v="jornada:metas">'+(G.length?'Ver todas as metas ('+G.length+')':'Criar uma meta')+'</button></div>';
+ if(!G.length)return '<div class="empty">Você ainda não tem metas cadastradas.</div>'+go;
+ const open=G.filter(x=>!x.g.done);
+ open.sort((a,b)=>((b.p>0)-(a.p>0))||((a.dl==null?1e9:a.dl)-(b.dl==null?1e9:b.dl)));
+ const dn=G.length-open.length;
+ const row=x=>{const late=x.dl!==null&&x.dl<0,pz=x.dl===null?'sem prazo':late?'⚠️ prazo passou há '+(-x.dl)+' dia(s)':x.dl===0?'é hoje!':'faltam '+x.dl+' dia(s)';
+  return '<div class="hx-gl'+(late?' late':'')+'"><div class="hx-gt"><b>'+esc(x.g.name)+'</b><span>'+x.p+'%</span></div><div class="bar"><i style="width:'+x.p+'%"></i></div><small>'+pz+(x.g.auto?' · progresso automático':'')+'</small></div>'};
+ return (open.length?open.slice(0,4).map(row).join(''):'<div class="empty">🏆 Todas as metas foram conquistadas.</div>')+(open.length>4?'<p class="small" style="margin:8px 0 0">+'+(open.length-4)+' em andamento nas demais metas.</p>':'')+(dn&&open.length?'<p class="small" style="margin:6px 0 0">🏆 '+dn+' conquistada(s).</p>':'')+go}
+
+/* 2.1 · saudação e identificação */
+function hxHello(){
+ const n=st.cfg.name||'herói';
+ if(cur!==todayS())return 'Revisando o dia · '+esc(n);
+ const h=new Date().getHours();
+ return (h<5?'Boa madrugada':h<12?'Bom dia':h<18?'Boa tarde':'Boa noite')+', '+esc(n)}
+function hxId(){
+ const S=ST,ep=EPI.find(e=>S.best>=e[0]||e[0]===0)[1];
+ return hxChip('idl','⚜️ Nível '+S.hl+' · '+LV[S.vl-1].n)+hxChip('ide',ep)}
+
+/* 8 · ações rápidas (somente funções que já existem) */
+function hxQuick(){
+ const b=(a,v,t)=>'<button type="button" class="hx-q" data-a="'+a+'" data-v="'+v+'">'+t+'</button>';
+ return '<nav class="hx-qa" aria-label="Ações rápidas">'+b('goto','hx-reg','📝 Registrar progresso')+b('goto','hx-rotcard','⏱️ Rotina')+b('gosub','jornada:metas','🎯 Metas')+b('gocal','','🗓️ Calendário')+b('gosub','templo:trof','🏆 Conquistas')+'</nav>'}
+
+/* 7 · painel complementar (#side) */
+function hxCal(){
+ const t=todayS(),p=t.split('-').map(Number),Y=p[0],M=p[1],first=new Date(Y,M-1,1).getDay(),dim=new Date(Y,M,0).getDate(),lay=calLayer;
+ let cells='';calLayer='all';
+ try{for(let i=0;i<first;i++)cells+='<i></i>';
+  for(let d=1;d<=dim;d++){const s=Y+'-'+pad(M)+'-'+pad(d),cl=calCls(s),dis=(cl==='out'||cl==='fut'),has=!dis&&wc(getDay(s).diary)>0;
+   cells+='<button type="button" class="ccell '+cl+(s===cur?' sel':'')+(s===t?' tdy':'')+'"'+(dis?' disabled':' data-a="goday" data-v="'+s+'"')+'><b>'+d+'</b>'+(has?'<i class="dd"></i>':'')+'</button>'}}
+ finally{calLayer=lay}
+ return '<div class="hx-calh"><b>'+MONTHS[M-1]+' '+Y+'</b><button type="button" class="btn ghost sm" data-a="gocal">Abrir</button></div><div class="cweek">'+DOW.map(x=>'<span>'+x+'</span>').join('')+'</div><div class="cgrid">'+cells+'</div><p class="small" style="margin:6px 0 0">🥇 7 · 🥈 5 · 🥉 3 pilares · ponto = diário.</p>'}
+function hxNext(){
+ const t=todayS(),now=hxNow(),P=hxPillars(t),by={};P.forEach(x=>{by[x.k]=x});
+ const nx=routineItems().filter(r=>r[0]>now&&!by[r[3]].done).slice(0,4);
+ if(nx.length)return nx.map(r=>'<div class="hx-nx"><b>'+minT(r[0]%1440)+'</b><span>'+r[1]+' '+esc(r[2])+'</span></div>').join('');
+ const w=routineItems()[0];
+ return '<div class="empty" style="padding:6px">Nada mais agendado para hoje.</div><div class="hx-nx"><b>Amanhã</b><span>'+w[1]+' '+w[2]+' · '+minT(w[0]%1440)+'</span></div>'}
+function hxSide(){
+ const e=document.getElementById('side');if(!e)return;
+ if(tab!=='hoje'){if(e.innerHTML){e.innerHTML='';e.__hx=''}e.setAttribute('aria-hidden','true');return}
+ e.removeAttribute('aria-hidden');
+ const S=ST,al=S.al[S.lim],at=ATT[S.lim],need=Math.max(0,Math.ceil(al.hi-S.att[at.k])),mult=Math.min(2,1+0.1*Math.floor(S.streak/7)),td=todayS();
+ const rows=S.rows.filter(r=>!r.pre).slice(-7),sq=rows.map(r=>{const c=r.tier>=2?'g':(r.tier===1||r.frozen||r.pc>0)?'h':(r.s===td?'':'m');return '<button type="button" class="hx-sq '+c+(r.s===cur?' on':'')+'" data-a="goday" data-v="'+r.s+'" aria-label="'+parse(r.s).toLocaleDateString('pt-BR',{day:'2-digit',month:'long'})+'"><b>'+parse(r.s).getDate()+'</b><small>'+DOW[parse(r.s).getDay()]+'</small></button>'}).join('');
+ const ids=(st.seen.ach||[]).slice(-3).reverse(),A=ids.map(id=>ACH.find(a=>a.id===id)).filter(Boolean);
+ const ach=A.length?A.map(a=>'<div class="hx-ach"><span>'+a.i+'</span><div><b>'+esc(a.n)+'</b><small>'+esc(a.d)+'</small></div></div>').join(''):'<div class="empty" style="padding:6px">Nenhuma conquista ainda.</div>';
+ const sc=(cls,pn,ic,tt,body)=>'<section class="card hx-sc '+cls+'" data-hx-panel="'+pn+'"><h3><span class="ic">'+ic+'</span><span class="tt">'+tt+'</span></h3>'+body+'</section>';
+ hxSet(e,'<div class="hx-sidew">'
+  +sc('hx-p-player','player','⚜️','Progresso do herói','<div class="hx-lv"><b>Nível '+S.hl+'</b><span>'+LV[S.vl-1].n+'</span></div><div class="hx-st2"><div><b>'+nf(S.xp,0)+'</b>XP total</div><div><b>'+nf(S.coins,0)+'</b>Δ moedas</div></div><div class="bar"><i style="width:'+Math.round(al.p*100)+'%"></i></div><p class="small" style="margin:6px 0 0">Próximo nível: faltam '+nf(need,0)+' XP em '+at.i+' '+at.n+', o atributo que limita o herói.</p>')
+  +sc('hx-p-streak','streak','🔥','Sequência','<div class="hx-st2"><div><b>'+S.streak+'</b>dias seguidos</div><div><b>'+S.best+'</b>recorde</div><div><b>x'+nf(mult)+'</b>bônus</div></div><div class="hx-sqs">'+sq+'</div>')
+  +sc('hx-p-cal','cal','🗓️','Calendário',hxCal())
+  +sc('hx-p-next','next','⏳','Próximas atividades',hxNext())
+  +sc('hx-p-ach','ach','🏆','Conquistas recentes',ach+'<div class="row" style="margin-top:8px"><button type="button" class="btn ghost sm" data-a="gosub" data-v="templo:trof">Ver todas</button></div>')
+  +'</div>')}
+
+/* atualização leve (chamada por updateStatuses/soft e pelo render) */
+function hxUpdate(){
+ if(tab!=='hoje')return;
+ hxSet('hx-id',hxId());
+ const p=document.getElementById('hx-pct');if(p)p.textContent='Conquiste '+pctDay()+'% dos seus objetivos';
+ hxSet('hx-hero',hxHero());hxSet('hx-central',hxCentral());hxSet('pend',pendHTML());hxSet('hx-rot',routineHTML());hxSet('hx-goals',hxGoals());hxSet('hx-nexts',hxNext());
+ hxSide()}
 function updateStatuses(){
  if(tab!=='hoje')return;
  const c=st.cfg,d=getDay(cur),ws=wakeStat(d),p=pil(d,cur);
@@ -1734,7 +2057,7 @@ function updateStatuses(){
  const ki=$('#kinfo');if(ki){const wt=curWeight(cur);let t='≈ '+Math.round(km*wt*0.55)+' kcal (estimativa) · ~'+nf(Math.round(km*1312),0)+' passos';if(km>0&&d.mins>0)t+=' · ritmo '+nf(d.mins/km)+' min/km';ki.textContent=t}
  const g=diaryGoal(cur),n=wc(d.diary),wb=$('#wcb');if(wb)wb.style.width=Math.min(100,n/g*100)+'%';const wce=$('#wc');if(wce)wce.textContent=n+' de '+g+' palavras na meta de hoje'+(n>=g?' ✔':'');
  const av=$('#artv');if(av)av.textContent=d.arts;
- const pe=$('#pend');if(pe)pe.innerHTML=pendHTML();
+ hxUpdate();
 }
 
 /* ===== Calendário editável ===== */
@@ -2312,7 +2635,7 @@ let tsub='trof',cur=todayS(),flt='todos',ST=null,wrapI=0,wrapSl=[],fcShow=false;
 window.getXP=()=>ST?ST.att.codigo:0;
 const VIEWS={hoje:viewHoje,cal:viewCal,reino:viewReino,mente:viewMente,artes:viewArtes,jornada:viewJornada,templo:viewTemplo};
 function refresh(){ST=compute()}
-function render(){refresh();document.body.dataset.theme=st.cfg.theme;renderTop();renderNav();$('#view').innerHTML=VIEWS[tab]();if(tab==='reino'&&window.Reino)Reino.render();updateStatuses();checkProgress()}
+function render(){refresh();document.body.dataset.theme=st.cfg.theme;renderTop();renderNav();$('#view').innerHTML=VIEWS[tab]();hxSide();if(tab==='reino'&&window.Reino)Reino.render();updateStatuses();checkProgress()}
 function soft(){refresh();renderTop();updateStatuses();checkProgress()}
 function levelUp(S){const vl=S.vl,n=LV[vl-1].n,pres=S.hl>10?' ★'+(S.hl-10):'';sfx('level');vib([80,60,160]);confetti(160);epic('Nível '+S.hl+'. '+n);
  openOv('<div class="bolt"></div><div class="emp-big">'+charHTML(vl)+'</div><h2>'+L('Nível','Level')+' '+S.hl+pres+'</h2><b style="font-size:20px">'+n+'</b><p class="sub"><i>“'+PHR[vl-1]+'”</i></p>'+(S.hl<=10?'<p class="sub" style="color:var(--gold2)">🌄 Novo cenário: <b>'+BGS[vl-1].n+'</b></p>':'<p class="sub" style="color:var(--gold2)">Prestígio: o jogo não tem fim.</p>')+'<button class="btn" data-a="close">Seguir a jornada</button>')}
@@ -2391,6 +2714,7 @@ function act(a,v,el){
  case 'gdone':{const g=st.goals.find(x=>x.id===v);if(g){g.done=g.done?0:1;save();if(g.done){sfx('win');confetti(160);toast('🏆 Meta conquistada: '+esc(g.name)+' (+300 moedas)')}render()}return}
  case 'gdel':if(confirm('Remover esta meta?')){st.goals=st.goals.filter(x=>x.id!==v);save();render()}return;
  case 'impreino':{try{applyReinoImport(JSON.parse(atob($('#imp-reino').value.trim())));toast('Progresso do Reino importado!')}catch(e){toast('Código inválido.')}return}
+ case 'gosub':{const p=String(v).split(':');if(p[0]==='templo')tsub=p[1];else SUB[p[0]]=p[1];tab=p[0];window.scrollTo(0,0);render();return}
  default:if(mathAct(a,v,el))return;return actOld(a,v,el)}
  }
 
