@@ -1982,8 +1982,7 @@ function viewHojeBody(){
  h+=card('c-walk','🏃','Caminhada (Hermes)','Walk','walk','<div class="walk"><div class="ringw"><svg viewBox="0 0 100 100"><circle class="rb" cx="50" cy="50" r="44"/><circle id="ringc" class="rf" cx="50" cy="50" r="44" transform="rotate(-90 50 50)"/></svg><div class="rt"><b id="kmv">0</b><small>de '+nf(c.kmGoal)+' km</small></div></div><div class="wcol"><div><span class="lab">Quilômetros (pode passar da meta)</span><input type="number" inputmode="decimal" step="0.1" min="0" data-f="km" value="'+(d.km||'')+'" placeholder="0"></div><div><span class="lab">Minutos andando</span><input type="number" inputmode="numeric" min="0" data-f="mins" value="'+(d.mins||'')+'" placeholder="0"></div></div></div><div class="chips" style="margin-top:10px"><button class="chip" data-a="km+" data-v="1">+1 km</button><button class="chip" data-a="km+" data-v="5">+5 km</button><button class="chip" data-a="kmset" data-v="'+c.kmGoal+'">Meta ('+nf(c.kmGoal)+')</button><button class="chip" data-a="km+" data-v="-1">−1 km</button></div><label class="chk" style="margin-top:12px"><input type="checkbox" data-f="minWalk" '+(d.minWalk?'checked':'')+'><span>Caminhada mínima: vale '+c.minMin+' min em dia ruim.</span></label><p class="sub" id="kinfo" style="margin-bottom:0"></p>');
  h+='<section class="card hx-hero" id="hx-hero">'+hxHero()+'</section>';
  h+='<section class="card hx-cmd" id="hx-central">'+hxCentral()+'</section>';
- h+='<section class="card hx-rot" id="hx-rotcard"><h3><span class="ic">⏱️</span><span class="tt">'+L('Rotina do dia','Daily routine')+'</span></h3><div id="hx-rot">'+routineHTML()+'</div></section>';
- h+='<section class="card hx-goals" id="hx-goalscard"><h3><span class="ic">🎯</span><span class="tt">'+L('Progresso das metas','Goals progress')+'</span></h3><div id="hx-goals">'+hxGoals()+'</div></section>';
+  h+='<section class="card hx-goals" id="hx-goalscard"><h3><span class="ic">🎯</span><span class="tt">'+L('Progresso das metas','Goals progress')+'</span></h3><div id="hx-goals">'+hxGoals()+'</div></section>';
  h+='<section class="card hx-nextcard" id="hx-nextcard" data-hx-panel="next"><h3><span class="ic">⏳</span><span class="tt">Próximas atividades</span></h3><div id="hx-nexts">'+hxNext()+'</div></section>';
  h+=mascot();
  h+='<section class="card"><h3><span class="ic">🔥</span><span class="tt">'+L('Por que eu comecei','Why I started')+'</span></h3><textarea data-c="why" style="min-height:70px;margin-top:8px">'+esc(c.why)+'</textarea></section>';
@@ -2091,13 +2090,12 @@ function hxRow(m,main){
  const pc=Math.round(m.prog*100);
  return '<div class="hx-m s-'+m.s.k+(main?' main':'')+'"><span class="hx-i">'+m.ico+'</span><div class="hx-b"><b>'+esc(m.name)+'</b><div class="hx-chips">'+hxMeta(m)+'</div><div class="hx-bar"><i style="width:'+pc+'%"></i></div><small>'+esc(m.ptxt)+'</small></div><div class="hx-a">'+hxBadge(m)+'<div class="hx-bt">'+hxBtns(m,true)+'</div></div></div>'}
 function hxCentral(){
- const g=hxGroups(cur),fut=g.all.filter(m=>!m.done&&m.s.k==='future').length,pend=(g.main?1+g.sec.length:0)-fut;
+ const s=cur,isT=s===todayS(),now=hxNow(),P=hxPillars(s);
+ P.forEach(x=>{x.s=hxState(x,isT,now)});
+ const dn=P.filter(x=>x.done).length,fut=P.filter(x=>!x.done&&x.s.k==='future').length,pend=P.length-dn-fut;
  let h='<h3><span class="ic">📜</span><span class="tt">'+L('Central de Missões','Quest board')+'</span></h3>';
- h+='<div class="hx-tiles"><div class="t-ok"><span>✔</span><b>'+pad(g.done.length)+'</b>Concluídas</div><div class="t-pd"><span>⚔️</span><b>'+pad(pend)+'</b>Pendentes</div><div class="t-fu"><span>⏳</span><b>'+pad(fut)+'</b>Futuras</div></div>';
- h+='<div class="hx-g"><h4>👑 Missão principal</h4>'+(g.main?hxRow(g.main,true):'<div class="empty">✨ Nenhuma missão pendente neste dia.</div>')+'</div>';
- if(g.sec.length)h+='<div class="hx-g"><h4>🗡️ Missões secundárias <em>'+g.sec.length+'</em></h4>'+g.sec.map(m=>hxRow(m,false)).join('')+'</div>';
- if(g.done.length)h+='<div class="hx-g"><h4>🏅 Missões concluídas <em>'+g.done.length+'</em></h4><div class="hx-done">'+g.done.map(m=>'<div class="hx-d"><span class="ok">✔</span><span class="hx-i">'+m.ico+'</span><b>'+esc(m.name)+'</b>'+(m.xp?'<i>+'+m.xp+' XP</i>':'')+'</div>').join('')+'</div></div>';
- return h}
+ h+='<div class="hx-tiles"><div class="t-ok"><span>✔</span><b>'+pad(dn)+'</b>Concluídas</div><div class="t-pd"><span>⚔️</span><b>'+pad(pend)+'</b>Pendentes</div><div class="t-fu"><span>⏳</span><b>'+pad(fut)+'</b>Futuras</div></div>';
+ return h+routineHTML(true)}
 
 /* 4 · atividades pendentes ("Hoje falta") */
 function pendHTML(){
@@ -2110,13 +2108,13 @@ function pendHTML(){
   return '<div class="hx-p s-'+m.s.k+'"><span class="hx-i">'+m.ico+'</span><div class="hx-b"><b>'+esc(m.name)+'</b><small>'+a[0]+' '+a[1]+(m.t!=null?' · 🕒 '+minT(m.t%1440):'')+' · '+esc(m.ptxt)+'</small></div><div class="hx-a">'+hxBadge(m,pr)+'<div class="hx-bt">'+hxBtns(m,true)+'</div></div></div>'}).join('')+'</div>'}
 
 /* 5 · rotina diária */
-function routineHTML(){
+function routineHTML(noSum){
  const s=cur,isT=s===todayS(),now=hxNow(),P=hxPillars(s),by={};
  P.forEach(x=>{x.s=hxState(x,isT,now);by[x.k]=x});
  const tot=P.length,dn=P.filter(x=>x.done).length,pc=Math.round(dn/tot*100),items=routineItems();
  const nx=isT?items.findIndex(r=>r[0]>now&&!by[r[3]].done):-1;
  const row=(time,m,cls)=>{const a=HX_ATT[m.cat];return '<div class="hx-r '+(m.done?'ok ':'')+(cls||'')+'"><b>'+time+'</b><span class="hx-i">'+m.ico+'</span><div class="hx-b"><span>'+esc(m.k==='wake'||m.k==='walk'||m.k==='news'||m.k==='code'||m.k==='fin'||m.k==='diary'?(items.find(r=>r[3]===m.k)||[0,0,m.name])[2]:m.name)+'</span><small>'+a[0]+' '+a[1]+' · '+HX_STL[m.s.k]+'</small></div><span class="hx-ck" aria-label="'+(m.done?'concluída':'pendente')+'">'+(m.done?'✔':'○')+'</span></div>'};
- let h='<div class="hx-sum"><div><b>'+tot+'</b>previstas</div><div><b>'+dn+'</b>concluídas</div><div><b>'+(tot-dn)+'</b>pendentes</div><div><b>'+pc+'%</b>do dia</div></div><div class="bar"><i style="width:'+pc+'%"></i></div>';
+ let h=noSum?'':'<div class="hx-sum"><div><b>'+tot+'</b>previstas</div><div><b>'+dn+'</b>concluídas</div><div><b>'+(tot-dn)+'</b>pendentes</div><div><b>'+pc+'%</b>do dia</div></div><div class="bar"><i style="width:'+pc+'%"></i></div>';
  h+='<div class="hx-tl">'+items.map((r,i)=>row(minT(r[0]%1440),by[r[3]],i===nx?'nx':'')).join('')+'</div>';
  const un=P.filter(x=>x.t==null);
  if(un.length)h+='<h4 class="hx-h4">Sem horário fixo</h4><div class="hx-tl">'+un.map(m=>row('—',m,'')).join('')+'</div>';
@@ -2147,7 +2145,7 @@ function hxId(){
 /* 8 · ações rápidas (somente funções que já existem) */
 function hxQuick(){
  const b=(a,v,t)=>'<button type="button" class="hx-q" data-a="'+a+'" data-v="'+v+'">'+t+'</button>';
- return '<nav class="hx-qa" aria-label="Ações rápidas">'+b('goto','hx-reg','📝 Registrar progresso')+b('goto','hx-rotcard','⏱️ Rotina')+b('gosub','jornada:metas','🎯 Metas')+b('gocal','','🗓️ Calendário')+b('gosub','templo:trof','🏆 Conquistas')+'</nav>'}
+ return '<nav class="hx-qa" aria-label="Ações rápidas">'+b('goto','hx-reg','📝 Registrar progresso')+b('goto','hx-central','⏱️ Rotina')+b('gosub','jornada:metas','🎯 Metas')+b('gocal','','🗓️ Calendário')+b('gosub','templo:trof','🏆 Conquistas')+'</nav>'}
 
 /* 7 · painel complementar (#side) */
 function hxCal(){
@@ -2186,7 +2184,7 @@ function hxUpdate(){
  if(tab!=='hoje')return;
  hxSet('hx-id',hxId());
  const p=document.getElementById('hx-pct');if(p)p.textContent='Conquiste '+pctDay()+'% dos seus objetivos';
- hxSet('hx-hero',hxHero());hxSet('hx-central',hxCentral());hxSet('pend',pendHTML());hxSet('hx-rot',routineHTML());hxSet('hx-goals',hxGoals());hxSet('hx-nexts',hxNext());
+ hxSet('hx-hero',hxHero());hxSet('hx-central',hxCentral());hxSet('pend',pendHTML());hxSet('hx-goals',hxGoals());hxSet('hx-nexts',hxNext());
  hxSide()}
 function updateStatuses(){
  if(tab!=='hoje')return;
@@ -2694,11 +2692,11 @@ else if(t=="a"){try{const o=JSON.parse(atob(document.getElementById("imp").value
 RKL(e=>{const k=e.target.closest("[data-ask]"),x=e.target.closest("[data-x]");if(k)ask(k.parentNode);if(x)backup(x.dataset.x)});
 const PH=(c,s)=>L.map((l,i)=>`<button class="nd${i==s?" on":""}${i>c?" lk":""}" data-n="${i}">${i<c?"✅":i>c?"🔒":l.e}<small>${i+1}</small></button>`).join("");
 function aulas(){const c=cur(),sel=N<0?Math.min(c,5):N,lv=L[sel],D=AU[sel];
-RA().innerHTML=`<section class="card"><h1>📖 Aulas</h1><div class="mut">Explicação do zero, com exemplos que você pode editar e executar. Toque num reino:</div><div class="path">${PH(c,sel)}</div></section>
+RA().innerHTML=`<section class="card"><h1>📖 Aulas</h1><div class="mut">Explicação do zero, com exemplos que você pode editar e executar. Toque num reino:</div><div class="path">${L.map((l,i)=>`<button class="nd${i==sel?" on":""}" data-n="${i}">${i<c?"✅":l.e}<small>${i+1}</small></button>`).join("")}</div></section>
 <section class="card"><h2>${lv.e} ${lv.n} · ${lv.t}</h2>${D?lv.m.map((m,j)=>{const x=D[j];return `<details class="mk" id="au${j}"${j==GJ?" open":""}><summary>📖 ${m[0]}</summary>${x.a}
 <p><b>🔤 Glossário (inglês = português)</b></p><ul>${x.g.map(g=>`<li><b>${g[0]}</b>: ${g[1]}</li>`).join("")}</ul>
 <p><b>⚠️ Erros comuns de iniciante</b></p><ul>${x.e.map(g=>`<li>${g}</li>`).join("")}</ul>
-<p><b>🔎 O que esse código mostra?</b></p>${x.o.map((q,k)=>`<div class="qz"><pre>${q[0].replace(/&/g,"&amp;").replace(/</g,"&lt;")}</pre>${q[1].map((o,i)=>`<button class="row" data-o="${sel}.${j}.${k}.${i}">${o}</button>`).join("")}<div class="mut"></div></div>`).join("")}<p><b>💬 Pergunte ao Claude</b></p><div class="ask" data-ctx="${sel}.${j}"><textarea rows="2" placeholder="Escreva sua dúvida sobre esta aula..."></textarea><button class="btn" data-ask>💬 Perguntar</button><div class="ans mut">${window.claude?"":"Neste arquivo local, o botão copia sua pergunta e abre o Claude em outra aba."}</div></div></details>`}).join(""):"<p>🚧 Estas aulas serão escritas na próxima rodada.</p>"}</section>`;
+${x.o.length?"<p><b>🔎 O que esse código mostra?</b></p>":""}${x.o.map((q,k)=>`<div class="qz"><pre>${q[0].replace(/&/g,"&amp;").replace(/</g,"&lt;")}</pre>${q[1].map((o,i)=>`<button class="row" data-o="${sel}.${j}.${k}.${i}">${o}</button>`).join("")}<div class="mut"></div></div>`).join("")}<p><b>💬 Pergunte ao Claude</b></p><div class="ask" data-ctx="${sel}.${j}"><textarea rows="2" placeholder="Escreva sua dúvida sobre esta aula..."></textarea><button class="btn" data-ask>💬 Perguntar</button><div class="ans mut">${window.claude?"":"Neste arquivo local, o botão copia sua pergunta e abre o Claude em outra aba."}</div></div></details>`}).join(""):"<p>🚧 Estas aulas serão escritas na próxima rodada.</p>"}</section>`;
 if(GJ>=0){const el=document.getElementById("au"+GJ);if(el)el.scrollIntoView();GJ=-1}}
 RKL(e=>{const t=e.target,r=t.closest("[data-run]"),o=t.closest("[data-o]"),g=t.closest("[data-go]");
 if(r){const box=r.parentNode,out=box.querySelector(".out"),L2=[];try{new Function("console",box.querySelector("textarea").value)({log:(...a)=>L2.push(a.map(x=>typeof x=="object"?JSON.stringify(x):String(x)).join(" "))});out.textContent=L2.join("\n")||"(sem saída: use console.log para mostrar algo)"}catch(err){out.textContent=err.name=="EvalError"?"O editor só roda no arquivo local (index.html). Aqui, copie o código e teste no Console (F12).":(L2.length?L2.join("\n")+"\n":"")+"❌ Erro: "+err.message}}
@@ -2770,10 +2768,581 @@ d:["Dia 1: monte o HTML (2 campos, botão e resultado).","Dia 2: calcule a médi
 q:[["O value de um input chega como:",["número","texto","booleano"],1,"Sempre texto; converta com Number()."],["Qual função testa se algo não é número?",["isNaN","isString","Number.text"],0,"isNaN('abc') devolve true."],["Para reagir ao clique usamos:",["addEventListener","querySelectorAll","push"],0,"addEventListener('click', função) escuta o clique."]],
 f:[["Number()","Converte texto em número."],["toFixed(1)","Formata com 1 casa decimal (devolve texto)."],["addEventListener","Escuta um evento (ex.: clique) e executa uma função."]]}
 ]];
+/* ===== Reino 2 · Soldado: aulas completas, divididas em etapas ===== */
+const ET=[];
+ET[1]=[
+{i:'🗃️',obj:'Guardar seu código com histórico e enviá-lo ao GitHub.',tp:['Explicar o que é Git e GitHub','Criar um repositório e fazer commits','Criar uma branch e fazer merge','Enviar o código com push']},
+{i:'🏗️',obj:'Montar páginas com as tags certas e formulários que coletam dados.',tp:['Usar header, main, section e footer','Criar um formulário com label e input','Escolher o type certo de cada campo','Usar required para validar']},
+{i:'🎨',obj:'Dar cor e forma à página e fazê-la caber em qualquer tela.',tp:['Ligar CSS ao HTML e usar seletores','Entender o modelo de caixa (box model)','Alinhar itens com Flexbox','Adaptar a tela com media query']},
+{i:'🐲',obj:'Juntar tudo: telas de login e cadastro de aluno.',tp:['Montar a tela de login','Montar o cadastro de aluno','Estilizar com Flexbox','Enviar o projeto ao GitHub']}];
+ST[1]=[
+{t:`<p><b>Passo 1 · O problema.</b> Já salvou um arquivo como <i>trabalho_final_v2_agora_vai.doc</i>? O <b>Git</b> resolve isso: é uma máquina do tempo do seu código. O <b>GitHub</b> é o armário online onde você guarda uma cópia.</p>
+<p><b>Passo 2 · Primeiro repositório.</b> <i>Repository (repositório)</i> é a pasta que o Git vigia. <i>Commit (registro)</i> é uma foto do projeto com uma mensagem.</p>
+<pre>git init
+git add .
+git commit -m "primeira versão"</pre>
+<p><code>add</code> escolhe o que entra na foto; <code>commit</code> tira a foto.</p>
+<p><b>Passo 3 · Branch e merge.</b> <i>Branch (ramo)</i> é uma cópia para testar sem estragar o original; <i>merge (mesclar)</i> traz o teste de volta.</p>
+<pre>git switch -c teste-visual
+git switch main
+git merge teste-visual</pre>
+<p><b>Passo 4 · Enviar.</b> <i>Push (empurrar)</i> manda seus commits ao GitHub; <i>pull (puxar)</i> traz as novidades.</p>
+<pre>git remote add origin URL
+git push -u origin main</pre>`,
+ex:[["Dica: qual comando mostra o que mudou? Escreva os 3 comandos para registrar o arquivo index.html com a mensagem 'cria página'.","git add index.html\ngit commit -m \"cria página\"\n# git status mostra o que mudou"],["Dica: pense em 'criar e entrar'. Crie e entre numa branch chamada login, depois volte para a main.","git switch -c login\ngit switch main"],["Dica: o que 'push' faz? Qual comando envia a branch main ao GitHub?","git push origin main"]],
+d:["Dia 1: crie uma pasta, rode git init e faça 2 commits com mensagens claras.","Dia 2: crie uma branch, mude um arquivo, volte à main e faça o merge.","Dia 3: crie o repositório 'reino-do-codigo' no GitHub e dê o primeiro push."],
+q:[["O que o comando commit faz?",["Envia ao GitHub","Registra uma foto do projeto","Cria uma branch"],1,"commit grava o estado atual com uma mensagem. Enviar é o push."],["Para que serve uma branch?",["Testar sem estragar a versão principal","Apagar arquivos","Baixar o Git"],0,"Branch é um ramo paralelo; depois você junta com merge."],["Qual a diferença entre Git e GitHub?",["São a mesma coisa","Git é a ferramenta; GitHub é o site que guarda cópias","GitHub roda sem Git"],1,"Git roda no seu computador; GitHub hospeda online."]],
+f:[["commit","registro: foto do projeto com mensagem."],["branch","ramo: cópia paralela para testar."],["push / pull","empurrar para o GitHub / puxar de lá."]]},
+{t:`<p><b>Passo 1 · HTML semântico.</b> <i>Semantic (semântico)</i> é usar a tag que diz o que o conteúdo <b>é</b>, como rótulos numa gaveta: o computador e o leitor de tela entendem.</p>
+<pre>&lt;header&gt;título&lt;/header&gt;
+&lt;main&gt;
+  &lt;section&gt;conteúdo&lt;/section&gt;
+&lt;/main&gt;
+&lt;footer&gt;rodapé&lt;/footer&gt;</pre>
+<p><b>Passo 2 · Formulário.</b> <code>&lt;form&gt;</code> é a ficha de papel da secretaria. Cada campo é um <code>&lt;input&gt;</code> e cada nome é um <code>&lt;label&gt;</code> (rótulo), ligado pelo <code>for</code> e <code>id</code>.</p>
+<pre>&lt;form&gt;
+  &lt;label for="nome"&gt;Nome&lt;/label&gt;
+  &lt;input id="nome" type="text" required&gt;
+  &lt;button type="submit"&gt;Enviar&lt;/button&gt;
+&lt;/form&gt;</pre>
+<p><b>Passo 3 · Tipos.</b> <code>type</code> escolhe o campo: <code>text</code>, <code>email</code>, <code>password</code> (esconde), <code>number</code>, <code>date</code>. <b>Passo 4 · Validar.</b> <code>required</code> impede enviar vazio.</p>`,
+ex:[["Dica: header, main e footer. Monte o esqueleto de uma página com os três.","&lt;header&gt;Faculdade&lt;/header&gt;\n&lt;main&gt;...&lt;/main&gt;\n&lt;footer&gt;2026&lt;/footer&gt;"],["Dica: qual type esconde as letras? Crie um campo de senha obrigatório com label.","&lt;label for=\"senha\"&gt;Senha&lt;/label&gt;\n&lt;input id=\"senha\" type=\"password\" required&gt;"],["Dica: o 'for' do label repete o quê? Ligue o label ao campo de e-mail.","&lt;label for=\"email\"&gt;E-mail&lt;/label&gt;\n&lt;input id=\"email\" type=\"email\"&gt;"]],
+d:["Dia 1: monte uma página com header, main, section e footer.","Dia 2: crie um formulário com nome, e-mail e senha, todos com label.","Dia 3: teste o required e o type email tentando enviar errado."],
+q:[["Por que usar tags semânticas?",["Só para enfeitar","Descrevem o papel do conteúdo","Deixam a página mais lenta"],1,"Elas dizem o que cada parte é, ajudando buscadores e leitores de tela."],["Qual type esconde o que se digita?",["text","password","email"],1,"password mostra bolinhas no lugar das letras."],["O que o required faz?",["Pinta o campo","Impede enviar o campo vazio","Apaga o campo"],1,"O navegador bloqueia o envio até preencher."]],
+f:[["label","rótulo: nome do campo, ligado ao input pelo id."],["semantic","semântico: tag que explica o papel do conteúdo."],["required","obrigatório: não deixa enviar vazio."]]},
+{t:`<p><b>Passo 1 · CSS.</b> HTML é o esqueleto; <b>CSS</b> é a roupa. Uma regra tem <i>selector (seletor)</i> e declarações.</p>
+<pre>h1 { color: navy; }
+.card { background: #eee; }
+#topo { margin: 0; }</pre>
+<p>Tag, <code>.classe</code> (vários elementos) e <code>#id</code> (um só). Ligue com <code>&lt;link rel="stylesheet" href="estilo.css"&gt;</code>.</p>
+<p><b>Passo 2 · Box model (modelo de caixa).</b> Todo elemento é uma caixa: <b>content</b> (conteúdo), <b>padding</b> (espaço dentro, como o acolchoado), <b>border</b> (borda) e <b>margin</b> (espaço fora).</p>
+<p><b>Passo 3 · Flexbox.</b> Alinha itens numa linha ou coluna, como livros numa prateleira.</p>
+<pre>.menu { display: flex; gap: 12px;
+  justify-content: space-between;
+  align-items: center; }</pre>
+<p><b>Passo 4 · Responsivo.</b> <i>Media query</i> muda o estilo conforme a largura da tela.</p>
+<pre>@media (max-width: 600px) {
+  .menu { flex-direction: column; }
+}</pre>`,
+ex:[["Dica: ponto para classe. Deixe de vermelho o texto da classe aviso.",".aviso { color: red; }"],["Dica: dentro = padding; fora = margin. Dê 16px de espaço interno e 8px externo ao .card.",".card { padding: 16px; margin: 8px; }"],["Dica: qual valor liga o flex? Coloque 3 itens lado a lado com 10px de espaço, e vire coluna em telas até 500px.",".lista { display: flex; gap: 10px; }\n@media (max-width: 500px) {\n  .lista { flex-direction: column; }\n}"]],
+d:["Dia 1: crie estilo.css, ligue ao HTML e mude cor e fonte do título.","Dia 2: faça 3 cartões com padding, borda e margin.","Dia 3: alinhe os cartões com Flexbox e teste no modo celular (F12)."],
+q:[["Qual seletor atinge vários elementos?",["#id","Classe (.nome)","Nenhum"],1,"A classe pode ser usada em muitos elementos; o id é único."],["Espaço DENTRO da caixa, entre conteúdo e borda:",["margin","padding","gap"],1,"padding é interno; margin é externo."],["Para que serve a media query?",["Mudar o estilo conforme o tamanho da tela","Criar formulários","Enviar ao GitHub"],0,"Ela aplica regras só em certas larguras de tela."]],
+f:[["padding / margin","espaço dentro / espaço fora da caixa."],["flexbox","alinha itens em linha ou coluna (display: flex)."],["media query","regra de CSS para certos tamanhos de tela."]]},
+{t:`<p><b>Chefe:</b> duas telas para o sistema da faculdade. Faça em passos pequenos e <b>dê um commit a cada passo</b>.</p>
+<p><b>Passo 1 · Login.</b> Arquivo <code>login.html</code>: título, e-mail, senha e botão Entrar.</p>
+<pre>&lt;main class="caixa"&gt;
+  &lt;h1&gt;Entrar&lt;/h1&gt;
+  &lt;form&gt;
+    &lt;label for="e"&gt;E-mail&lt;/label&gt;
+    &lt;input id="e" type="email" required&gt;
+    &lt;label for="s"&gt;Senha&lt;/label&gt;
+    &lt;input id="s" type="password" required&gt;
+    &lt;button&gt;Entrar&lt;/button&gt;
+  &lt;/form&gt;
+&lt;/main&gt;</pre>
+<p><b>Passo 2 · Cadastro.</b> <code>cadastro.html</code>: nome, matrícula (<code>number</code>), curso e nascimento (<code>date</code>).</p>
+<p><b>Passo 3 · Estilo.</b> Centralize a caixa e empilhe os campos com Flexbox:</p>
+<pre>body { display: flex; justify-content: center; }
+.caixa { width: 100%; max-width: 360px; padding: 16px; }
+form { display: flex; flex-direction: column; gap: 8px; }</pre>
+<p><b>Passo 4 · Enviar.</b> <code>git add .</code>, <code>git commit</code> e <code>git push</code>.</p>`,
+ex:[["Dica: matrícula é só número. Qual type e qual atributo a tornam obrigatória?","&lt;label for=\"mat\"&gt;Matrícula&lt;/label&gt;\n&lt;input id=\"mat\" type=\"number\" required&gt;"],["Dica: 'empilhar' = coluna. Que 3 linhas de CSS empilham os campos do form com 8px de espaço?","form {\n  display: flex;\n  flex-direction: column;\n  gap: 8px;\n}"]],
+d:["Dia 1: monte login.html e faça o commit.","Dia 2: monte cadastro.html com 4 campos e faça o commit.","Dia 3: estilize as duas telas, teste no celular e dê o push."],
+q:[["Qual type serve para a data de nascimento?",["text","date","password"],1,"date mostra um calendário e valida o formato."],["Por que fazer commits pequenos?",["Para gastar menos internet","Cada passo fica salvo e fácil de desfazer","O GitHub exige"],1,"Commits pequenos criam um histórico claro."],["O que faz flex-direction: column?",["Coloca os itens um sobre o outro","Apaga a borda","Centraliza o texto"],0,"Muda o eixo do Flexbox: de linha para coluna."]],
+f:[["flex-direction","direção do Flexbox: row (linha) ou column (coluna)."],["type=date","campo de data com calendário."],["commit pequeno","um passo por registro: histórico limpo."]]}];
+/* ===== Reinos 3 e 4 ===== */
+ET[2]=[
+{i:'🏷️',obj:'Dar tipos ao JavaScript para o computador avisar erros antes de rodar.',tp:['Declarar variáveis com tipo','Criar uma interface','Tipar parâmetros e retorno de função','Compilar com tsc']},
+{i:'🗄️',obj:'Ler e alterar dados de um banco com SQL.',tp:['Usar SELECT com WHERE','Usar INSERT','Usar UPDATE com WHERE','Usar DELETE com WHERE']},
+{i:'🧩',obj:'Desenhar as tabelas do sistema e ligá-las entre si.',tp:['Definir tabelas e colunas','Escolher chave primária','Ligar tabelas com chave estrangeira','Desenhar alunos, cursos e matrículas']},
+{i:'🐲',obj:'Criar o banco PostgreSQL da faculdade com dados de teste.',tp:['Criar o banco e as tabelas','Inserir dados de teste','Consultar com JOIN','Guardar o script no GitHub']}];
+ST[2]=[
+{t:`<p><b>Passo 1 · Tipos.</b> <b>TypeScript</b> é o JavaScript com etiquetas: você diz o <i>type (tipo)</i> de cada caixa e ele reclama se colocar o conteúdo errado, como uma gaveta "meias" que não aceita sapato.</p>
+<pre>let nome: string = "Ana";
+let media: number = 7.5;
+let ativo: boolean = true;</pre>
+<p><b>Passo 2 · Interface.</b> <i>Interface (molde)</i> descreve o formato de um objeto.</p>
+<pre>interface Aluno { nome: string; matricula: number; curso: string; }</pre>
+<p><b>Passo 3 · Funções.</b> Tipe o que entra e o que sai.</p>
+<pre>function listar(alunos: Aluno[]): void {
+  alunos.forEach(a =&gt; console.log(a.nome));
+}</pre>
+<p><b>Passo 4 · Compilar.</b> <code>tsc arquivo.ts</code> gera o .js e mostra os erros de tipo.</p>`,
+ex:[["Dica: string é texto. Declare a variável curso com tipo e valor 'Direito'.","let curso: string = \"Direito\";"],["Dica: use o molde Aluno. Crie uma função que recebe um Aluno e devolve o nome (string).","function nomeDe(a: Aluno): string {\n  return a.nome;\n}"]],
+d:["Dia 1: crie a interface Aluno e 2 objetos desse tipo.","Dia 2: escreva listarAlunos(alunos: Aluno[]) e rode com node.","Dia 3: provoque um erro de tipo de propósito e leia a mensagem do tsc."],
+q:[["Para que serve uma interface?",["Descrever o formato de um objeto","Apagar variáveis","Criar o banco"],0,"Ela é o molde: diz quais campos e tipos o objeto tem."],["O que acontece ao pôr texto numa variável number?",["Nada","O tsc avisa o erro","O texto vira número"],1,"O erro aparece antes de o programa rodar."],["O que significa : void numa função?",["Não devolve nada","Devolve texto","Devolve erro"],0,"void quer dizer 'sem retorno'."]],
+f:[["type","tipo: o que a variável pode guardar."],["interface","molde: formato de um objeto."],["tsc","compilador do TypeScript."]]},
+{t:`<p><b>Passo 1 · Banco e tabela.</b> <i>Database (banco de dados)</i> é um arquivo de fichas e a <i>table (tabela)</i> é uma planilha: linhas são registros, colunas são campos. <b>SQL</b> é a língua para conversar com ele.</p>
+<p><b>Passo 2 · SELECT</b> (ler). <code>WHERE</code> filtra.</p>
+<pre>SELECT nome, curso FROM alunos WHERE curso = 'Direito';</pre>
+<p><b>Passo 3 · INSERT</b> (inserir).</p>
+<pre>INSERT INTO alunos (nome, curso) VALUES ('Ana', 'Direito');</pre>
+<p><b>Passo 4 · UPDATE e DELETE.</b> <b>Sempre use WHERE</b>, senão altera ou apaga tudo!</p>
+<pre>UPDATE alunos SET curso = 'Letras' WHERE id = 1;
+DELETE FROM alunos WHERE id = 1;</pre>`,
+ex:[["Dica: SELECT + FROM. Liste todos os campos da tabela cursos.","SELECT * FROM cursos;"],["Dica: UPDATE precisa de WHERE. Mude o nome do aluno de id 2 para 'Bia'.","UPDATE alunos SET nome = 'Bia' WHERE id = 2;"]],
+d:["Dia 1: crie a tabela alunos e insira 3 registros.","Dia 2: faça 3 SELECTs com WHERE diferentes.","Dia 3: faça um UPDATE e um DELETE, conferindo com SELECT antes e depois."],
+q:[["Qual comando lê dados?",["SELECT","INSERT","DELETE"],0,"SELECT consulta; INSERT cria; DELETE apaga."],["O que faz DELETE sem WHERE?",["Apaga um registro","Apaga todos os registros","Dá erro sempre"],1,"Sem filtro, vale para a tabela inteira."],["WHERE serve para...",["Filtrar quais linhas valem","Criar tabela","Ordenar"],0,"Ele limita a ação às linhas que combinam."]],
+f:[["table","tabela: planilha de registros."],["WHERE","onde: filtra as linhas."],["CRUD","criar, ler, atualizar e apagar (INSERT, SELECT, UPDATE, DELETE)."]]},
+{t:`<p><b>Passo 1 · Tabelas.</b> Uma tabela por assunto: alunos, cursos, matrículas.</p>
+<p><b>Passo 2 · Primary key (chave primária).</b> É o número de identidade, único em cada linha (<code>id</code>).</p>
+<p><b>Passo 3 · Foreign key (chave estrangeira).</b> É o "endereço" que aponta para outra tabela, como o RG de um aluno escrito na ficha da matrícula.</p>
+<pre>CREATE TABLE matriculas (
+  id SERIAL PRIMARY KEY,
+  aluno_id INT REFERENCES alunos(id),
+  curso_id INT REFERENCES cursos(id)
+);</pre>
+<p><b>Passo 4 · Relação.</b> Um aluno pode ter várias matrículas e um curso recebe vários alunos. A tabela do meio liga os dois.</p>`,
+ex:[["Dica: pense em 'identidade'. Qual coluna é a chave primária de alunos?","id, único e nunca repetido."],["Dica: a matrícula 'aponta' para o aluno. Escreva a coluna da matrícula que referencia alunos.","aluno_id INT REFERENCES alunos(id)"]],
+d:["Dia 1: liste no papel os campos de alunos, cursos e matrículas.","Dia 2: desenhe as setas entre as tabelas.","Dia 3: acrescente colaboradores e diga como ligariam ao resto."],
+q:[["Para que serve a chave primária?",["Identificar cada linha com um valor único","Guardar senhas","Apagar dados"],0,"Ela distingue uma linha das outras."],["O que é uma chave estrangeira?",["Uma coluna que aponta para outra tabela","Uma senha","Um tipo de texto"],0,"Ela liga registros de tabelas diferentes."],["Qual tabela liga alunos e cursos?",["matriculas","notas","senha"],0,"A tabela do meio guarda quem fez qual curso."]],
+f:[["primary key","chave primária: identidade única."],["foreign key","chave estrangeira: aponta para outra tabela."],["relation","relação: ligação entre tabelas."]]},
+{t:`<p><b>Chefe:</b> o banco da faculdade no PostgreSQL, em passos.</p>
+<p><b>Passo 1 ·</b> crie o banco e as tabelas.</p>
+<pre>CREATE DATABASE faculdade;
+CREATE TABLE alunos (id SERIAL PRIMARY KEY, nome TEXT, curso TEXT);</pre>
+<p><b>Passo 2 ·</b> dados de teste.</p>
+<pre>INSERT INTO alunos (nome, curso) VALUES ('Ana','Direito'),('Caio','Letras');</pre>
+<p><b>Passo 3 ·</b> <b>JOIN</b> (juntar) mostra dados de duas tabelas.</p>
+<pre>SELECT a.nome, c.titulo FROM matriculas m
+JOIN alunos a ON a.id = m.aluno_id
+JOIN cursos c ON c.id = m.curso_id;</pre>
+<p><b>Passo 4 ·</b> salve tudo em <code>banco.sql</code> e dê commit e push.</p>`,
+ex:[["Dica: o ON diz quais colunas se casam. Una matriculas e alunos mostrando o nome.","SELECT a.nome FROM matriculas m JOIN alunos a ON a.id = m.aluno_id;"],["Dica: insira dois registros em um só comando, separados por vírgula.","INSERT INTO cursos (titulo) VALUES ('Direito'),('Letras');"]],
+d:["Dia 1: crie o banco e as 3 tabelas.","Dia 2: insira 5 alunos, 3 cursos e 6 matrículas.","Dia 3: faça um JOIN e guarde o script no GitHub."],
+q:[["O que o JOIN faz?",["Junta dados de tabelas ligadas","Apaga uma tabela","Cria senha"],0,"Ele combina linhas pelas chaves."],["Por que ter dados de teste?",["Para experimentar sem risco","Para vender","Para economizar memória"],0,"Você testa consultas antes dos dados reais."],["Qual extensão guarda o script do banco?",[".sql",".css",".png"],0,"Arquivos .sql guardam comandos SQL."]],
+f:[["JOIN","juntar: combina tabelas pelas chaves."],["seed","dados de teste iniciais."],["script SQL","arquivo com comandos para recriar o banco."]]}];
+ET[3]=[
+{i:'🚪',obj:'Criar o primeiro servidor que responde a pedidos.',tp:['Instalar Node e Express','Criar uma rota GET','Criar uma rota POST','Testar no navegador']},
+{i:'🏯',obj:'Organizar a API em módulos, controllers e services.',tp:['Entender o módulo','Criar um controller','Criar um service','Ligar tudo no NestJS']},
+{i:'🔌',obj:'Falar com o PostgreSQL por código usando o Prisma.',tp:['Descrever o modelo no schema','Rodar a migration','Buscar dados','Gravar dados']},
+{i:'🔑',obj:'Fazer login seguro com token e perfis.',tp:['Entender o JWT','Gerar o token no login','Proteger rotas','Separar aluno e colaborador']},
+{i:'🐲',obj:'Entregar o CRUD de alunos e matrículas protegido.',tp:['Criar as rotas do CRUD','Proteger com token','Validar os dados','Testar com cliente de API']}];
+ST[3]=[
+{t:`<p><b>Passo 1 · API.</b> <i>API</i> é o garçom: leva o pedido do cliente (site) à cozinha (banco) e traz a resposta. <b>Express</b> é uma biblioteca do Node para montar esse garçom.</p>
+<pre>npm install express</pre>
+<p><b>Passo 2 · Rota GET</b> (buscar).</p>
+<pre>const express = require("express");
+const app = express();
+app.use(express.json());
+app.get("/alunos", (req, res) =&gt; res.json([{ nome: "Ana" }]));
+app.listen(3000);</pre>
+<p><b>Passo 3 · Rota POST</b> (enviar). Os dados chegam em <code>req.body</code>.</p>
+<pre>app.post("/alunos", (req, res) =&gt; res.status(201).json(req.body));</pre>
+<p><b>Passo 4 ·</b> rode <code>node app.js</code> e abra <code>localhost:3000/alunos</code>.</p>`,
+ex:[["Dica: GET busca. Crie a rota GET /cursos que devolve uma lista com um curso.","app.get(\"/cursos\", (req, res) =&gt; res.json([{ titulo: \"Direito\" }]));"],["Dica: onde chegam os dados enviados? Devolva o req.body em um POST /cursos.","app.post(\"/cursos\", (req, res) =&gt; res.json(req.body));"]],
+d:["Dia 1: instale o Express e suba o servidor na porta 3000.","Dia 2: crie GET e POST de /alunos com uma lista na memória.","Dia 3: teste no navegador e com o curl."],
+q:[["O que faz uma rota GET?",["Busca dados","Apaga o servidor","Cria o banco"],0,"GET é para pedir informação."],["Onde ficam os dados enviados num POST?",["req.body","res.send","app.listen"],0,"O corpo do pedido chega em req.body."],["O que app.listen(3000) faz?",["Liga o servidor na porta 3000","Cria uma rota","Compila"],0,"Abre o servidor para receber pedidos."]],
+f:[["API","interface para programas conversarem."],["route","rota: endereço e verbo (GET, POST)."],["req / res","request (pedido) / response (resposta)."]]},
+{t:`<p><b>Passo 1 · Por que NestJS?</b> Quando o código cresce, vira bagunça. O <b>NestJS</b> é um prédio com andares: cada assunto tem sua sala.</p>
+<p><b>Passo 2 · Module (módulo).</b> A sala do assunto, ex.: Alunos.</p>
+<p><b>Passo 3 · Controller.</b> Recebe o pedido (a recepção).</p>
+<pre>@Controller("alunos")
+export class AlunosController {
+  constructor(private s: AlunosService) {}
+  @Get() listar() { return this.s.listar(); }
+}</pre>
+<p><b>Passo 4 · Service (serviço).</b> Faz o trabalho de verdade (a cozinha).</p>
+<pre>@Injectable()
+export class AlunosService {
+  listar() { return [{ nome: "Ana" }]; }
+}</pre>
+<p>Crie com <code>nest g resource alunos</code>.</p>`,
+ex:[["Dica: quem recebe o pedido? Diga quem decide e quem executa: controller ou service.","Controller recebe o pedido; service executa a regra."],["Dica: @Get() fica antes do método. Crie um método listar() em um controller 'cursos'.","@Controller(\"cursos\")\nexport class CursosController {\n  @Get() listar() { return []; }\n}"]],
+d:["Dia 1: crie o projeto Nest e o recurso alunos.","Dia 2: faça o service devolver uma lista fixa.","Dia 3: teste GET /alunos no navegador."],
+q:[["Qual a função do controller?",["Receber o pedido","Guardar o banco","Desenhar a tela"],0,"Ele é a recepção da API."],["E a do service?",["Fazer o trabalho e as regras","Criar o CSS","Enviar o e-mail"],0,"A regra de negócio mora no service."],["O que é um module?",["Agrupa as peças de um assunto","Uma senha","Um tipo"],0,"É a sala que reúne controller e service."]],
+f:[["module","módulo: agrupa um assunto."],["controller","controlador: recebe pedidos."],["service","serviço: executa a lógica."]]},
+{t:`<p><b>Passo 1 · ORM.</b> <i>ORM</i> é um tradutor: você escreve JavaScript e ele fala SQL. O <b>Prisma</b> é um ORM.</p>
+<p><b>Passo 2 · Schema.</b> Descreva a tabela em <code>schema.prisma</code>.</p>
+<pre>model Aluno {
+  id    Int    @id @default(autoincrement())
+  nome  String
+  curso String
+}</pre>
+<p><b>Passo 3 · Migration (migração).</b> Cria a tabela no banco.</p>
+<pre>npx prisma migrate dev --name inicio</pre>
+<p><b>Passo 4 · Usar.</b></p>
+<pre>const prisma = new PrismaClient();
+await prisma.aluno.findMany();
+await prisma.aluno.create({ data: { nome: "Ana", curso: "Direito" } });</pre>`,
+ex:[["Dica: findMany = vários. Busque todos os alunos.","await prisma.aluno.findMany();"],["Dica: create recebe data. Grave o aluno Caio, curso Letras.","await prisma.aluno.create({ data: { nome: \"Caio\", curso: \"Letras\" } });"]],
+d:["Dia 1: configure a DATABASE_URL e o schema do Aluno.","Dia 2: rode a migration e confira a tabela.","Dia 3: ligue o service do Nest ao Prisma."],
+q:[["O que é um ORM?",["Tradutor entre código e banco","Um navegador","Uma senha"],0,"Ele permite usar o banco sem escrever SQL."],["O que faz a migration?",["Cria ou muda tabelas no banco","Apaga o código","Abre o site"],0,"Ela aplica o schema no banco."],["Qual método busca vários registros?",["findMany","create","delete"],0,"findMany devolve uma lista."]],
+f:[["ORM","tradutor entre objetos e tabelas."],["schema","descrição das tabelas."],["migration","migração: aplica mudanças no banco."]]},
+{t:`<p><b>Passo 1 · JWT.</b> <i>JSON Web Token</i> é uma pulseira de festa: depois de mostrar o documento na porta (login), você usa a pulseira para entrar nas áreas.</p>
+<p><b>Passo 2 · Login.</b> Confira e-mail e senha, depois gere o token.</p>
+<pre>const token = jwt.sign({ id: user.id, perfil: user.perfil }, SEGREDO, { expiresIn: "1h" });</pre>
+<p><b>Passo 3 · Proteger.</b> O cliente manda <code>Authorization: Bearer TOKEN</code>; um <i>guard (guarda)</i> confere antes de deixar passar.</p>
+<p><b>Passo 4 · Perfis.</b> O token carrega o perfil: <code>aluno</code> vê só os próprios dados; <code>colaborador</code> gerencia alunos.</p>`,
+ex:[["Dica: a pulseira. O que o token prova?","Que a pessoa já fez login e quem ela é."],["Dica: 'expiresIn'. Por que o token tem prazo?","Se for roubado, deixa de valer logo."]],
+d:["Dia 1: crie POST /login que devolve um token.","Dia 2: proteja GET /alunos com um guard.","Dia 3: bloqueie o aluno de ver dados de outros."],
+q:[["Para que serve o JWT?",["Provar que o login foi feito","Guardar imagens","Criar tabelas"],0,"O token acompanha cada pedido."],["O que é um guard?",["Quem confere o token antes da rota","Um banco","Uma cor"],0,"Ele barra quem não tem permissão."],["Por que o token expira?",["Reduz o dano se for roubado","Economiza internet","Por estética"],0,"Prazo curto limita o uso indevido."]],
+f:[["JWT","token assinado que prova o login."],["guard","guarda: barra rotas sem permissão."],["role","perfil: aluno ou colaborador."]]},
+{t:`<p><b>Chefe:</b> CRUD de alunos e matrículas protegido.</p>
+<p><b>Passo 1 · Rotas.</b> POST criar, GET listar, PATCH alterar, DELETE apagar.</p>
+<pre>@Post() criar(@Body() d) { return this.s.criar(d); }
+@Delete(":id") apagar(@Param("id") id: string) { return this.s.apagar(+id); }</pre>
+<p><b>Passo 2 · Proteção.</b> <code>@UseGuards(JwtGuard)</code> no controller; só colaborador altera.</p>
+<p><b>Passo 3 · Validar.</b> Rejeite nome vazio e matrícula repetida com erro 400.</p>
+<p><b>Passo 4 · Testar</b> no Insomnia ou Postman: sem token deve dar 401.</p>`,
+ex:[["Dica: o código 401 quer dizer 'sem credencial'. O que esperar ao chamar GET /alunos sem token?","Erro 401 (não autorizado)."],["Dica: qual verbo apaga? Escreva a rota que apaga o aluno de um id.","@Delete(\":id\") apagar(@Param(\"id\") id: string) { ... }"]],
+d:["Dia 1: faça o CRUD de alunos.","Dia 2: faça as matrículas ligadas ao aluno e ao curso.","Dia 3: proteja tudo e teste os erros."],
+q:[["Qual verbo cria um registro?",["POST","GET","DELETE"],0,"POST envia dados novos."],["Erro 401 significa...",["Sem login válido","Página não existe","Tudo certo"],0,"Falta credencial ou ela é inválida."],["Por que validar os dados?",["Impedir dados errados no banco","Deixar mais bonito","Gastar menos"],0,"A API nunca deve confiar no que chega."]],
+f:[["CRUD","criar, ler, atualizar e apagar."],["401","não autorizado."],["validation","validação: checar dados antes de gravar."]]}];
+/* ===== Reinos 5 e 6 ===== */
+ET[4]=[
+{i:'⚛️',obj:'Montar telas com peças reutilizáveis que guardam dados.',tp:['Criar um componente','Passar props','Guardar dados com useState','Reagir a cliques']},
+{i:'📋',obj:'Buscar dados da API e mostrá-los em tabela.',tp:['Usar fetch','Usar useEffect','Listar com map','Tratar carregando e erro']},
+{i:'🔐',obj:'Criar formulários e telas que exigem login.',tp:['Controlar inputs','Enviar o formulário','Guardar o token','Proteger telas']},
+{i:'🐲',obj:'Entregar o painel do colaborador com busca de aluno.',tp:['Listar alunos','Criar o campo de busca','Filtrar a lista','Proteger com login']}];
+ST[4]=[
+{t:`<p><b>Passo 1 · Componente.</b> <b>React</b> monta a tela com peças de montar. Um <i>component (componente)</i> é uma peça: uma função que devolve HTML (JSX).</p>
+<pre>function Cartao() {
+  return &lt;h2&gt;Olá, aluno&lt;/h2&gt;;
+}</pre>
+<p><b>Passo 2 · Props.</b> <i>Props (propriedades)</i> são os argumentos da peça.</p>
+<pre>function Cartao({ nome }) { return &lt;h2&gt;Olá, {nome}&lt;/h2&gt;; }
+// uso: &lt;Cartao nome="Ana" /&gt;</pre>
+<p><b>Passo 3 · Estado.</b> <i>State (estado)</i> é a memória da peça; quando muda, a tela se atualiza.</p>
+<pre>const [n, setN] = useState(0);
+&lt;button onClick={() =&gt; setN(n + 1)}&gt;{n}&lt;/button&gt;</pre>`,
+ex:[["Dica: props vêm entre chaves. Crie o componente Curso que mostra o título recebido.","function Curso({ titulo }) { return &lt;p&gt;{titulo}&lt;/p&gt;; }"],["Dica: useState devolve valor e função. Crie um contador que começa em 10.","const [n, setN] = useState(10);"]],
+d:["Dia 1: crie um projeto com Vite e mostre um componente.","Dia 2: reaproveite o componente 3 vezes com props diferentes.","Dia 3: faça um botão que conta cliques."],
+q:[["O que é um componente?",["Uma peça de tela reutilizável","Um banco","Uma senha"],0,"É uma função que devolve JSX."],["Para que servem as props?",["Enviar dados para o componente","Guardar a senha","Criar rotas"],0,"São os dados que a peça recebe."],["O que acontece quando o estado muda?",["A tela se atualiza","Nada","O projeto fecha"],0,"O React redesenha a peça."]],
+f:[["component","componente: peça reutilizável."],["props","propriedades: dados recebidos."],["state","estado: memória que atualiza a tela."]]},
+{t:`<p><b>Passo 1 · fetch.</b> <code>fetch</code> faz o pedido à API, como mandar um mensageiro à cozinha.</p>
+<pre>const r = await fetch("http://localhost:3000/alunos");
+const dados = await r.json();</pre>
+<p><b>Passo 2 · useEffect.</b> Roda código depois de a tela aparecer, ideal para buscar dados uma vez.</p>
+<pre>useEffect(() =&gt; {
+  fetch(url).then(r =&gt; r.json()).then(setAlunos);
+}, []);</pre>
+<p><b>Passo 3 · Tabela.</b> <code>map</code> transforma cada item em uma linha.</p>
+<pre>&lt;tbody&gt;{alunos.map(a =&gt; &lt;tr key={a.id}&gt;&lt;td&gt;{a.nome}&lt;/td&gt;&lt;/tr&gt;)}&lt;/tbody&gt;</pre>
+<p><b>Passo 4 ·</b> mostre "Carregando..." enquanto espera e uma mensagem se der erro.</p>`,
+ex:[["Dica: map devolve uma peça por item. Liste os cursos em &lt;li&gt;.","{cursos.map(c =&gt; &lt;li key={c.id}&gt;{c.titulo}&lt;/li&gt;)}"],["Dica: o [] no fim do useEffect. O que ele significa?","Roda só uma vez, quando a tela aparece."]],
+d:["Dia 1: busque /alunos e mostre no console.","Dia 2: mostre os alunos numa tabela.","Dia 3: adicione Carregando e mensagem de erro."],
+q:[["Para que serve o fetch?",["Pedir dados à API","Pintar a tela","Criar tabelas"],0,"Ele faz o pedido HTTP."],["Qual função cria uma linha por item?",["map","sum","print"],0,"map transforma lista em peças."],["Por que usar a prop key?",["O React identifica cada item","Deixa colorido","É o nome da tabela"],0,"Ela dá identidade a cada item da lista."]],
+f:[["fetch","buscar dados de uma URL."],["useEffect","código que roda após a tela aparecer."],["key","chave: identifica o item na lista."]]},
+{t:`<p><b>Passo 1 · Input controlado.</b> O estado guarda o que a pessoa digita.</p>
+<pre>const [email, setEmail] = useState("");
+&lt;input value={email} onChange={e =&gt; setEmail(e.target.value)} /&gt;</pre>
+<p><b>Passo 2 · Enviar.</b></p>
+<pre>async function entrar(e) {
+  e.preventDefault();
+  const r = await fetch(URL + "/login", { method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, senha }) });
+  const { token } = await r.json();
+  localStorage.setItem("token", token);
+}</pre>
+<p><b>Passo 3 · Token.</b> <code>localStorage</code> guarda o token no navegador.</p>
+<p><b>Passo 4 · Tela protegida.</b> Sem token, mande para o login.</p>
+<pre>if (!localStorage.getItem("token")) return &lt;Login /&gt;;</pre>`,
+ex:[["Dica: o que faz preventDefault()?","Impede a página de recarregar ao enviar o formulário."],["Dica: setItem tem nome e valor. Guarde o token.","localStorage.setItem(\"token\", token);"]],
+d:["Dia 1: faça o form de login com inputs controlados.","Dia 2: envie ao /login e guarde o token.","Dia 3: bloqueie a lista de alunos sem token."],
+q:[["O que é um input controlado?",["O valor vem do estado","Não aceita texto","Só aceita número"],0,"O estado é a fonte do valor."],["Onde o token foi guardado?",["localStorage","No CSS","No banco"],0,"O navegador guarda para as próximas telas."],["O que fazer sem token?",["Mostrar o login","Mostrar tudo","Apagar a conta"],0,"Tela protegida exige login."]],
+f:[["controlled input","campo cujo valor vem do estado."],["localStorage","memória do navegador."],["protected route","rota que exige login."]]},
+{t:`<p><b>Chefe:</b> painel do colaborador com busca de aluno.</p>
+<p><b>Passo 1 ·</b> liste os alunos (fetch com token).</p>
+<pre>fetch(url, { headers: { Authorization: "Bearer " + token } })</pre>
+<p><b>Passo 2 ·</b> campo de busca com estado.</p>
+<pre>const [busca, setBusca] = useState("");</pre>
+<p><b>Passo 3 ·</b> filtre sem tocar na lista original.</p>
+<pre>const vistos = alunos.filter(a =&gt;
+  a.nome.toLowerCase().includes(busca.toLowerCase()));</pre>
+<p><b>Passo 4 ·</b> mostre <code>vistos</code> na tabela e bloqueie quem não for colaborador. Dê commit a cada passo.</p>`,
+ex:[["Dica: filter mantém quem passa no teste. Filtre alunos pelo curso 'Direito'.","alunos.filter(a =&gt; a.curso === \"Direito\")"],["Dica: toLowerCase. Por que usá-lo na busca?","Para achar 'ana' e 'Ana' do mesmo jeito."]],
+d:["Dia 1: tabela de alunos com token.","Dia 2: campo de busca filtrando em tempo real.","Dia 3: esconda o painel de quem não é colaborador."],
+q:[["O que filter faz?",["Cria nova lista só com quem passa no teste","Apaga a lista","Ordena"],0,"A lista original fica intacta."],["Por que mandar o token no cabeçalho?",["A API saber quem pede","Pintar a tela","Acelerar"],0,"É a pulseira do pedido."],["Por que deixar a busca no estado?",["A tela atualiza ao digitar","Economiza internet","Obrigação"],0,"Cada letra muda o estado e a lista."]],
+f:[["filter","filtrar: ficar só com o que passa no teste."],["Authorization","cabeçalho com o token."],["includes","verifica se um texto contém outro."]]}];
+ET[5]=[
+{i:'🛡️',obj:'Proteger senhas e dados e cumprir a lei de proteção de dados.',tp:['Entender hash de senha','Usar bcrypt','Criar logs sem dados sensíveis','Aplicar permissões mínimas']},
+{i:'🧪',obj:'Testar o código e revisá-lo antes de publicar.',tp:['Escrever um teste simples','Rodar os testes','Revisar o código','Corrigir o que o teste achou']},
+{i:'🚀',obj:'Colocar banco, API e site no ar.',tp:['Usar variáveis de ambiente','Publicar o banco','Publicar a API','Publicar o front-end']},
+{i:'🐉',obj:'Entregar o sistema da faculdade (MVP) funcionando na internet.',tp:['Conferir login e CRUD no ar','Revisar a segurança','Escrever o README','Compartilhar o link']}];
+ST[5]=[
+{t:`<p><b>Passo 1 · Hash.</b> Nunca guarde a senha pura. <i>Hash</i> é uma trituradora: a senha vira uma papa que não volta ao original, mas dá a mesma papa sempre.</p>
+<p><b>Passo 2 · bcrypt.</b></p>
+<pre>const hash = await bcrypt.hash(senha, 10);
+const ok = await bcrypt.compare(senha, hash);</pre>
+<p><b>Passo 3 · LGPD.</b> Lei que protege dados pessoais: colete só o necessário e permita apagar.</p>
+<p><b>Passo 4 · Logs e permissões.</b> <i>Log (registro de eventos)</i> nunca leva senha ou token. Dê a cada perfil só o acesso de que precisa.</p>`,
+ex:[["Dica: hash não volta atrás. Como conferir a senha no login?","Use bcrypt.compare(senha, hash)."],["Dica: pense em 'mínimo necessário'. O aluno deve ver as notas de outros?","Não: cada perfil vê só o que precisa."]],
+d:["Dia 1: grave a senha com hash no cadastro.","Dia 2: confira com compare no login.","Dia 3: revise os logs e remova dados sensíveis."],
+q:[["Por que usar hash na senha?",["Se vazar, a senha não aparece","Deixa mais rápido","Reduz o banco"],0,"O hash não volta ao original."],["O que a LGPD pede?",["Proteger dados pessoais","Cobrar mais","Evitar login"],0,"Coletar só o necessário e proteger."],["O que NÃO pôr nos logs?",["Senhas e tokens","Datas","Rotas"],0,"Logs podem vazar."]],
+f:[["hash","triturar a senha: não volta."],["LGPD","lei de proteção de dados."],["least privilege","menor privilégio: acesso mínimo."]]},
+{t:`<p><b>Passo 1 · Teste.</b> <i>Test (teste)</i> é um fiscal automático que confere se o código faz o esperado.</p>
+<pre>test("soma 2+3", () =&gt; {
+  expect(2 + 3).toBe(5);
+});</pre>
+<p><b>Passo 2 · Rodar.</b> <code>npm test</code>. Verde passou; vermelho falhou.</p>
+<p><b>Passo 3 · Revisar.</b> Releia o código: nomes claros, sem repetição, sem senhas dentro dele.</p>
+<p><b>Passo 4 ·</b> teste o que importa: login, cálculo e rotas do CRUD.</p>`,
+ex:[["Dica: toBe compara. Teste que 10 / 2 dá 5.","test(\"divide\", () =&gt; expect(10 / 2).toBe(5));"],["Dica: o que um teste vermelho avisa?","Que algo não faz o esperado: corrija antes de publicar."]],
+d:["Dia 1: escreva 3 testes de funções simples.","Dia 2: teste o login da API.","Dia 3: revise o projeto com um checklist."],
+q:[["Para que serve um teste?",["Conferir o código sozinho","Deixar bonito","Apagar erros"],0,"Ele roda e acusa falhas."],["Teste vermelho quer dizer...",["Falhou","Passou","Nada"],0,"Corrija antes de seguir."],["O que revisar?",["Nomes claros e ausência de senhas no código","Cor do site","Só o CSS"],0,"Segredos nunca vão no código."]],
+f:[["test","teste automático."],["code review","revisão de código."],["assert","verificar: expect(...).toBe(...)."]]},
+{t:`<p><b>Passo 1 · Variáveis de ambiente.</b> Segredos (senha do banco, chave do JWT) ficam num arquivo <code>.env</code>, fora do código e fora do GitHub (<code>.gitignore</code>).</p>
+<pre>DATABASE_URL=...
+JWT_SECRET=...</pre>
+<p><b>Passo 2 · Deploy (publicar).</b> Levar o sistema do seu PC para um servidor.</p>
+<p><b>Passo 3 · Ordem.</b> 1) banco; 2) API, apontando para o banco; 3) front-end, apontando para a API.</p>
+<p><b>Passo 4 ·</b> teste cada peça pela internet e anote as URLs.</p>`,
+ex:[["Dica: o que vai no .gitignore?","O arquivo .env, para não vazar segredos."],["Dica: quem depende de quem? Em que ordem publicar banco, API e front?","Banco, depois API, depois front-end."]],
+d:["Dia 1: crie o .env e coloque-o no .gitignore.","Dia 2: publique banco e API.","Dia 3: publique o front-end e teste."],
+q:[["Onde guardar segredos?",["No .env, fora do GitHub","No código","No README"],0,"Segredos nunca vão ao repositório."],["O que é deploy?",["Publicar o sistema","Escrever testes","Desenhar telas"],0,"Colocar no ar."],["Qual vai primeiro?",["O banco","O front-end","O README"],0,"A API precisa do banco pronto."]],
+f:[["deploy","publicar no servidor."],[".env","arquivo de segredos."],["environment variable","variável de ambiente."]]},
+{t:`<p><b>Chefe final:</b> o sistema da faculdade (MVP) no ar. <i>MVP (produto mínimo viável)</i> é a primeira versão que já funciona.</p>
+<p><b>Passo 1 ·</b> no site publicado, faça login, cadastre um aluno, matricule e busque.</p>
+<p><b>Passo 2 ·</b> checklist de segurança: senha com hash, token com prazo, .env fora do GitHub, perfis separados.</p>
+<p><b>Passo 3 ·</b> escreva o <code>README.md</code>: o que é, como rodar, tecnologias, link.</p>
+<p><b>Passo 4 ·</b> mostre o link a alguém e peça que teste.</p>`,
+ex:[["Dica: o que é o mínimo para um MVP?","Login, cadastro de aluno, matrícula e busca funcionando."],["Dica: quem lê o README?","Quem for usar o projeto: diz o que é e como rodar."]],
+d:["Dia 1: teste tudo no ar e anote bugs.","Dia 2: corrija e confira o checklist.","Dia 3: escreva o README e compartilhe."],
+q:[["O que é um MVP?",["Primeira versão que já funciona","Versão final perfeita","Um banco"],0,"Funciona primeiro, evolui depois."],["O que o README explica?",["O que é e como rodar","Só as cores","Senhas"],0,"É a porta de entrada do projeto."],["O que conferir antes de divulgar?",["Segurança e fluxo principal","Só o logo","Nada"],0,"Teste login, cadastro, matrícula e busca."]],
+f:[["MVP","produto mínimo viável."],["README","arquivo que apresenta o projeto."],["checklist","lista de conferência."]]}];
+/* ===== Aulas completas: reinos 2 a 4 ===== */
+const mk=(a,g,e,o)=>({a,g,e,o:o||[]});
+AU[1]=[
+mk(`<p><b>Git = máquina do tempo.</b> Cada <i>commit</i> é uma foto do projeto. Se algo quebrar, você volta a uma foto antiga. O <b>GitHub</b> é o armário na internet onde as fotos ficam guardadas.</p>
+<p><b>Fluxo de todo dia:</b> você mexe nos arquivos, escolhe o que entra na foto (<code>git add</code>), tira a foto (<code>git commit -m "mensagem"</code>) e manda para o GitHub (<code>git push</code>).</p>
+<pre>git status          # o que mudou?
+git add .           # separa tudo para a foto
+git commit -m "cria tela de login"
+git push</pre>
+<p><b>Branch</b> é um ramo para testar sem medo: <code>git switch -c teste</code> cria e entra; <code>git switch main</code> volta; <code>git merge teste</code> traz o teste para a main. Escreva mensagens que digam o que mudou, não "arrumei".</p>`,
+[["repository","repositório: pasta vigiada pelo Git"],["commit","registro: foto do projeto"],["branch","ramo: cópia paralela para testar"],["merge","mesclar: juntar um ramo na main"],["push / pull","enviar / baixar do GitHub"]],
+["Esquecer o <code>git add</code>: o commit sai vazio e sem as mudanças.","Dar commit na main quando queria testar numa branch: crie a branch antes.","Mensagens como 'asd': daqui a um mês você não sabe o que foi."]),
+mk(`<p><b>HTML é o esqueleto da página.</b> Tags semânticas dão nome ao que é cada parte: <code>&lt;header&gt;</code> (cabeçalho), <code>&lt;main&gt;</code> (conteúdo principal), <code>&lt;section&gt;</code> (seção), <code>&lt;footer&gt;</code> (rodapé). É como pôr etiquetas nas gavetas, em vez de chamar tudo de "caixa".</p>
+<p><b>Formulário = ficha de papel.</b> Cada campo tem um <code>&lt;label&gt;</code> (o nome impresso) ligado ao <code>&lt;input&gt;</code> pelo <code>for</code> e <code>id</code>, iguais. Clicar no nome já foca no campo.</p>
+<pre>&lt;form&gt;
+  &lt;label for="mat"&gt;Matrícula&lt;/label&gt;
+  &lt;input id="mat" type="number" required&gt;
+  &lt;button type="submit"&gt;Enviar&lt;/button&gt;
+&lt;/form&gt;</pre>
+<p>O <code>type</code> escolhe o teclado e a validação (<code>email</code>, <code>password</code>, <code>date</code>). <code>required</code> bloqueia o envio vazio.</p>`,
+[["semantic","semântico: tag com significado"],["form","formulário: ficha de dados"],["input","campo de entrada"],["label","rótulo: nome do campo"],["required","obrigatório"]],
+["Label sem <code>for</code>: não se liga ao campo.","Dois elementos com o mesmo <code>id</code>: o id é único.","Usar <code>&lt;div&gt;</code> para tudo em vez da tag semântica."]),
+mk(`<p><b>CSS é a roupa da página.</b> Uma regra diz <i>quem</i> (seletor) e <i>como</i> (declarações): <code>h1 { color: navy; }</code>. <code>.classe</code> vale para vários elementos; <code>#id</code> para um só.</p>
+<p><b>Todo elemento é uma caixa:</b> conteúdo no meio, <code>padding</code> (acolchoado interno), <code>border</code> (borda) e <code>margin</code> (distância dos vizinhos).</p>
+<p><b>Flexbox</b> arruma os itens de uma caixa-mãe como livros numa prateleira:</p>
+<pre>.menu { display: flex; gap: 12px; justify-content: space-between; }</pre>
+<p><b>Responsivo:</b> a tela do celular é estreita. A media query troca regras conforme a largura:</p>
+<pre>@media (max-width: 600px) { .menu { flex-direction: column; } }</pre>`,
+[["selector","seletor: quem recebe o estilo"],["box model","modelo de caixa"],["padding / margin","espaço interno / externo"],["flexbox","layout flexível em linha ou coluna"],["media query","regra por tamanho de tela"]],
+["Esquecer o <code>;</code> no fim da declaração.","Aplicar <code>display:flex</code> nos filhos em vez da caixa-mãe.","Esquecer a tag <code>&lt;meta name=\"viewport\"&gt;</code> e a tela no celular parecer minúscula."]),
+mk(`<p><b>Chefe: telas de login e cadastro.</b> Vá por partes e dê um commit por parte, como degraus de uma escada.</p>
+<p><b>1) login.html:</b> um <code>&lt;main&gt;</code> com <code>&lt;form&gt;</code> e dois campos (e-mail e senha) com label e <code>required</code>.</p>
+<p><b>2) cadastro.html:</b> nome (<code>text</code>), matrícula (<code>number</code>), curso (<code>text</code>) e nascimento (<code>date</code>).</p>
+<p><b>3) estilo.css:</b> centralize e empilhe os campos:</p>
+<pre>body { display: flex; justify-content: center; }
+form { display: flex; flex-direction: column; gap: 8px; }</pre>
+<p><b>4) Teste</b> no celular (F12, ícone do telefone) e envie com <code>git push</code>. Está pronto quando as duas telas funcionam e estão no GitHub.</p>`,
+[["login","entrar com e-mail e senha"],["layout","disposição dos elementos na tela"],["responsive","responsivo: se adapta ao tamanho da tela"],["MVP","primeira versão que já funciona"]],
+["Mudar tudo de uma vez e dar um commit gigante.","Esquecer de ligar o CSS com <code>&lt;link rel=\"stylesheet\"&gt;</code>.","Tipo errado no campo (senha com <code>text</code> mostra a senha)."])];
+AU[2]=[
+mk(`<p><b>TypeScript = JavaScript com etiquetas.</b> Você diz o tipo de cada caixa e ele avisa o erro <i>antes</i> de rodar, como uma gaveta "meias" que recusa sapato.</p>
+<pre>let nome: string = "Ana";
+let media: number = 7.5;
+nome = 10;   // erro: 10 não é string</pre>
+<p><b>Interface</b> é o molde de um objeto:</p>
+<pre>interface Aluno { nome: string; matricula: number; curso: string; }
+function mostrar(a: Aluno): void { console.log(a.nome); }</pre>
+<p>Depois de <code>:</code> vem o tipo. <code>: void</code> diz que a função não devolve nada. Compile com <code>tsc arquivo.ts</code> e rode com <code>node arquivo.js</code>.</p>`,
+[["type","tipo do valor"],["interface","molde de objeto"],["compile","compilar: traduzir o .ts em .js"],["void","sem retorno"]],
+["Passar um objeto com campo faltando para uma função tipada.","Tentar rodar o .ts direto com node: compile antes.","Usar <code>any</code> para fugir do erro: perde a proteção."]),
+mk(`<p><b>Banco de dados = arquivo de fichas.</b> A tabela é uma planilha: linhas são registros e colunas são campos. SQL é a língua para pedir coisas a ele.</p>
+<pre>SELECT nome FROM alunos WHERE curso = 'Direito';
+INSERT INTO alunos (nome, curso) VALUES ('Ana', 'Direito');
+UPDATE alunos SET curso = 'Letras' WHERE id = 1;
+DELETE FROM alunos WHERE id = 1;</pre>
+<p>Leia assim: <i>selecione</i> o nome <i>da</i> tabela alunos <i>onde</i> o curso for Direito. Texto vai entre aspas simples. <b>UPDATE e DELETE sem WHERE mexem em tudo</b>: teste primeiro com um SELECT usando o mesmo WHERE.</p>`,
+[["table","tabela"],["row","linha: um registro"],["column","coluna: um campo"],["query","consulta ao banco"],["CRUD","criar, ler, atualizar, apagar"]],
+["Esquecer o <code>WHERE</code> e apagar a tabela inteira.","Aspas duplas no valor: no PostgreSQL texto usa aspas simples.","Esquecer o <code>;</code> no fim do comando."]),
+mk(`<p><b>Modelar = desenhar antes de construir,</b> como a planta de uma casa. Uma tabela por assunto: <b>alunos</b>, <b>cursos</b>, <b>matrículas</b>.</p>
+<p>Cada tabela tem uma <i>primary key</i> (<code>id</code>), o número de identidade único. A <i>foreign key</i> é o endereço que aponta para outra tabela: a matrícula guarda o <code>aluno_id</code> e o <code>curso_id</code>.</p>
+<pre>CREATE TABLE matriculas (
+  id SERIAL PRIMARY KEY,
+  aluno_id INT REFERENCES alunos(id),
+  curso_id INT REFERENCES cursos(id)
+);</pre>
+<p>Assim um aluno tem várias matrículas e um curso recebe vários alunos, sem repetir nomes por aí. Colaboradores ganham uma tabela própria.</p>`,
+[["primary key","chave primária"],["foreign key","chave estrangeira"],["relationship","relação entre tabelas"],["model","modelo: planta do banco"]],
+["Guardar o nome do curso em cada matrícula: guarde só o <code>curso_id</code>.","Tabela sem chave primária.","Misturar assuntos numa tabela só."]),
+mk(`<p><b>Chefe: o banco da faculdade.</b> Em passos, com commit a cada um.</p>
+<pre>CREATE DATABASE faculdade;
+CREATE TABLE alunos (id SERIAL PRIMARY KEY, nome TEXT, curso TEXT);
+INSERT INTO alunos (nome, curso) VALUES ('Ana','Direito'),('Caio','Letras');</pre>
+<p>Crie também cursos e matrículas. Para ver dados de duas tabelas juntas use o <b>JOIN</b> (juntar):</p>
+<pre>SELECT a.nome, c.titulo FROM matriculas m
+JOIN alunos a ON a.id = m.aluno_id
+JOIN cursos c ON c.id = m.curso_id;</pre>
+<p>Salve tudo em <code>banco.sql</code>: com ele você recria o banco em qualquer máquina. Pronto quando o JOIN mostra quem faz qual curso.</p>`,
+[["JOIN","juntar tabelas pelas chaves"],["seed","dados de teste iniciais"],["script","arquivo com comandos"],["PostgreSQL","banco de dados profissional gratuito"]],
+["Inserir matrícula com um <code>aluno_id</code> que não existe: dá erro de chave estrangeira.","Criar as tabelas fora de ordem: crie alunos e cursos antes das matrículas.","Perder o script: guarde o .sql no GitHub."])];
+AU[3]=[
+mk(`<p><b>API = o garçom.</b> O site faz um pedido, a API vai à cozinha (banco) e traz a resposta. <b>Express</b> monta esse garçom em poucas linhas.</p>
+<pre>const express = require("express");
+const app = express();
+app.use(express.json());
+app.get("/alunos", (req, res) =&gt; res.json([{ nome: "Ana" }]));
+app.post("/alunos", (req, res) =&gt; res.status(201).json(req.body));
+app.listen(3000);</pre>
+<p>Cada rota tem verbo e endereço. <b>GET</b> busca, <b>POST</b> envia. <code>req</code> é o pedido, <code>res</code> é a resposta. Os dados do POST chegam em <code>req.body</code> (por isso o <code>express.json()</code>). Rode com <code>node app.js</code>.</p>`,
+[["API","interface para programas conversarem"],["route","rota"],["request","pedido"],["response","resposta"],["status code","código de status: 200 ok, 404 não achou"]],
+["Esquecer o <code>express.json()</code>: <code>req.body</code> fica vazio.","Mudar o código e não reiniciar o servidor.","Porta ocupada: feche o outro servidor."]),
+mk(`<p><b>NestJS = prédio com andares.</b> Quando o projeto cresce, Express vira bagunça. O Nest dá uma sala para cada assunto.</p>
+<p>O <b>module</b> é a sala do assunto (Alunos). O <b>controller</b> é a recepção: recebe o pedido. O <b>service</b> é a cozinha: faz o trabalho e guarda as regras.</p>
+<pre>@Controller("alunos")
+export class AlunosController {
+  constructor(private s: AlunosService) {}
+  @Get() listar() { return this.s.listar(); }
+}</pre>
+<p>Os <i>decorators</i> (@Get, @Controller) são etiquetas que dizem o que cada peça faz. Gere tudo com <code>nest g resource alunos</code>.</p>`,
+[["module","módulo: agrupa um assunto"],["controller","controlador: recebe pedidos"],["service","serviço: faz o trabalho"],["decorator","decorador: etiqueta com @"]],
+["Pôr regra de negócio no controller: ela vai no service.","Esquecer de registrar o service no module.","Esquecer o <code>@Injectable()</code> no service."]),
+mk(`<p><b>ORM = tradutor.</b> Você escreve código e o <b>Prisma</b> fala SQL por você. Primeiro descreva a tabela no <code>schema.prisma</code>:</p>
+<pre>model Aluno {
+  id    Int    @id @default(autoincrement())
+  nome  String
+  curso String
+}</pre>
+<p>A <i>migration</i> cria a tabela no banco: <code>npx prisma migrate dev</code>. Depois use no código:</p>
+<pre>const prisma = new PrismaClient();
+await prisma.aluno.findMany();
+await prisma.aluno.create({ data: { nome: "Ana", curso: "Direito" } });</pre>
+<p>A URL do banco fica no <code>.env</code>, em <code>DATABASE_URL</code>.</p>`,
+[["ORM","tradutor entre código e banco"],["schema","descrição das tabelas"],["migration","migração: aplica o schema no banco"],["client","cliente: objeto que faz as consultas"]],
+["Mudar o schema e esquecer a migration.","Esquecer o <code>await</code>: você recebe uma promessa, não os dados.","<code>DATABASE_URL</code> errada: confira usuário, senha e porta."]),
+mk(`<p><b>JWT = pulseira de festa.</b> Na porta (login) você mostra o documento; recebe uma pulseira (token) e a usa no resto da festa.</p>
+<p>No login, confira e-mail e senha e gere o token com prazo:</p>
+<pre>const token = jwt.sign({ id: u.id, perfil: u.perfil }, SEGREDO, { expiresIn: "1h" });</pre>
+<p>O cliente manda o token em cada pedido: <code>Authorization: Bearer TOKEN</code>. O <i>guard</i> (guarda) confere antes de abrir a rota. O <b>perfil</b> dentro do token decide o que cada um pode: o aluno vê só os próprios dados; o colaborador gerencia.</p>
+<p>O <b>SEGREDO</b> fica no <code>.env</code>, nunca no código.</p>`,
+[["token","ficha que prova o login"],["JWT","token assinado"],["guard","guarda: barra sem permissão"],["role","perfil de acesso"],["expiration","validade do token"]],
+["Pôr o segredo direto no código.","Token sem prazo: se vazar, vale para sempre.","Confiar só no front-end para esconder telas: a API precisa conferir."]),
+mk(`<p><b>Chefe: CRUD protegido.</b> CRUD = criar, ler, atualizar e apagar. No Nest, cada verbo vira um método:</p>
+<pre>@Post() criar(@Body() d) { return this.s.criar(d); }
+@Get() listar() { return this.s.listar(); }
+@Patch(":id") alterar(@Param("id") id: string, @Body() d) { ... }
+@Delete(":id") apagar(@Param("id") id: string) { ... }</pre>
+<p>Proteja o controller com <code>@UseGuards(JwtGuard)</code>. Valide os dados: nome vazio ou matrícula repetida devolve <b>erro 400</b>. Sem token, a API deve responder <b>401</b>.</p>
+<p>Teste no Insomnia ou Postman: sem token (401), com token de aluno (403 ao alterar), com token de colaborador (funciona). Faça o CRUD de alunos e depois o de matrículas ligadas ao aluno e ao curso.</p>`,
+[["CRUD","criar, ler, atualizar e apagar"],["validation","validação"],["401 / 403","não autenticado / sem permissão"],["endpoint","endereço da API"]],
+["Esquecer de validar: dados ruins entram no banco.","Confundir 401 (sem login) com 403 (logado, sem permissão).","Apagar sem checar se o id existe."])];
+/* ===== Aulas completas: reinos 5 e 6 + etapas do reino 1 ===== */
+ET[0]=[
+{i:'📦',obj:'Guardar valores em variáveis e tomar decisões com if.',tp:['Criar variáveis com const e let','Distinguir texto, número e booleano','Usar operadores e comparações','Escrever if, else if e else']},
+{i:'🔁',obj:'Repetir tarefas com laços e organizar o código em funções.',tp:['Usar o laço for','Usar o laço while','Criar uma função com parâmetros','Usar return']},
+{i:'🧺',obj:'Guardar listas e objetos e mexer na página com o DOM.',tp:['Criar e percorrer arrays','Criar objetos com chave e valor','Selecionar elementos com getElementById','Reagir a cliques com addEventListener']},
+{i:'🐲',obj:'Montar a calculadora de média de notas.',tp:['Montar o HTML com os campos','Ler os valores com Number()','Validar com isNaN','Calcular e mostrar a média']}];
+AU[4]=[
+mk(`<p><b>React = peças de montar.</b> Em vez de uma página gigante, você cria peças pequenas (componentes) e as encaixa. Um componente é uma função que devolve a "cara" da peça (JSX, que parece HTML).</p>
+<pre>function Cartao({ nome }) {
+  return &lt;h2&gt;Olá, {nome}&lt;/h2&gt;;
+}
+// &lt;Cartao nome="Ana" /&gt;</pre>
+<p><b>Props</b> são os dados que a peça recebe, como os ingredientes de uma receita. <b>Estado</b> é a memória da peça: quando muda, a tela se redesenha sozinha.</p>
+<pre>const [n, setN] = useState(0);
+&lt;button onClick={() =&gt; setN(n + 1)}&gt;{n}&lt;/button&gt;</pre>
+<p>Nunca mude <code>n</code> direto: use <code>setN</code>. Crie o projeto com <code>npm create vite@latest</code>.</p>`,
+[["component","componente: peça de tela"],["props","dados que a peça recebe"],["state","estado: memória da peça"],["JSX","HTML dentro do JavaScript"]],
+["Nome de componente com letra minúscula: use <code>Cartao</code>, não <code>cartao</code>.","Mudar o estado direto (<code>n = n + 1</code>) em vez de usar <code>setN</code>.","Devolver dois elementos soltos: envolva em um só."]),
+mk(`<p><b>Buscar dados da API.</b> <code>fetch</code> é o mensageiro que vai à API e volta com a resposta. Em React, a busca roda no <code>useEffect</code>, que executa depois de a tela aparecer.</p>
+<pre>const [alunos, setAlunos] = useState([]);
+useEffect(() =&gt; {
+  fetch("http://localhost:3000/alunos")
+    .then(r =&gt; r.json()).then(setAlunos);
+}, []);</pre>
+<p>O <code>[]</code> no fim quer dizer "só uma vez". Para a tabela, o <code>map</code> vira cada aluno numa linha; a <code>key</code> dá identidade a cada linha:</p>
+<pre>{alunos.map(a =&gt; &lt;tr key={a.id}&gt;&lt;td&gt;{a.nome}&lt;/td&gt;&lt;/tr&gt;)}</pre>
+<p>Mostre "Carregando..." enquanto espera e uma mensagem se der erro: a internet falha.</p>`,
+[["fetch","buscar dados de uma URL"],["useEffect","roda depois de a tela aparecer"],["map","transforma cada item em uma peça"],["loading","carregando"]],
+["Esquecer o <code>[]</code>: a busca repete sem parar.","Esquecer a <code>key</code> na lista.","Erro de CORS: libere a origem do front na API."]),
+mk(`<p><b>Formulário em React.</b> O estado guarda o que a pessoa digita; o campo mostra o estado. Assim o React sempre sabe o valor (campo controlado).</p>
+<pre>const [email, setEmail] = useState("");
+&lt;input value={email} onChange={e =&gt; setEmail(e.target.value)} /&gt;</pre>
+<p>Ao enviar, evite o recarregamento e mande os dados à API:</p>
+<pre>async function entrar(e) {
+  e.preventDefault();
+  const r = await fetch(URL + "/login", { method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, senha }) });
+  localStorage.setItem("token", (await r.json()).token);
+}</pre>
+<p>Tela protegida: se não há token, mostre o login. Lembre que isso só esconde a tela; quem protege de verdade é a API.</p>`,
+[["controlled input","campo cujo valor vem do estado"],["preventDefault","impede o comportamento padrão"],["localStorage","memória do navegador"],["protected route","rota que exige login"]],
+["Esquecer o <code>e.preventDefault()</code>: a página recarrega.","Mandar o JSON sem o cabeçalho <code>Content-Type</code>.","Guardar a senha no localStorage: guarde só o token."]),
+mk(`<p><b>Chefe: painel do colaborador.</b> Passos pequenos, um commit por passo.</p>
+<p><b>1)</b> Liste os alunos mandando o token: <code>fetch(url, { headers: { Authorization: "Bearer " + token } })</code>.</p>
+<p><b>2)</b> Crie o estado da busca: <code>const [busca, setBusca] = useState("")</code>, ligado a um campo.</p>
+<p><b>3)</b> Filtre sem estragar a lista original:</p>
+<pre>const vistos = alunos.filter(a =&gt;
+  a.nome.toLowerCase().includes(busca.toLowerCase()));</pre>
+<p><b>4)</b> Mostre <code>vistos</code> na tabela e esconda o painel de quem não é colaborador. Pronto quando digitar "an" mostra só os alunos que combinam.</p>`,
+[["filter","filtrar: manter o que passa no teste"],["search","busca"],["dashboard","painel"],["Authorization","cabeçalho com o token"]],
+["Filtrar mudando o próprio array <code>alunos</code>: use uma variável nova.","Esquecer o <code>toLowerCase()</code>: 'ana' não acha 'Ana'.","Mostrar o painel sem checar o perfil."])];
+AU[5]=[
+mk(`<p><b>Hash = trituradora de senhas.</b> Nunca guarde a senha como a pessoa digitou. O <i>hash</i> a transforma numa papa que não volta ao original, mas que dá o mesmo resultado sempre. Se o banco vazar, as senhas não aparecem.</p>
+<pre>const hash = await bcrypt.hash(senha, 10);
+const ok = await bcrypt.compare(senha, hash);</pre>
+<p>No cadastro guarde o <code>hash</code>; no login use <code>compare</code>. A <b>LGPD</b> pede cuidado com dados pessoais: colete só o necessário, deixe a pessoa corrigir ou apagar. Em <b>logs</b> (registro de eventos) nunca ponha senha ou token. E dê a cada perfil só o acesso de que precisa.</p>`,
+[["hash","senha triturada, sem volta"],["bcrypt","biblioteca de hash de senha"],["LGPD","lei brasileira de proteção de dados"],["log","registro de eventos"],["least privilege","acesso mínimo necessário"]],
+["Guardar a senha pura no banco.","Comparar com <code>===</code> em vez de <code>bcrypt.compare</code>.","Imprimir o corpo do pedido de login no log."]),
+mk(`<p><b>Teste = fiscal automático.</b> Em vez de abrir o site e clicar para ver se funciona, você escreve um teste que confere sozinho.</p>
+<pre>test("calcula média", () =&gt; {
+  expect(media(8, 6)).toBe(7);
+});</pre>
+<p>Rode com <code>npm test</code>: verde passou, vermelho falhou e diz onde. Teste o que mais importa: login, cálculo e rotas do CRUD. Depois faça a <b>revisão</b>: nomes claros, sem código repetido, sem senha dentro do código. Corrija o que os testes e a revisão acharem antes de publicar.</p>`,
+[["test","teste automático"],["expect","esperar: comparar resultado"],["code review","revisão de código"],["bug","erro no programa"]],
+["Escrever o teste só depois de publicar.","Testar só o caminho feliz: teste também o erro (senha errada).","Ignorar teste vermelho."]),
+mk(`<p><b>Deploy = publicar.</b> Levar o sistema do seu computador para um servidor na internet.</p>
+<p><b>Segredos</b> (senha do banco, chave do JWT) ficam no arquivo <code>.env</code>, e o <code>.env</code> vai no <code>.gitignore</code>: nunca sobe ao GitHub. No servidor, você cadastra esses valores como <i>environment variables</i> (variáveis de ambiente).</p>
+<p><b>Ordem:</b> 1) banco; 2) API, com a URL do banco; 3) front-end, com a URL da API. Cada peça precisa da anterior pronta.</p>
+<p>Depois de publicar, teste cada URL pelo navegador e anote os endereços. Atenção: a API do ar deve liberar (CORS) o endereço do front-end.</p>`,
+[["deploy","publicar no servidor"],["environment variable","variável de ambiente"],[".env","arquivo de segredos"],["server","servidor"]],
+["Subir o <code>.env</code> para o GitHub.","Front-end apontando para <code>localhost</code> depois de publicado.","Publicar o front antes da API."]),
+mk(`<p><b>Chefe final: o sistema da faculdade (MVP) no ar.</b> MVP é a primeira versão que já funciona. Confira, no endereço publicado:</p>
+<p><b>1)</b> Fazer login como colaborador. <b>2)</b> Cadastrar um aluno. <b>3)</b> Matricular em um curso. <b>4)</b> Buscar o aluno no painel. <b>5)</b> Entrar como aluno e ver só os próprios dados.</p>
+<p><b>Checklist de segurança:</b> senha com hash, token com prazo, <code>.env</code> fora do GitHub, perfis separados, erros sem dados sensíveis.</p>
+<p>Escreva o <code>README.md</code>: o que é o sistema, tecnologias, como rodar e o link. Mostre a alguém e peça para testar. Você terminou a jornada: de variáveis ao sistema no ar.</p>`,
+[["MVP","produto mínimo viável"],["README","arquivo que apresenta o projeto"],["checklist","lista de conferência"],["feedback","retorno de quem testou"]],
+["Querer deixar perfeito antes de publicar: publique o mínimo e melhore.","Esquecer de testar o perfil de aluno.","README sem explicar como rodar."])];
+RKL(e=>{const c=e.target;if(!c.matches||!c.matches("[data-rk]"))return;st.tri[c.dataset.rk]=c.checked;save();
+ const d=c.closest("details"),b=d.querySelectorAll("[data-rk]"),n=[...b].filter(x=>x.checked).length;
+ d.querySelector(".rkc").textContent=n+"/"+b.length;d.querySelector(".bar i").style.width=Math.round(n/b.length*100)+"%"});
+function etp(i,j,s){const e=ET[i]&&ET[i][j];if(!e)return '';const k0='rk_'+i+'_'+j+'_',n=e.tp.filter((_,k)=>st.tri[k0+k]).length;
+ if(s)return ' · <span class="rkc">'+n+'/'+e.tp.length+'</span>';
+ return '<p class="small">Objetivo: '+e.obj+'</p><div class="bar"><i style="width:'+Math.round(n/e.tp.length*100)+'%"></i></div>'+e.tp.map((o,k)=>'<label class="chk li"><input type="checkbox" data-rk="'+k0+k+'" '+(st.tri[k0+k]?'checked':'')+'><span>'+o+'</span></label>').join('')}
+/* Estudo e Aulas nunca ficam "em breve": se o reino/marco ainda não tem aula escrita,
+   monta na hora a partir do roteiro M (estudar, ferramentas, prática, inglês, onde estudar) */
+(function(){
+ const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");
+ const gl=r=>r[3].split(" · ").map(p=>{const k=p.indexOf(" = ");return k<0?null:[p.slice(0,k).trim(),p.slice(k+3).trim()]}).filter(Boolean);
+ const all=[];M.forEach(rn=>rn.forEach(r=>gl(r).forEach(p=>all.push(p))));
+ const quiz=(ps,i,j)=>ps.slice(0,3).map((p,n)=>{
+  const w=[...new Set(all.filter(x=>x[1]!==p[1]).map(x=>x[1]))],o=(i*5+j*3+n*7)%w.length,
+   opts=[w[o],w[(o+11)%w.length]],pos=n%3;
+  if(opts[0]===opts[1])opts[1]=w[(o+1)%w.length];
+  opts.splice(pos,0,p[1]);
+  return ['O que significa "'+p[0]+'"?',opts,pos,p[0]+' = '+p[1]+'.']});
+ const erros=['Só ler e não praticar: programar se aprende digitando, então não pule a prática de 30 minutos.','Não anotar o termo em inglês: reveja o glossário todo dia para fixar.'];
+ M.forEach((rn,i)=>{
+  if(!ST[i])ST[i]=[];if(!AU[i])AU[i]=[];
+  rn.forEach((r,j)=>{
+   const ps=gl(r),ti=esc(L[i].m[j][0]),
+    base='<p><b>📌 O que estudar:</b> '+esc(r[0])+'.</p><p><b>🛠️ Ferramentas:</b> '+esc(r[1])+'</p><p><b>🎬 Onde estudar:</b> '+esc(r[4])+'</p>';
+   if(!ST[i][j])ST[i][j]={t:base+'<p class="mut">🚧 A teoria detalhada deste marco ainda vai ser escrita. Já dá para estudar pelo roteiro acima, praticar e treinar o vocabulário nos cartões e no quiz.</p>',
+    ex:[['Prática guiada: '+esc(r[2]),'Sem gabarito fixo: rode e confira o resultado. Travou? Use o 💬 Pergunte ao Claude na aula.']],
+    d:[esc(r[2])],q:quiz(ps,i,j),f:ps};
+   if(!AU[i][j])AU[i][j]={a:'<p><b>'+ti+'</b></p>'+base+'<p><b>⚔️ Prática (30 min):</b> '+esc(r[2])+'</p><p class="mut">🚧 A explicação passo a passo desta aula ainda vai ser escrita. Use o roteiro acima e pergunte suas dúvidas ao Claude logo abaixo.</p>',
+    g:ps,e:erros,o:[]}})})
+})();
 function estudo(){const c=cur(),sel=N<0?Math.min(c,5):N,lv=L[sel],D=ST[sel];
 RA().innerHTML=`<section class="card"><h1>📚 Estudo</h1><div class="mut">Teoria curta → exercícios → desafio de 30 min → quiz → cartões. Toque num reino:</div>
-<div class="path">${L.map((l,i)=>`<button class="nd${i==sel?" on":""}${i>c?" lk":""}" data-n="${i}">${i<c?"✅":i>c?"🔒":l.e}<small>${i+1}</small></button>`).join("")}</div></section>
-<section class="card"><h2>${lv.e} ${lv.n} · ${lv.t}</h2>${D?lv.m.map((m,j)=>{const x=D[j];return `<details class="mk"><summary>📖 ${m[0]}</summary>
+<div class="path">${L.map((l,i)=>`<button class="nd${i==sel?" on":""}" data-n="${i}">${i<c?"✅":l.e}<small>${i+1}</small></button>`).join("")}</div></section>
+<section class="card"><h2>${lv.e} ${lv.n} · ${lv.t}</h2>${D?lv.m.map((m,j)=>{const x=D[j];return `<details class="mk"><summary>${ET[sel]&&ET[sel][j]?ET[sel][j].i+" Etapa "+(j+1)+" · ":"📖 "}${m[0]}${etp(sel,j,1)}</summary>${etp(sel,j,0)}
 <button class="btn" data-go="${sel}.${j}">📖 Abrir aula completa</button><p><b>📚 Teoria</b></p>${x.t}
 <p><b>✍️ Exercícios</b> (tente antes de abrir o gabarito)</p>${x.ex.map((e,k)=>`<div>${k+1}. ${e[0]}<details><summary class="mut">ver gabarito</summary><pre>${e[1]}</pre></details></div>`).join("")}
 <p><b>⚔️ Desafios de 30 min</b></p><ul>${x.d.map(a=>`<li>${a}</li>`).join("")}</ul>
