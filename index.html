@@ -756,7 +756,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   --lay-pad:14px;--lay-gap:16px;
   --rail-w:clamp(190px,17vw,230px);
   --side-w:clamp(240px,20vw,290px);
-  --stage-max:900px;
+  --stage-max:1180px;
   --nav-cols:7;
   --nav-clear:116px;
   --sat:env(safe-area-inset-top,0px);--sab:env(safe-area-inset-bottom,0px);
@@ -883,7 +883,7 @@ body.dbg-layout #side:empty{display:block}
 
 /* 9. Desktop / notebook: A + B + C ------------------------------------ */
 @media (min-width:1180px){
-  :root{--rail-w:clamp(210px,16vw,240px)}
+  :root{--rail-w:clamp(190px,14vw,230px);--side-w:clamp(220px,17vw,270px)}
   body #app{
     max-width:calc(var(--rail-w) + var(--side-w) + var(--stage-max) + 2*var(--lay-gap) + 2*var(--lay-pad));
     grid-template-columns:var(--rail-w) minmax(0,1fr) var(--side-w);grid-template-areas:"rail stage side";
@@ -5521,6 +5521,7 @@ body .nest{flex-wrap:nowrap;overflow-x:auto}
 .v6-core>.card:nth-child(3):last-child{grid-column:1/-1}
 .v6-core{grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
 .v6-core>#c-walk{grid-column:1/-1}
+@media(min-width:1180px){.v6-core{grid-template-columns:repeat(3,minmax(0,1fr))}}
 .v6-core>#c-wake,.v6-core>#c-fin,.v6-core>#c-rev{min-width:0}
 .card[data-collapsible]>h3{cursor:pointer;display:flex;align-items:center;gap:8px;user-select:none}
 .card[data-collapsible]>h3>.bd{margin-left:auto}
