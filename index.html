@@ -2391,7 +2391,7 @@ function revQueue(){const r=RV(),t=todayS(),deck=revDeck(),due=[],nw=[];
  const room=Math.max(0,REV_NEW-r.nd.n);return{due:due,nw:nw.slice(0,room),newTotal:nw.length,deck:deck}}
 function revStart(){const q=revQueue(),t=todayS();RS={day:t,ids:q.due.map(c=>c.id).concat(q.nw.map(c=>c.id)),i:0,show:false,done:0,again:{}}}
 function revTodayCard(){if(diffDays(st.cfg.start,todayS())<0)return '';const q=revQueue(),tot=q.due.length+q.nw.length,r=RV(),done=r.log[todayS()]||0;
- return '<section class="card"><h3><span class="ic">🔁</span><span class="tt">Revisão de frases (Diário)</span></h3>'+(tot?'<p class="sub"><b>'+tot+'</b> frase'+(tot>1?'s':'')+' para revisar hoje ('+q.due.length+' de revisão + '+q.nw.length+' nova'+(q.nw.length===1?'':'s')+'). Leva uns 5 minutos.</p>':'<p class="sub">✅ Revisão de hoje em dia'+(done?' ('+done+' frases revisadas)':'')+'.</p>')+'<div class="row" style="margin-top:8px"><button class="btn alt sm" data-a="gomente" data-v="rev">'+(tot?'Revisar agora':'Ver revisão')+'</button></div></section>'}
+ return '<section class="card" id="c-rev"><h3><span class="ic">🔁</span><span class="tt">Revisão de frases (Diário)</span></h3>'+(tot?'<p class="sub"><b>'+tot+'</b> frase'+(tot>1?'s':'')+' para revisar hoje ('+q.due.length+' de revisão + '+q.nw.length+' nova'+(q.nw.length===1?'':'s')+'). Leva uns 5 minutos.</p>':'<p class="sub">✅ Revisão de hoje em dia'+(done?' ('+done+' frases revisadas)':'')+'.</p>')+'<div class="row" style="margin-top:8px"><button class="btn alt sm" data-a="gomente" data-v="rev">'+(tot?'Revisar agora':'Ver revisão')+'</button></div></section>'}
 function viewRevisao(){
  const t=todayS(),r=RV(),n=diffDays(st.cfg.start,t);
  if(n<0)return '<section class="card"><div class="empty">As frases começam em '+parse(st.cfg.start).toLocaleDateString('pt-BR')+'.</div></section>';
@@ -5519,6 +5519,9 @@ body .nest{flex-wrap:nowrap;overflow-x:auto}
 .v6-core{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:var(--sp-3);margin-top:var(--sp-3)}
 .v6-core>.card{margin-top:0}
 .v6-core>.card:nth-child(3):last-child{grid-column:1/-1}
+.v6-core{grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
+.v6-core>#c-walk{grid-column:1/-1}
+.v6-core>#c-wake,.v6-core>#c-fin,.v6-core>#c-rev{min-width:0}
 .card[data-collapsible]>h3{cursor:pointer;display:flex;align-items:center;gap:8px;user-select:none}
 .card[data-collapsible]>h3>.bd{margin-left:auto}
 .card[data-collapsible]>h3::after{content:'';flex:none;width:7px;height:7px;margin-left:6px;border-right:2px solid var(--mut);border-bottom:2px solid var(--mut);transform:rotate(45deg) translateY(-2px);transition:transform .2s}
@@ -5600,7 +5603,7 @@ const KEY='olimpo.v6.ui';let ui={open:{}};
 try{const j=JSON.parse(localStorage.getItem(KEY)||'{}');if(j&&typeof j==='object'){ui=j;ui.open=ui.open||{}}}catch(e){}
 const sv=()=>{try{localStorage.setItem(KEY,JSON.stringify(ui))}catch(e){}};
 const q=(s,r)=>(r||document).querySelector(s),qa=(s,r)=>Array.from((r||document).querySelectorAll(s));
-const OPEN=['c-wake','c-fin','c-walk','hx-hero','hx-central'];
+const OPEN=['c-wake','c-fin','c-walk','c-rev','c-trails','hx-hero','hx-central'];
 const HA={'c-wake':'mito1','c-walk':'mito2','hx-central':'mito3','hx-hero':'mito4','c-fin':'mito5'};
 const JA={res:'dev3',metas:'dev5',corpo:'dev4',cen:'dev1'};
 const IC={hoje:'hoje',cal:'cal',reino:'reino',mente:'mente',artes:'artes',jornada:'jornada',templo:'templo'};
@@ -5624,8 +5627,8 @@ function collapsible(v){
   h.setAttribute('tabindex','0');h.setAttribute('role','button');h.setAttribute('aria-expanded',ex?'true':'false')})
 }
 function trails(v){
- if(q('.v6-trails',v))return;const ref=document.getElementById('hx-goalscard')||q('.card[data-collapsible]',v);if(!ref)return;
- const s=document.createElement('section');s.className='card v6-trails';
+ if(q('.v6-trails',v))return;const ref=q('.v6-core',v)||document.getElementById('hx-goalscard')||q('.card[data-collapsible]',v);if(!ref)return;
+ const s=document.createElement('section');s.className='card v6-trails';s.id='c-trails';
  s.innerHTML='<h3><span class="ic">🧭</span><span class="tt">Trilhas de estudo</span></h3><div class="v6-tr">'+
  [['mito','Mitologia Grega','gosub','templo:trof'],['dev','Desenvolvimento pessoal','gosub','jornada:res'],['mat','Matemática','gosub','mente:mat'],['gram','Gramática','gosub','mente:gram'],['prog','Programação','goreino','']]
  .map(x=>'<button type="button" class="v6-tc" data-cd="'+x[0]+'" aria-label="'+x[1]+'" title="'+x[1]+'" data-a="'+x[2]+'"'+(x[3]?' data-v="'+x[3]+'"':'')+'></button>').join('')+'</div>';
@@ -5637,7 +5640,7 @@ function decorate(){
  const s=t==='mente'?SUB.mente:t==='jornada'?SUB.jornada:t==='templo'?(typeof tsub!=='undefined'?tsub:''):'';
  B.dataset.tab=t;B.dataset.sub=s||'';B.dataset.wash=WASH(t,s);
  if(t==='hoje'){
-  const dn=q('.datenav',v),core=['c-wake','c-fin','c-walk'].map(i=>document.getElementById(i)).filter(Boolean);
+  const dn=q('.datenav',v),core=['c-wake','c-fin','c-rev','c-walk'].map(i=>document.getElementById(i)).filter(Boolean);
   if(dn&&core.length&&!q('.v6-core',v)){const g=document.createElement('div');g.className='v6-core';core.forEach(c=>g.appendChild(c));dn.after(g)}
   trails(v);collapsible(v)
  }else if(!q('.v6-banner',v)){
