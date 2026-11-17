@@ -2139,6 +2139,7 @@ function viewHojeBody(){
  if(r&&r.frozen)h+='<div class="empty">❄️ Congelador usado neste dia: a sequência foi mantida. Se você fez algo, é só marcar abaixo.</div>';
  if(s<c.start)h+='<div class="empty">Antes de '+parse(c.start).toLocaleDateString('pt-BR')+' só o estudo de código conta.</div>';
  h+=hxQuick();
+ h+=(window.NUT&&NUT.quick?NUT.quick():'');
  h+=card('c-wake','☀️','Acordar (Apolo)','Wake up','wake','<p class="sub">Bônus de XP até '+minT(tmin(c.wake)+c.wakeGrace)+' · conta como feito até '+c.wakeLimit+'.</p><div class="row"><input type="time" data-f="wake" value="'+esc(d.wake)+'" aria-label="Horário que acordou"><button class="btn" data-a="now">'+L('Acordei!','I woke up!')+'</button></div>');
  h+=card('c-fin','💰','Finanças (Plutos)','Finance','fin','<p class="sub">Registre os gastos no app Finanças: ele marca aqui sozinho. Ou marque manualmente abaixo.</p><div class="row"><button class="btn" onclick="window.finWin=window.open(\'financas.html?v=\'+Date.now(),\'financas\')">💰 Abrir Finanças</button><button class="btn '+(d.fin?'':'alt')+'" data-a="fin">'+(d.fin?'✅ Registrei na planilha':'Registrei na planilha')+'</button><button class="btn ghost" data-a="nosp">'+(d.nosp?'🧘 Dia sem gasto ✔':'🧘 Dia sem gasto')+'</button></div><p class="small" style="margin:8px 0 0">Registrar vale 40 XP; dia sem gasto vale 15 XP e também cumpre o pilar.</p>');
  h+=card('c-walk','🏃','Caminhada (Hermes)','Walk','walk','<div class="walk"><div class="ringw"><svg viewBox="0 0 100 100"><circle class="rb" cx="50" cy="50" r="44"/><circle id="ringc" class="rf" cx="50" cy="50" r="44" transform="rotate(-90 50 50)"/></svg><div class="rt"><b id="kmv">0</b><small>de '+nf(c.kmGoal)+' km</small></div></div><div class="wcol"><div><span class="lab">Quilômetros (pode passar da meta)</span><input type="number" inputmode="decimal" step="0.1" min="0" data-f="km" value="'+(d.km||'')+'" placeholder="0"></div><div><span class="lab">Minutos andando</span><input type="number" inputmode="numeric" min="0" data-f="mins" value="'+(d.mins||'')+'" placeholder="0"></div></div></div><div class="chips" style="margin-top:10px"><button class="chip" data-a="km+" data-v="1">+1 km</button><button class="chip" data-a="km+" data-v="5">+5 km</button><button class="chip" data-a="kmset" data-v="'+c.kmGoal+'">Meta ('+nf(c.kmGoal)+')</button><button class="chip" data-a="km+" data-v="-1">−1 km</button></div><label class="chk" style="margin-top:12px"><input type="checkbox" data-f="minWalk" '+(d.minWalk?'checked':'')+'><span>Caminhada mínima: vale '+c.minMin+' min em dia ruim.</span></label><p class="sub" id="kinfo" style="margin-bottom:0"></p>');
@@ -5814,6 +5815,7 @@ function decorate(){
  if(t==='hoje'){
   const dn=q('.datenav',v),core=['c-wake','c-fin','c-rev','c-walk','c-train'].map(i=>document.getElementById(i)).filter(Boolean);
   if(dn&&core.length&&!q('.v6-core',v)){const g=document.createElement('div');g.className='v6-core';core.forEach(c=>g.appendChild(c));dn.after(g)}
+  {const hq=document.getElementById('hq-quick');if(dn&&hq)dn.after(hq)}
   trails(v);collapsible(v)
  }else if(!q('.v6-banner',v)){
   const k=BN(t,s);if(k){const b=document.createElement('div');b.className='v6-banner v6-bn-'+k;
@@ -5917,6 +5919,63 @@ try{navIcons();decorate()}catch(e){console.warn('v6 init',e)}
 .nu-fi span{float:right;color:var(--nug2);font-size:12px}.nu-fi small{display:block;color:var(--mut);font-weight:600;font-size:11.5px;margin-top:2px}
 .nu-rem .btn{width:100%}
 @media(prefers-reduced-motion:reduce){.nu-tile,.nu-bt i{transition:none}}
+</style>
+<style id="hq-css">
+/* ===== Atalhos rápidos da tela Hoje (hq-) · escopo próprio ===== */
+.hq{margin:12px 0}
+.hq>h3{display:inline-flex;align-items:center;gap:8px;margin:0 0 8px;padding:6px 14px;border:2px solid var(--line);border-radius:999px;background:var(--card);font:800 15px Cinzel,Georgia,serif;color:var(--gold2)}
+.hq-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.hq-wide{grid-column:1/-1}
+.hq-box{position:relative;min-width:0;padding:10px 11px 11px;border:2px solid var(--line);border-radius:18px;background:var(--card2);color:var(--ink)}
+.hq-h{display:flex;align-items:center;gap:6px;min-height:26px;margin-bottom:4px}
+.hq-h .nu-i{flex:none}
+.hq-h b{font:800 13.5px 'Nunito',sans-serif;white-space:nowrap}
+.hq-bd{flex:1;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-size:11.5px;color:var(--mut);font-weight:700}
+.hq-h b:last-child,.hq-h .hq-fl{flex:1}
+.hq-lk{margin-left:auto;flex:none;border:0;background:none;color:var(--gold2);font:800 12px 'Nunito',sans-serif;padding:6px 2px;min-height:32px;cursor:pointer;white-space:nowrap}
+.hq-w .hq-lk,.hq-e .hq-lk{font-size:22px;line-height:1;min-width:32px}
+.hq-v{font:700 12.5px 'Nunito',sans-serif;color:var(--mut);margin-top:2px}
+.hq-v b{font:800 24px Cinzel,Georgia,serif;color:var(--ink)}
+.hq-sm{display:block;margin-top:3px;font-size:11.5px;color:var(--mut);font-weight:700;line-height:1.3}
+.hq-pb{height:12px;border-radius:8px;background:rgba(255,255,255,.14);overflow:hidden;margin:6px 0 2px}
+.hq-pb i{display:block;height:100%;border-radius:8px;background:linear-gradient(90deg,#38b2fc,#1d8fe8);transition:width .5s}
+.hq-act{display:flex;gap:8px;margin-top:9px}
+.hq-b{flex:1;min-height:44px;border:0;border-radius:14px;padding:8px 10px;font:900 14px 'Nunito',sans-serif;background:linear-gradient(180deg,#6ccaff,#2b9cf0);color:#06223d;box-shadow:0 3px 0 #1479d4;cursor:pointer}
+.hq-b:active{transform:translateY(2px);box-shadow:0 1px 0 #1479d4}
+.hq-b.alt{flex:none;width:46px;padding:8px 0;background:transparent;color:var(--ink);border:2px solid var(--line);box-shadow:none;font-size:17px}
+.hq-b:disabled{opacity:.4;pointer-events:none}
+.hq-en{display:flex;align-items:center;gap:8px}
+.hq-ring{width:58px;height:58px;flex:none}
+.hq-rt{fill:none;stroke:rgba(255,255,255,.16);stroke-width:7}
+.hq-rg{fill:none;stroke-width:7;stroke-linecap:round;transition:stroke-dasharray .6s}
+.hq-rg.lo{stroke:var(--gold)}.hq-rg.ok{stroke:var(--laurel)}.hq-rg.hi{stroke:var(--orange)}
+.hq-rtx{font:800 12.5px 'Nunito',sans-serif;fill:var(--ink)}
+.hq-ch{position:relative;display:flex;gap:5px;height:78px;margin-top:8px}
+.hq-col{flex:1;min-width:0;display:flex;flex-direction:column}
+.hq-bw{flex:1;display:flex;align-items:flex-end;justify-content:center}
+.hq-bar{display:block;width:100%;max-width:26px;border-radius:4px 4px 2px 2px;background:rgba(255,255,255,.34);transition:height .5s}
+.hq-col.on .hq-bar{background:var(--gold)}
+.hq-col em{height:14px;font:700 10px/14px 'Nunito',sans-serif;font-style:normal;text-align:center;color:var(--mut)}
+.hq-col.on em{color:var(--gold2)}
+.hq-tl{position:absolute;left:0;right:0;height:0;border-top:1.5px dashed var(--orange);pointer-events:none}
+.hq-car{position:relative}
+.hq-track{display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x proximity;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;scrollbar-width:thin;padding:8px 2px 8px}
+.hq-tr{position:relative;flex:none;width:80px;scroll-snap-align:start;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px 6px;border:2px solid var(--line);border-radius:14px;background:var(--card);color:var(--ink);font-family:inherit;cursor:pointer;transition:transform .15s,border-color .2s}
+.hq-tr:active{transform:scale(.96)}
+.hq-tr b{display:flex;align-items:center;justify-content:center;min-height:24px;font:800 10.5px/1.15 'Nunito',sans-serif;text-align:center}
+.hq-tr.on{border-color:var(--laurel);box-shadow:0 0 0 2px rgba(70,194,122,.3)}
+.hq-ic{display:block;flex:none;width:58px;max-width:none;margin:0}
+.hq-ck{position:absolute;top:-7px;right:-5px;width:20px;height:20px;border-radius:50%;background:var(--laurel);color:#06280f;font:900 12px/20px sans-serif;text-align:center;font-style:normal;box-shadow:0 1px 3px rgba(0,0,0,.5)}
+.hq-ar{display:none}
+@media(hover:hover) and (pointer:fine){.hq-ar{display:grid;place-items:center;position:absolute;top:44%;transform:translateY(-50%);width:30px;height:30px;padding:0;border-radius:50%;border:2px solid var(--line);background:var(--card2);color:var(--ink);font:900 18px/1 sans-serif;cursor:pointer;z-index:2}.hq-ar.l{left:-10px}.hq-ar.r{right:-10px}}
+.hq-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.hq .nu-qc{min-height:42px;padding:6px 12px;font-size:13px}
+.hq .nu-qc span{font-size:18px}
+.hq button:focus-visible{outline:3px solid var(--gold2);outline-offset:2px}
+/* a folha de registro é criada fora do container .nu; sem estas variáveis ela ficava transparente e sem borda */
+.nu-sheet{--nug:#c99a2e;--nug2:#ffdf7a;--nud:#5a4208;--nup:linear-gradient(160deg,rgba(40,31,62,.99),rgba(16,12,30,.99));color:var(--ink)}
+.nu-sin{background-color:#161027}
+@media(prefers-reduced-motion:reduce){.hq-pb i,.hq-rg,.hq-tr{transition:none}}
 </style>
 <style id="nu-quick-css">
 .nu-wq{background:linear-gradient(165deg,#38b2fc,#1d8fe8);color:#fff;border-radius:22px;padding:14px 16px 16px;margin:12px 0;box-shadow:0 8px 22px rgba(20,110,200,.35);border:2px solid rgba(255,255,255,.35)}
@@ -6029,6 +6088,13 @@ const NU_FOODS=[
 ['Pão de queijo','Salgados',363,5.1,34.2,24.6,0.6,null,464,null,{'unidade':30},'e'],
 ['Pizza de mussarela','Salgados',287,12.6,33.3,11.6,1.8,null,560,null,{'fatia':110},'e'],
 ['Bolo simples (baunilha)','Doces e bolos',360,6.0,57.0,12.0,1.0,28,300,3.0,{'fatia':60,'fatia grande':90},'e'],
+['Bolo de chocolate','Doces e bolos',410,6.2,54.7,18.5,null,null,null,null,{'fatia':60,'fatia grande':90}],
+['Bolo de chocolate com cobertura de chocolate','Doces e bolos',430,5.5,56,20.5,null,null,null,null,{'fatia':70,'fatia grande':100},'e'],
+['Bolo de cenoura','Doces e bolos',349,4.2,44.3,17.3,null,null,null,null,{'fatia':60,'fatia grande':90},'e'],
+['Bolo de cenoura com cobertura de chocolate','Doces e bolos',370,4.5,50,16.5,null,null,null,null,{'fatia':70,'fatia grande':100},'e'],
+['Bolo de coco','Doces e bolos',333,5.7,52.3,11.3,null,null,null,null,{'fatia':60,'fatia grande':90}],
+['Bolo de milho','Doces e bolos',311,4.8,45.1,12.4,null,null,null,null,{'fatia':60,'fatia grande':90}],
+['Bolo de laranja','Doces e bolos',371,4.8,58.3,13.2,null,null,null,null,{'fatia':60,'fatia grande':90},'e'],
 ['Bolinho de carne de soja (PTS)','Carnes',185,18,12,7,4,1,420,1.2,{'unidade':30,'porção':150},'e'],
 ['Leite com Nescau','Bebidas',88,3.3,11.6,3.2,0.7,9.8,55,2.0,{'copo':230},'e'],
 ['Cuscuz com manteiga','Cereais',142,2.1,24.1,4.6,2.0,null,254,2.4,{'porção':105,'fatia':105},'e'],
@@ -6233,13 +6299,15 @@ function needProf(){return '<div class="nu-warn">'+I('alerta',22)+'<span>Preench
 const TILES=[['perfil','Perfil Corporal'],['banquete','Banquete do Herói'],['energia','Energia Vital'],['fonte','Fonte da Vida'],['evolucao','Evolução Corporal'],['treino','Treinamento do Guerreiro'],['cronicas','Crônicas da Evolução'],['asclepio','Sabedoria de Asclépio'],['conquistas','Conquistas'],['config','Configurações'],['ajuda','Ajuda'],['voltar','Voltar']];
 /* ===== Atalhos rápidos do santuário: água e comidas do dia a dia ===== */
 const QF=[
- ['Bolo simples (baunilha)','Bolo','🍰','fatia',1],
+ ['Bolo simples (baunilha)','Bolo','🍰','fatia',1,'bolo'],
  ['Bolinho de carne de soja (PTS)','Bolinhas de carne de soja','🧆','unidade',3],
  ['Leite com Nescau','Leite com Nescau','🥛','copo',1],
  ['Cuscuz de milho cozido','Cuscuz','🌽','fatia',1],
  ['Cuscuz com manteiga','Cuscuz com manteiga','🧈','porção',1],
  ['Carne de boi (patinho)','Carne de boi','🥩','bife',1]
 ];
+/* sabores disponíveis no atalho (nome na base, rótulo curto) */
+const QFL={bolo:[['Bolo simples (baunilha)','Baunilha'],['Bolo de chocolate','Chocolate'],['Bolo de chocolate com cobertura de chocolate','Chocolate c/ cobertura'],['Bolo de cenoura','Cenoura'],['Bolo de cenoura com cobertura de chocolate','Cenoura c/ cobertura'],['Bolo de coco','Coco'],['Bolo de milho','Milho'],['Bolo de laranja','Laranja']]};
 function autoMeal(){const d=new Date(),h=d.getHours()+d.getMinutes()/60;return h<10?'cafe':h<11.5?'lm':h<14.5?'alm':h<17.5?'lt':h<21?'jan':'cei'}
 function glassSvg(f){
  f=Math.max(0,Math.min(1,f));
@@ -6264,7 +6332,15 @@ function quickFoods(){
 function qSheet(i){
  const q=QF[i],f=allFoods().find(x=>x.n===q[0]);if(!f){toast('Alimento não encontrado.');return}
  NS.ctx={meal:autoMeal(),fid:f.id,qi:i};
- openSheet('<div class="nu-sh"><h3>'+q[2]+' '+esc(q[1])+'</h3><button class="btn ghost sm" data-nu="sclose">Fechar</button></div><small class="nu-s">Refeição</small><div class="nu-qchips" id="nu-qm">'+MEALS.map(m=>'<button class="nu-qc'+(m[0]===NS.ctx.meal?' on':'')+'" data-nu="qmeal" data-v="'+m[0]+'">'+m[1]+'</button>').join('')+'</div><div class="nu-form"><label class="nu-f"><span>Quantidade</span><input id="nu-q" data-nui="pq" type="number" inputmode="decimal" step="any" min="0" value="'+q[4]+'"></label><label class="nu-f"><span>Unidade</span><select id="nu-u" data-nuc="pq">'+unitOpts(f,q[3])+'</select></label></div><div id="nu-pv" class="nu-pv"></div><div class="nu-row"><button class="btn" data-nu="addok">Adicionar</button></div>');
+ openSheet('<div class="nu-sh"><h3>'+q[2]+' '+esc(q[1])+'</h3><button class="btn ghost sm" data-nu="sclose">Fechar</button></div><small class="nu-s">Refeição</small><div class="nu-qchips" id="nu-qm">'+MEALS.map(m=>'<button class="nu-qc'+(m[0]===NS.ctx.meal?' on':'')+'" data-nu="qmeal" data-v="'+m[0]+'">'+m[1]+'</button>').join('')+'</div>'+(q[5]&&QFL[q[5]]?'<small class="nu-s">Sabor</small><div class="nu-qchips" id="nu-qf">'+QFL[q[5]].map((x,j)=>'<button type="button" class="nu-qc'+(x[0]===q[0]?' on':'')+'" data-nu="qflav" data-v="'+j+'">'+esc(x[1])+'</button>').join('')+'</div>':'')+'<div class="nu-form"><label class="nu-f"><span>Quantidade</span><input id="nu-q" data-nui="pq" type="number" inputmode="decimal" step="any" min="0" value="'+q[4]+'"></label><label class="nu-f"><span>Unidade</span><select id="nu-u" data-nuc="pq">'+unitOpts(f,q[3])+'</select></label></div><div id="nu-pv" class="nu-pv"></div><div class="nu-row"><button class="btn" data-nu="addok">Adicionar</button></div>');
+ pqPrev()}
+function qFlav(v,b){
+ if(!NS.ctx||NS.ctx.qi==null)return;
+ const g=QFL[QF[NS.ctx.qi][5]],fl=g&&g[+v],f=fl&&allFoods().find(x=>x.n===fl[0]);
+ if(!f){toast('Sabor não encontrado.');return}
+ NS.ctx.fid=f.id;
+ document.querySelectorAll('#nu-qf .nu-qc').forEach(x=>x.classList.toggle('on',x===b));
+ const sel=q1('#nu-u');if(sel){const keep=sel.value;sel.innerHTML=unitOpts(f,keep)}
  pqPrev()}
 function qMeal(v,b){if(!NS.ctx)return;NS.ctx.meal=v;document.querySelectorAll('#nu-qm .nu-qc').forEach(x=>x.classList.toggle('on',x===b))}
 function vHub(){
@@ -6783,7 +6859,9 @@ function act(a,v,el){
   case 'recsave':recSave();return;
   case 'recdel':if(confirm('Excluir esta receita?')){ens().recipes=ens().recipes.filter(x=>x.id!==NS.ctx.rec.id);idx=null;touch();save();closeSheet();render()}return;
   case 'qfood':qSheet(+v);return;
- case 'qmeal':qMeal(v,b);return;
+ case 'qmeal':qMeal(v,el);return;
+ case 'qflav':qFlav(v,el);return;
+ case 'hqscroll':{const t=q1('#hq-track');if(t)t.scrollBy({left:(+v)*Math.max(120,t.clientWidth*.8),behavior:'smooth'});return}
  case 'qmore':addFoodSheet(autoMeal());return;
  case 'water':addWater(v);return;
   case 'wcustom':addWater((q1('#nu-wm')||{}).value);return;
@@ -6829,6 +6907,46 @@ function vAjuda(){
  +it('Crônicas da Evolução','relatórios por dia, semana, mês ou período, com exportação em Excel e PDF.')
  +it('Sabedoria de Asclépio','observações automáticas por regras, sem diagnóstico. Nenhuma IA externa é necessária.')
  +'<p class="nu-disc">Fontes: base inicial com valores de referência da TACO; importe a TACO/TBCA oficial em Configurações. Dados ausentes aparecem como “—”. Todas as metas são estimativas e podem ser revistas com um nutricionista. Este recurso não substitui orientação médica.</p></section></div>'}
+/* ===== Mini atalhos da tela Hoje: água, treinos, energia do dia e comidas ===== */
+const HQN={muay:'Muay Thai',bike:'Bicicleta',stairs:'Escada',gym:'Musculação',rope:'Corda',abs:'Abdominais',plank:'Prancha',neck:'Pescoço',burpee:'Burpee',pullup:'Barra fixa'};
+const HQW=['D','S','T','Q','Q','S','S'];
+const hqHead=(ic,t,bd,lk,lt)=>'<div class="hq-h">'+ic+'<b>'+t+'</b>'+(bd?'<span class="hq-bd">'+bd+'</span>':'')+(lk?'<button type="button" class="hq-lk" data-nu="open" data-v="'+lk+'" aria-label="Abrir '+t+'">'+(lt||'Abrir ›')+'</button>':'')+'</div>';
+function hqWater(){
+ const T=dayTot(cur),G=goals(),u=dn(cur),cup=ens().cfg.cup||250,goal=G.water>0?G.water:2000,ml=T.water;
+ const pc=Math.min(100,ml/goal*100),left=Math.max(0,Math.ceil((goal-ml)/cup-1e-9));
+ return '<div class="hq-box hq-w">'+hqHead(I('gota',22),'Água','','fonte','›')
+  +'<div class="hq-v"><b>'+nf(ml,0)+'</b> / '+nf(goal,0)+' ml</div>'
+  +'<div class="hq-pb" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+r0(pc)+'" aria-label="Meta de água"><i style="width:'+pc+'%"></i></div>'
+  +'<small class="hq-sm">'+(ml>=goal?'Meta do dia concluída!':'faltam '+left+' '+(left===1?'copo':'copos'))+'</small>'
+  +'<div class="hq-act"><button type="button" class="hq-b" data-nu="water" data-v="'+cup+'">+ '+cup+' ml</button><button type="button" class="hq-b alt" data-nu="wundo" aria-label="Desfazer o último registro de água"'+(u&&u.w.length?'':' disabled')+'>↩</button></div></div>'}
+function hqEnergy(){
+ const T=dayTot(cur),G=goals(),tg=G.ok&&G.k>0?G.k:0,k=T.k||0,pr=tg>0?k/tg:0;
+ const cls=tg<=0?'lo':pr>1.15?'hi':pr>=.85?'ok':'lo',R=26,C=2*Math.PI*R,dash=tg>0?Math.min(1,pr)*C:0;
+ const st2=tg<=0?'sem meta (faça o Perfil)':pr<.85?'faltam '+nf(tg-k,0)+' kcal':pr<=1.15?'dentro da faixa ideal':'acima da meta';
+ const ring='<svg viewBox="0 0 64 64" class="hq-ring" aria-hidden="true"><circle cx="32" cy="32" r="'+R+'" class="hq-rt"/><circle cx="32" cy="32" r="'+R+'" class="hq-rg '+cls+'" transform="rotate(-90 32 32)" stroke-dasharray="'+dash.toFixed(1)+' '+C.toFixed(1)+'"/><text x="32" y="36" text-anchor="middle" class="hq-rtx">'+(tg>0?r0(pr*100)+'%':'—')+'</text></svg>';
+ const days=[];for(let i=6;i>=0;i--){const s=addDays(cur,-i);days.push({s:s,v:r0(dayTot(s).k)})}
+ const mx=Math.max(1,tg,...days.map(d=>d.v))*1.1;let bars='';
+ days.forEach(d=>{const on=d.s===cur?' on':'';
+  bars+='<div class="hq-col'+on+'" title="'+dBR(d.s)+': '+nf(d.v,0)+' kcal"><div class="hq-bw"><span class="hq-bar" style="height:'+(d.v>0?Math.max(d.v/mx*100,3):0).toFixed(1)+'%"></span></div><em>'+HQW[parse(d.s).getDay()]+'</em></div>'});
+ const tl=tg>0?'<i class="hq-tl" style="bottom:calc(14px + (100% - 14px)*'+(tg/mx).toFixed(3)+')"></i>':'';
+ const mac=G.ok?'P '+nf(T.p,0)+'/'+nf(G.p,0)+' · C '+nf(T.c,0)+'/'+nf(G.c,0)+' · G '+nf(T.f,0)+'/'+nf(G.f,0)+' g':'P '+nf(T.p,0)+' · C '+nf(T.c,0)+' · G '+nf(T.f,0)+' g';
+ return '<div class="hq-box hq-e">'+hqHead(I('o_fogo',22),'Energia do dia','','energia','›')
+  +'<div class="hq-en">'+ring+'<div class="hq-v"><b>'+nf(k,0)+'</b> kcal<small class="hq-sm">'+st2+'</small></div></div>'
+  +'<div class="hq-ch" role="img" aria-label="Calorias dos últimos sete dias'+(tg>0?' (linha tracejada: meta de '+nf(tg,0)+' kcal)':'')+'">'+tl+bars+'</div>'
+  +'<small class="hq-sm">'+mac+'</small></div>'}
+function hqTrain(){
+ const d=getDay(cur),n=trainN(d),kc=(d.tk||[]).reduce((a,v)=>a+(v||0),0);
+ const tiles=TRN.map((t,i)=>{const on=trainOk(d,i),sm=trSum(d,i);
+  return '<button type="button" class="hq-tr'+(on?' on':'')+'" data-a="trdone" data-v="'+i+'" title="'+esc(t[1]+(sm?' · '+sm:''))+'" aria-label="'+esc(t[1]+(on?' (concluído, toque para editar)':' (toque para registrar)'))+'"><span class="oly-pn pn-'+t[0]+' hq-ic" role="img" aria-hidden="true"></span><b>'+esc(HQN[t[0]]||t[1])+'</b>'+(on?'<i class="hq-ck" aria-hidden="true">✓</i>':'')+'</button>'}).join('');
+ return '<div class="hq-box hq-t hq-wide">'+hqHead(I('halter',22),'Treinos',n+'/'+TRN.length+' hoje'+(kc>0?' · ≈ '+nf(kc,0)+' kcal':''),'treino')
+  +'<div class="hq-car"><button type="button" class="hq-ar l" data-nu="hqscroll" data-v="-1" aria-label="Treinos anteriores">‹</button><div class="hq-track" id="hq-track" role="group" aria-label="Escolha um treino">'+tiles+'</div><button type="button" class="hq-ar r" data-nu="hqscroll" data-v="1" aria-label="Próximos treinos">›</button></div></div>'}
+function hqFoods(){
+ const T=dayTot(cur);
+ return '<div class="hq-box hq-f hq-wide">'+hqHead(I('salada',22),'Comi agora',T.n?T.n+(T.n===1?' item':' itens')+' · '+nf(T.k,0)+' kcal':'nada registrado','banquete','Banquete ›')
+  +'<div class="hq-chips">'+QF.map((q,i)=>'<button type="button" class="nu-qc" data-nu="qfood" data-v="'+i+'"><span aria-hidden="true">'+q[2]+'</span>'+q[1]+'</button>').join('')+'<button type="button" class="nu-qc" data-nu="qmore">＋ Outro</button></div></div>'}
+function quickToday(){
+ try{ens();return '<section class="hq" id="hq-quick" aria-label="Atalhos rápidos"><h3><span aria-hidden="true">⚡</span>Atalhos rápidos</h3><div class="hq-grid">'+hqWater()+hqEnergy()+hqTrain()+hqFoods()+'</div></section>'}
+ catch(e){console.warn('atalhos',e);return ''}}
 /* ===== integração com o programa ===== */
 function todayCard(d){
  const n=trainN(d),kc=(d.tk||[]).reduce((a,v)=>a+(v||0),0);
@@ -6841,9 +6959,10 @@ document.addEventListener('input',e=>{const t=e.target;if(t&&t.dataset&&t.datase
 document.addEventListener('change',e=>{const t=e.target;if(t&&t.dataset&&t.dataset.nuc)chg(t.dataset.nuc,t)});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&q1('#nu-sheet.on'))closeSheet()});
 document.addEventListener('click',e=>{if(e.target.id==='nu-sheet')closeSheet()});
-const NUT=window.NUT={view:view,open:open,todayCard:todayCard,bonusXP:bonusXP,stats:stats,calc:calc,goals:goals,analyzers:[],analyze:analyze,_:{dn:dn,dayTot:dayTot,search:search,mkEntry:mkEntry,allFoods:allFoods,importDB:importDB,exportRows:exportRows,zip:zip,NS:NS}};
+const NUT=window.NUT={view:view,open:open,todayCard:todayCard,quick:quickToday,bonusXP:bonusXP,stats:stats,calc:calc,goals:goals,analyzers:[],analyze:analyze,_:{dn:dn,dayTot:dayTot,search:search,mkEntry:mkEntry,allFoods:allFoods,importDB:importDB,exportRows:exportRows,zip:zip,NS:NS}};
 injectCss();regAch();
-const _r=render;render=function(){const r=_r.apply(this,arguments);try{if(tab==='jornada'&&SUB.jornada==='nut'){if(NS.mod==='perfil')liveProf();if(NS.mod==='treino')actPrev()}}catch(e){console.warn('nut',e)}return r};
+document.addEventListener('scroll',e=>{const t=e.target;if(t&&t.id==='hq-track')NS.hqx=t.scrollLeft},true);
+const _r=render;render=function(){const r=_r.apply(this,arguments);try{const tk=q1('#hq-track');if(tk&&NS.hqx)tk.scrollLeft=NS.hqx}catch(e){}try{if(tab==='jornada'&&SUB.jornada==='nut'){if(NS.mod==='perfil')liveProf();if(NS.mod==='treino')actPrev()}}catch(e){console.warn('nut',e)}return r};
 try{render()}catch(e){console.warn('nut init',e)}
 })();
 </script>
